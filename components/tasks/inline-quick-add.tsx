@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { parseQuickTask } from "@/utils/parse-quick-task";
 import { tasksService } from "@/services/tasks.service";
+import { HighlightedQuickInput } from "@/components/tasks/highlighted-quick-input";
 
 export function InlineQuickAdd({
   placeholder,
@@ -30,6 +30,8 @@ export function InlineQuickAdd({
         priority: parsed.priority ?? undefined,
         dueDate: parsed.dueDate,
         dueTime: parsed.dueTime,
+        dueTimeEnd: parsed.dueTimeEnd,
+        recurrence: parsed.recurrence,
         tagNames: parsed.tagNames,
         projectId,
       });
@@ -43,17 +45,12 @@ export function InlineQuickAdd({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex items-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] px-3.5 py-2.5 focus-within:border-[var(--color-accent)]"
-    >
-      <Plus className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
-      <input
+    <form onSubmit={handleSubmit}>
+      <HighlightedQuickInput
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={setValue}
         placeholder={placeholder ?? "Preparar relatório mensal"}
         disabled={isSubmitting}
-        className="w-full bg-transparent text-sm text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] outline-none"
       />
     </form>
   );

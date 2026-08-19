@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { parseQuickTask } from "@/utils/parse-quick-task";
+import { HighlightedQuickInput } from "@/components/tasks/highlighted-quick-input";
+import { parseQuickTask, RECURRENCE_LABELS } from "@/utils/parse-quick-task";
 import { tasksService } from "@/services/tasks.service";
 import { PRIORITY_LABELS } from "@/lib/labels";
 
@@ -31,6 +31,8 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
         priority: parsed.priority ?? undefined,
         dueDate: parsed.dueDate,
         dueTime: parsed.dueTime,
+        dueTimeEnd: parsed.dueTimeEnd,
+        recurrence: parsed.recurrence,
         tagNames: parsed.tagNames,
       });
       toast.success("Tarefa adicionada à Inbox");
@@ -48,14 +50,14 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
       open={open}
       onClose={onClose}
       title="Adicionar tarefa"
-      description="Escreve em linguagem natural — datas, #etiquetas e !prioridade são reconhecidas automaticamente."
+      description="Escreve em linguagem natural — datas, horas, #etiquetas, !prioridade e recorrência são reconhecidas automaticamente."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          autoFocus
-          placeholder="Reunião amanhã às 14h #trabalho !alta"
+        <HighlightedQuickInput
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={setValue}
+          autoFocus
+          placeholder="Reunião das 14h às 16h toda sexta-feira #trabalho !alta"
         />
 
         {preview && (
@@ -69,11 +71,23 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
               <span className="rounded-full bg-[var(--color-surface-alt)] px-2.5 py-1 text-[var(--color-secondary)]">
                 {preview.dueDate}
                 {preview.dueTime ? ` · ${preview.dueTime}` : ""}
+                {preview.dueTimeEnd ? `–${preview.dueTimeEnd}` : ""}
+              </span>
+            )}
+            {!preview.dueDate && preview.dueTime && (
+              <span className="rounded-full bg-[var(--color-surface-alt)] px-2.5 py-1 text-[var(--color-secondary)]">
+                {preview.dueTime}
+                {preview.dueTimeEnd ? `–${preview.dueTimeEnd}` : ""}
               </span>
             )}
             {preview.priority && (
               <span className="rounded-full bg-[var(--color-surface-alt)] px-2.5 py-1 text-[var(--color-warning)]">
                 {PRIORITY_LABELS[preview.priority]}
+              </span>
+            )}
+            {preview.recurrence?.frequency && (
+              <span className="rounded-full bg-[var(--color-surface-alt)] px-2.5 py-1 text-[var(--color-success)]">
+                {RECURRENCE_LABELS[preview.recurrence.frequency]}
               </span>
             )}
             {preview.tagNames.map((tag) => (

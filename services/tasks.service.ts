@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Task, TaskPriority } from "@/types/database";
+import type { Task, TaskPriority, Recurrence } from "@/types/database";
 
 export interface CreateTaskInput {
   title: string;
@@ -7,6 +7,8 @@ export interface CreateTaskInput {
   projectId?: string | null;
   dueDate?: string | null;
   dueTime?: string | null;
+  dueTimeEnd?: string | null;
+  recurrence?: Recurrence | null;
   priority?: TaskPriority;
   tagNames?: string[];
 }
@@ -36,6 +38,8 @@ export const tasksService = {
         project_id: input.projectId ?? null,
         due_date: input.dueDate ?? null,
         due_time: input.dueTime ?? null,
+        due_time_end: input.dueTimeEnd ?? null,
+        recurrence: input.recurrence ?? null,
         priority: input.priority ?? "sem_prioridade",
         status: "pendente",
       })

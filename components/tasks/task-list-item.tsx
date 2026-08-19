@@ -1,4 +1,4 @@
-import { Circle } from "lucide-react";
+import { Circle, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PRIORITY_COLOR_VAR } from "@/lib/labels";
 import type { Task } from "@/types/database";
@@ -14,9 +14,11 @@ export function TaskListItem({ task }: { task: Task }) {
       <div className="min-w-0 flex-1">
         <p className={cn("truncate text-sm font-medium text-[var(--color-ink)]")}>{task.title}</p>
         {(task.due_date || task.due_time) && (
-          <p className="text-xs text-[var(--color-ink-muted)]">
+          <p className="flex items-center gap-1 text-xs text-[var(--color-ink-muted)]">
             {task.due_date}
             {task.due_time ? ` · ${task.due_time}` : ""}
+            {task.due_time_end ? `–${task.due_time_end}` : ""}
+            {task.recurrence && <Repeat className="h-3 w-3" />}
           </p>
         )}
       </div>

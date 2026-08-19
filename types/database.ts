@@ -70,6 +70,7 @@ export interface Task {
   description: string | null;
   due_date: string | null; // YYYY-MM-DD
   due_time: string | null; // HH:mm
+  due_time_end: string | null; // HH:mm — fim do intervalo, quando existe
   priority: TaskPriority;
   status: TaskStatus;
   is_important: boolean;
