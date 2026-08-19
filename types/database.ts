@@ -72,6 +72,7 @@ export interface Task {
   due_time: string | null; // HH:mm
   priority: TaskPriority;
   status: TaskStatus;
+  is_important: boolean;
   recurrence: Recurrence | null;
   reminder_at: string | null; // timestamptz
   position: number;

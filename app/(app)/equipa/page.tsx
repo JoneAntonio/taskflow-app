@@ -5,7 +5,7 @@ import { AgentCard } from "@/components/team/agent-card";
 import { AddAgentButton } from "@/components/team/add-agent-button";
 import type { TeamAgent } from "@/types/team-maturity";
 
-export const metadata: Metadata = { title: "Maturidade da Equipa — TaskFlow" };
+export const metadata: Metadata = { title: "Maturidade da Equipa — JAFLOW" };
 
 export default async function EquipaPage() {
   const supabase = await createClient();

@@ -23,9 +23,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TaskFlow — organiza o teu fluxo",
+  title: "JAFLOW — organiza o teu fluxo",
   description:
-    "TaskFlow é a aplicação de produtividade que junta tarefas, projetos, hábitos e foco num único lugar.",
+    "JAFLOW é a aplicação de produtividade que junta tarefas, projetos, hábitos e foco num único lugar.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

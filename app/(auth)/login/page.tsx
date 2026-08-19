@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 
-export const metadata: Metadata = { title: "Iniciar sessão — TaskFlow" };
+export const metadata: Metadata = { title: "Iniciar sessão — JAFLOW" };
 
 export default function LoginPage() {
   return (

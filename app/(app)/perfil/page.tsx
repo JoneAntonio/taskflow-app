@@ -5,7 +5,7 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
-export const metadata: Metadata = { title: "Perfil — TaskFlow" };
+export const metadata: Metadata = { title: "Perfil — JAFLOW" };
 
 export default async function PerfilPage() {
   const supabase = await createClient();

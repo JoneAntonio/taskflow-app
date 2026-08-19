@@ -8,7 +8,7 @@ import { WeeklyProductivityChart } from "@/components/dashboard/weekly-productiv
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-export const metadata: Metadata = { title: "Dashboard — TaskFlow" };
+export const metadata: Metadata = { title: "Dashboard — JAFLOW" };
 
 export default async function DashboardPage() {
   const supabase = await createClient();

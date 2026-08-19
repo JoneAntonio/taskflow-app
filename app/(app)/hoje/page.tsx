@@ -4,7 +4,7 @@ import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import type { Task } from "@/types/database";
 
-export const metadata: Metadata = { title: "Hoje — TaskFlow" };
+export const metadata: Metadata = { title: "Hoje — JAFLOW" };
 
 function groupByPeriod(tasks: Task[]) {
   const groups = { manha: [] as Task[], tarde: [] as Task[], noite: [] as Task[], semHora: [] as Task[] };

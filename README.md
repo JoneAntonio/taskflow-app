@@ -1,19 +1,22 @@
-# TaskFlow
+# JAFLOW
 
-Aplicação de produtividade e gestão de tarefas — Next.js 15 (App Router) + TypeScript + Tailwind CSS v4 + Supabase.
+Aplicação de produtividade e gestão de tarefas — Next.js 15/16 (App Router) + TypeScript + Tailwind CSS v4 + Supabase.
 
-## Estado atual: Fase 1 concluída + parte da Fase 2
+## Estado atual: todas as áreas principais estão funcionais
 
-- ✅ Estrutura do projeto, configuração, Tailwind, tipos
-- ✅ Supabase: esquema completo, RLS, triggers
 - ✅ Autenticação completa (registo, login, logout, recuperação/alteração de password, proteção de rotas)
 - ✅ Layout principal: Sidebar (desktop), navegação inferior (mobile), topbar, dark/light/system mode
-- ✅ Dashboard com dados reais (tarefas hoje/atrasadas/próximas, taxa de conclusão, gráfico de produtividade semanal)
-- ✅ Inbox com criação rápida de tarefas (parser de linguagem natural: `#etiqueta`, `!prioridade`, "amanhã às 14h")
-- ✅ Página "Hoje" com tarefas agrupadas por período do dia
+- ✅ Dashboard com dados reais
+- ✅ Inbox com criação rápida de tarefas (parser de linguagem natural)
+- ✅ Hoje, Próximas, Calendário (vista mensal)
+- ✅ Projetos (criar, editar, eliminar, ver tarefas por projeto)
+- ✅ Etiquetas (criar, eliminar, contagem de tarefas)
+- ✅ Pesquisa global (tarefas, projetos, etiquetas)
+- ✅ Hábitos (criar, marcar diariamente, sequência de dias)
+- ✅ Pomodoro (temporizador funcional, sessões registadas)
+- ✅ Estatísticas
 - ✅ Perfil (nome, fuso horário, notificações, tema)
-- ✅ **Maturidade da Equipa** — módulo M1–M4: agentes, critérios ponderados, avaliação com plano de desenvolvimento, gráfico de evolução e histórico completo
-- 🚧 Projetos, Etiquetas, Calendário, Recorrência, Hábitos, Pomodoro, Estatísticas — placeholders "Chega na Fase X", a implementar nas fases seguintes conforme o plano combinado
+- ✅ Maturidade da Equipa (avaliação M1-M4, critérios ponderados, histórico, gráfico de evolução)
 
 ## Como correr localmente
 

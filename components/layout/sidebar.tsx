@@ -66,7 +66,7 @@ export function Sidebar({
       <div className="relative flex items-center gap-2 px-5 pb-4 pt-6">
         <Waypoints className="h-5 w-5 text-[var(--color-accent)]" />
         <span className="font-display text-base font-semibold text-[var(--color-ink)]">
-          TaskFlow
+          JAFLOW
         </span>
       </div>
 
@@ -108,7 +108,7 @@ export function Sidebar({
         )}
       </nav>
 
-      {/* Linha de fluxo vertical — assinatura visual do TaskFlow */}
+      {/* Linha de fluxo vertical — assinatura visual do JAFLOW */}
       <div
         aria-hidden
         className="mx-5 mb-5 h-1 rounded-full"

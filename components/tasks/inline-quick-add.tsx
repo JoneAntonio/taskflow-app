@@ -7,7 +7,13 @@ import { toast } from "sonner";
 import { parseQuickTask } from "@/utils/parse-quick-task";
 import { tasksService } from "@/services/tasks.service";
 
-export function InlineQuickAdd({ placeholder }: { placeholder?: string }) {
+export function InlineQuickAdd({
+  placeholder,
+  projectId,
+}: {
+  placeholder?: string;
+  projectId?: string;
+}) {
   const [value, setValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -25,6 +31,7 @@ export function InlineQuickAdd({ placeholder }: { placeholder?: string }) {
         dueDate: parsed.dueDate,
         dueTime: parsed.dueTime,
         tagNames: parsed.tagNames,
+        projectId,
       });
       setValue("");
       router.refresh();

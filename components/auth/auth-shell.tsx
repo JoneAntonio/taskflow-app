@@ -24,7 +24,7 @@ export function AuthShell({
         />
         <div className="relative flex items-center gap-2">
           <Waypoints className="h-6 w-6 text-[var(--color-accent)]" />
-          <span className="font-display text-lg font-semibold">TaskFlow</span>
+          <span className="font-display text-lg font-semibold">JAFLOW</span>
         </div>
         <div className="relative max-w-sm">
           <p className="font-display text-3xl font-semibold leading-tight">
@@ -35,7 +35,7 @@ export function AuthShell({
             acompanhar o teu ritmo, não para o atrapalhar.
           </p>
         </div>
-        <p className="relative text-xs text-[#75778a]">© {new Date().getFullYear()} TaskFlow</p>
+        <p className="relative text-xs text-[#75778a]">© {new Date().getFullYear()} JAFLOW</p>
       </div>
 
       {/* Painel do formulário */}
@@ -44,7 +44,7 @@ export function AuthShell({
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             <Waypoints className="h-6 w-6 text-[var(--color-accent)]" />
             <span className="font-display text-lg font-semibold text-[var(--color-ink)]">
-              TaskFlow
+              JAFLOW
             </span>
           </div>
           <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">{title}</h1>

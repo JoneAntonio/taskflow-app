@@ -12,6 +12,7 @@ import {
   BarChart3,
   Search,
   Users,
+  LayoutGrid,
 } from "lucide-react";
 
 export interface NavItem {
@@ -36,6 +37,7 @@ export const organizeNav: NavItem[] = [
 ];
 
 export const focusNav: NavItem[] = [
+  { label: "Matriz de Eisenhower", href: "/matriz", icon: LayoutGrid },
   { label: "Hábitos", href: "/habitos", icon: Sparkles },
   { label: "Pomodoro", href: "/pomodoro", icon: TimerReset },
   { label: "Estatísticas", href: "/estatisticas", icon: BarChart3 },

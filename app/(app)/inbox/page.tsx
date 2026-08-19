@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 
-export const metadata: Metadata = { title: "Inbox — TaskFlow" };
+export const metadata: Metadata = { title: "Inbox — JAFLOW" };
 
 export default async function InboxPage() {
   const supabase = await createClient();
