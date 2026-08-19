@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/*
+  TaskFlow — Sistema de tokens visuais
+  Paleta: "grafite + chama âmbar" — fundo neutro sóbrio, tinta quase-preta,
+  um único acento quente (âmbar) reservado para foco/ação, e um azul-aço
+  frio para hierarquia secundária (prioridade média, links, estados info).
+  Objetivo: sensação de estúdio de produtividade, não de app genérico.
+*/
+
+:root {
+  --color-bg: #f7f7f4;
+  --color-surface: #ffffff;
+  --color-surface-alt: #efefe9;
+  --color-border: #e3e2da;
+  --color-ink: #1a1c22;
+  --color-ink-muted: #6b6f7b;
+  --color-accent: #f2a93b;
+  --color-accent-ink: #1a1c22;
+  --color-secondary: #3f6fa8;
+  --color-danger: #e2504c;
+  --color-success: #3f9e6d;
+  --color-warning: #f2a93b;
+
+  --color-priority-none: #b9bcc4;
+  --color-priority-baixa: #7d93a8;
+  --color-priority-media: #3f6fa8;
+  --color-priority-alta: #f2a93b;
+  --color-priority-urgente: #e2504c;
+
+  --shadow-sm: 0 1px 2px rgba(26, 28, 34, 0.04);
+  --shadow-md: 0 4px 16px rgba(26, 28, 34, 0.08);
+  --shadow-lg: 0 12px 32px rgba(26, 28, 34, 0.12);
+}
+
+.dark {
+  --color-bg: #14151b;
+  --color-surface: #1b1d25;
+  --color-surface-alt: #23252f;
+  --color-border: #2c2f3a;
+  --color-ink: #f1f1ee;
+  --color-ink-muted: #9498a3;
+  --color-accent: #f5b656;
+  --color-accent-ink: #14151b;
+  --color-secondary: #6f9bd1;
+  --color-danger: #ea6f6b;
+  --color-success: #55b686;
+  --color-warning: #f5b656;
+
+  --color-priority-none: #565a66;
+  --color-priority-baixa: #8fa4b8;
+  --color-priority-media: #6f9bd1;
+  --color-priority-alta: #f5b656;
+  --color-priority-urgente: #ea6f6b;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-alt: var(--color-surface-alt);
+  --color-border: var(--color-border);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-accent: var(--color-accent);
+  --color-accent-ink: var(--color-accent-ink);
+  --color-secondary: var(--color-secondary);
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-plex-mono);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+}
+
+.font-mono-data {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
