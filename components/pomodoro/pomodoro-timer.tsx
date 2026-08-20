@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Play, Pause, RotateCcw, ListTodo } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+
+export interface PomodoroTaskOption {
+  id: string;
+  title: string;
+}
 
 type SessionType = "foco" | "pausa_curta" | "pausa_longa";
 
@@ -20,12 +25,13 @@ const LABELS: Record<SessionType, string> = {
   pausa_longa: "Pausa longa",
 };
 
-export function PomodoroTimer() {
+export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) {
   const [sessionType, setSessionType] = useState<SessionType>("foco");
   const [customDurations, setCustomDurations] = useState<Record<SessionType, number>>(DURATIONS);
   const [secondsLeft, setSecondsLeft] = useState(DURATIONS.foco * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
+  const [selectedTaskId, setSelectedTaskId] = useState<string>("");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   function switchSession(type: SessionType) {
@@ -45,6 +51,7 @@ export function PomodoroTimer() {
       if (user) {
         await supabase.from("pomodoro_sessions").insert({
           user_id: user.id,
+          task_id: selectedTaskId || null,
           duration_minutes: customDurations[sessionType],
           session_type: sessionType,
           completed_at: new Date().toISOString(),
@@ -101,6 +108,24 @@ export function PomodoroTimer() {
 
   return (
     <div className="flex flex-col items-center gap-6">
+      {tasks.length > 0 && (
+        <div className="flex w-full max-w-xs items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+          <ListTodo className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
+          <select
+            value={selectedTaskId}
+            onChange={(e) => setSelectedTaskId(e.target.value)}
+            className="w-full bg-transparent text-sm text-[var(--color-ink)] outline-none"
+          >
+            <option value="">Sem tarefa associada</option>
+            {tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="flex gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1">
         {(Object.keys(LABELS) as SessionType[]).map((type) => (
           <button

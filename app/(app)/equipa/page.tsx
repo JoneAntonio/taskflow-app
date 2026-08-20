@@ -68,8 +68,9 @@ export default async function EquipaPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {sortedGroupNames.map((groupName) => (
+          {sortedGroupNames.map((groupName, index) => (
             <div key={groupName}>
+              {index > 0 && <div className="mb-8 h-px bg-[var(--color-border)]" />}
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
                 {groupName} · {groups.get(groupName)!.length}{" "}
                 {groups.get(groupName)!.length === 1 ? "agente" : "agentes"}

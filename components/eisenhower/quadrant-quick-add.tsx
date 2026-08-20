@@ -45,9 +45,10 @@ export function QuadrantQuickAdd({
         isImportant: important,
       });
       setValue("");
+      toast.success("Tarefa adicionada");
       router.refresh();
-    } catch {
-      toast.error("Não foi possível criar a tarefa.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível criar a tarefa.");
     } finally {
       setIsSubmitting(false);
     }

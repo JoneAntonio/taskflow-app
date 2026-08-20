@@ -8,10 +8,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { teamMaturityService } from "@/services/team-maturity.service";
+import type { TeamAgent } from "@/types/team-maturity";
 
-export function NewAgentDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [name, setName] = useState("");
-  const [operation, setOperation] = useState("");
+export function NewAgentDialog({
+  open,
+  onClose,
+  agent,
+}: {
+  open: boolean;
+  onClose: () => void;
+  /** Quando fornecido, o diálogo passa a editar este agente em vez de criar um novo. */
+  agent?: TeamAgent;
+}) {
+  const [name, setName] = useState(agent?.name ?? "");
+  const [operation, setOperation] = useState(agent?.operation ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -21,17 +31,24 @@ export function NewAgentDialog({ open, onClose }: { open: boolean; onClose: () =
 
     setIsSubmitting(true);
     try {
-      const agent = await teamMaturityService.createAgent({
-        name: name.trim(),
-        operation: operation.trim() || undefined,
-      });
-      toast.success("Agente adicionado");
-      setName("");
-      setOperation("");
-      onClose();
-      router.push(`/equipa/${agent.id}`);
+      if (agent) {
+        await teamMaturityService.updateAgent(agent.id, { name: name.trim(), operation: operation.trim() || null });
+        toast.success("Agente atualizado");
+        onClose();
+        router.refresh();
+      } else {
+        const created = await teamMaturityService.createAgent({
+          name: name.trim(),
+          operation: operation.trim() || undefined,
+        });
+        toast.success("Agente adicionado");
+        setName("");
+        setOperation("");
+        onClose();
+        router.push(`/equipa/${created.id}`);
+      }
     } catch {
-      toast.error("Não foi possível adicionar o agente.");
+      toast.error("Não foi possível guardar o agente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -41,8 +58,8 @@ export function NewAgentDialog({ open, onClose }: { open: boolean; onClose: () =
     <Dialog
       open={open}
       onClose={onClose}
-      title="Novo agente"
-      description="Adiciona um membro da equipa para começares a avaliar a maturidade. Se o agente pertencer a outra equipa/operação mas continuar sob a tua responsabilidade, indica isso no campo Operação."
+      title={agent ? "Editar agente" : "Novo agente"}
+      description="Se o agente pertencer a outra equipa/operação mas continuar sob a tua responsabilidade, indica isso no campo Operação."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -69,7 +86,7 @@ export function NewAgentDialog({ open, onClose }: { open: boolean; onClose: () =
             Cancelar
           </Button>
           <Button type="submit" isLoading={isSubmitting}>
-            Adicionar agente
+            {agent ? "Guardar" : "Adicionar agente"}
           </Button>
         </div>
       </form>

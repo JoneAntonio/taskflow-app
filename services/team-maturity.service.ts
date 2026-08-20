@@ -132,4 +132,18 @@ export const teamMaturityService = {
     if (error) throw error;
     return data as MaturityEvaluation;
   },
+  async updateAgent(agentId: string, input: { name: string; operation?: string | null }): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("team_agents")
+      .update({ name: input.name, operation: input.operation ?? null })
+      .eq("id", agentId);
+    if (error) throw error;
+  },
+
+  async archiveAgent(agentId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("team_agents").update({ archived: true }).eq("id", agentId);
+    if (error) throw error;
+  },
 };
