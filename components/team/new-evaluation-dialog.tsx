@@ -37,7 +37,11 @@ export function NewEvaluationDialog({
 
   const totalWeight = criteria.reduce((sum, c) => sum + c.weight, 0) || 100;
   const weightedResult = useMemo(() => {
-    const sum = criteria.reduce((acc, c) => acc + (scores[c.id] ?? 0) * c.weight, 0);
+    const sum = criteria.reduce((acc, c) => {
+      const raw = scores[c.id] ?? 0;
+      const effective = c.inverted ? 6 - raw : raw;
+      return acc + effective * c.weight;
+    }, 0);
     return sum / totalWeight;
   }, [criteria, scores, totalWeight]);
   const recommendedMaturity = maturityFromScore(weightedResult);
@@ -53,6 +57,7 @@ export function NewEvaluationDialog({
           criterion_id: c.id,
           name: c.name,
           weight: c.weight,
+          inverted: c.inverted,
           score: scores[c.id] ?? 0,
         })),
         confirmedMaturity: finalMaturity,
@@ -91,6 +96,11 @@ export function NewEvaluationDialog({
                   <span className="text-xs font-normal text-[var(--color-ink-muted)]">
                     ({criterion.weight}%)
                   </span>
+                  {criterion.inverted && (
+                    <span className="ml-1.5 rounded-full bg-[var(--color-surface-alt)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-ink-muted)]">
+                      quanto menor, melhor
+                    </span>
+                  )}
                 </span>
                 <span className="font-mono-data text-[var(--color-ink-muted)]">
                   {(scores[criterion.id] ?? 0).toFixed(1)}

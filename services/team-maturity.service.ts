@@ -68,6 +68,7 @@ export const teamMaturityService = {
       user_id: user.id,
       name: criterion.name,
       weight: criterion.weight,
+      inverted: criterion.inverted,
       position: index,
     }));
     const { data: created, error: insertError } = await supabase
@@ -107,8 +108,13 @@ export const teamMaturityService = {
     if (!user) throw new Error("Utilizador não autenticado");
 
     const totalWeight = input.scores.reduce((sum, entry) => sum + entry.weight, 0) || 100;
+    // Critérios invertidos (ex: TMA) contam ao contrário: uma pontuação alta
+    // nesse critério significa mau desempenho, por isso usamos (6 - score).
     const weightedResult =
-      input.scores.reduce((sum, entry) => sum + entry.score * entry.weight, 0) / totalWeight;
+      input.scores.reduce((sum, entry) => {
+        const effectiveScore = entry.inverted ? 6 - entry.score : entry.score;
+        return sum + effectiveScore * entry.weight;
+      }, 0) / totalWeight;
     const recommendedMaturity = maturityFromScore(weightedResult);
 
     const { data, error } = await supabase

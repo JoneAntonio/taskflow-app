@@ -15,4 +15,19 @@ export const taskActionsService = {
       .eq("id", taskId);
     if (error) throw error;
   },
+
+  async reopenTask(taskId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("tasks")
+      .update({ status: "pendente", completed_at: null })
+      .eq("id", taskId);
+    if (error) throw error;
+  },
+
+  async deletePermanently(taskId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+    if (error) throw error;
+  },
 };

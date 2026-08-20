@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Topbar } from "@/components/layout/topbar";
 import { QuickAddDialog } from "@/components/tasks/quick-add-dialog";
+import { ReminderWatcher } from "@/components/notifications/reminder-watcher";
 import type { Profile, Project } from "@/types/database";
 
 export function AppShell({
@@ -29,6 +30,7 @@ export function AppShell({
 
       <BottomNav onQuickAdd={() => setQuickAddOpen(true)} />
       <QuickAddDialog open={quickAddOpen} onClose={() => setQuickAddOpen(false)} />
+      <ReminderWatcher />
     </div>
   );
 }

@@ -16,6 +16,7 @@ export interface ScheduleValue {
   dueTimeEnd: string | null;
   priority: TaskPriority | null;
   recurrence: Recurrence | null;
+  reminderMinutesBefore: number | null;
 }
 
 const QUICK_DATE_OPTIONS = [
@@ -80,7 +81,14 @@ export function SchedulePopover({
   }
 
   function clear() {
-    const cleared: ScheduleValue = { dueDate: null, dueTime: null, dueTimeEnd: null, priority: null, recurrence: null };
+    const cleared: ScheduleValue = {
+      dueDate: null,
+      dueTime: null,
+      dueTimeEnd: null,
+      priority: null,
+      recurrence: null,
+      reminderMinutesBefore: null,
+    };
     setLocal(cleared);
     onChange(cleared);
     onClose();
@@ -160,6 +168,36 @@ export function SchedulePopover({
                 className="h-9 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-ink)]"
               />
             </div>
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-[var(--color-ink-muted)]">Lembrete (avisa antes da hora)</p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {[
+                { label: "Nenhum", value: null },
+                { label: "5 min", value: 5 },
+                { label: "15 min", value: 15 },
+                { label: "30 min", value: 30 },
+              ].map((opt) => (
+                <button
+                  key={opt.label}
+                  type="button"
+                  disabled={!local.dueDate || !local.dueTime}
+                  onClick={() => setLocal((prev) => ({ ...prev, reminderMinutesBefore: opt.value }))}
+                  className={cn(
+                    "rounded-lg border px-2 py-1.5 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                    local.reminderMinutesBefore === opt.value
+                      ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                      : "border-[var(--color-border)] text-[var(--color-ink-muted)]"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {(!local.dueDate || !local.dueTime) && (
+              <p className="mt-1 text-[11px] text-[var(--color-ink-muted)]">Define data e hora para poderes ativar um lembrete.</p>
+            )}
           </div>
         </div>
       )}

@@ -20,6 +20,14 @@ function isUrgent(task: Task): boolean {
   return false;
 }
 
+function sortWithCompletedLast(tasks: Task[]): Task[] {
+  return [...tasks].sort((a, b) => {
+    const aDone = a.status === "concluida" ? 1 : 0;
+    const bDone = b.status === "concluida" ? 1 : 0;
+    return aDone - bDone;
+  });
+}
+
 export default async function MatrizPage() {
   const supabase = await createClient();
   const {
@@ -27,18 +35,25 @@ export default async function MatrizPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: tasks } = await supabase
-    .from("tasks")
-    .select("*")
-    .in("status", ["pendente", "em_progresso"])
-    .order("created_at", { ascending: false });
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const all = (tasks ?? []) as Task[];
+  const [{ data: activeTasks }, { data: recentlyCompleted }] = await Promise.all([
+    supabase.from("tasks").select("*").in("status", ["pendente", "em_progresso"]).order("created_at", { ascending: false }),
+    supabase
+      .from("tasks")
+      .select("*")
+      .eq("status", "concluida")
+      .gte("completed_at", thirtyDaysAgo.toISOString())
+      .order("completed_at", { ascending: false }),
+  ]);
 
-  const doQuadrant = all.filter((t) => isUrgent(t) && t.is_important);
-  const scheduleQuadrant = all.filter((t) => !isUrgent(t) && t.is_important);
-  const delegateQuadrant = all.filter((t) => isUrgent(t) && !t.is_important);
-  const eliminateQuadrant = all.filter((t) => !isUrgent(t) && !t.is_important);
+  const all = [...((activeTasks ?? []) as Task[]), ...((recentlyCompleted ?? []) as Task[])];
+
+  const doQuadrant = sortWithCompletedLast(all.filter((t) => isUrgent(t) && t.is_important));
+  const scheduleQuadrant = sortWithCompletedLast(all.filter((t) => !isUrgent(t) && t.is_important));
+  const delegateQuadrant = sortWithCompletedLast(all.filter((t) => isUrgent(t) && !t.is_important));
+  const eliminateQuadrant = sortWithCompletedLast(all.filter((t) => !isUrgent(t) && !t.is_important));
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -46,6 +61,7 @@ export default async function MatrizPage() {
         <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Matriz de Eisenhower</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           A urgência vem da prioridade e da data; marca a estrela ⭐ numa tarefa para a definires como importante.
+          Tarefas concluídas ficam riscadas aqui durante 30 dias, com opção de eliminar em definitivo.
         </p>
       </div>
 

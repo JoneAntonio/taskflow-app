@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Star, Check } from "lucide-react";
+import { Star, Check, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { taskActionsService } from "@/services/task-actions.service";
@@ -11,6 +11,7 @@ import type { Task } from "@/types/database";
 export function EisenhowerTaskRow({ task }: { task: Task }) {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
+  const isCompleted = task.status === "concluida";
 
   async function handleToggleImportant() {
     setIsPending(true);
@@ -24,42 +25,87 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
     }
   }
 
-  async function handleComplete() {
+  async function handleToggleComplete() {
     setIsPending(true);
     try {
-      await taskActionsService.markComplete(task.id);
-      toast.success("Tarefa concluída");
+      if (isCompleted) {
+        await taskActionsService.reopenTask(task.id);
+      } else {
+        await taskActionsService.markComplete(task.id);
+        toast.success("Tarefa concluída");
+      }
       router.refresh();
     } catch {
-      toast.error("Não foi possível concluir a tarefa.");
+      toast.error("Não foi possível atualizar a tarefa.");
+      setIsPending(false);
+    }
+  }
+
+  async function handleDeletePermanently() {
+    if (!confirm("Eliminar esta tarefa definitivamente? Não é possível desfazer.")) return;
+    setIsPending(true);
+    try {
+      await taskActionsService.deletePermanently(task.id);
+      toast.success("Tarefa eliminada");
+      router.refresh();
+    } catch {
+      toast.error("Não foi possível eliminar a tarefa.");
       setIsPending(false);
     }
   }
 
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-surface)] px-3 py-2 text-sm">
+    <div
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-3 py-2 text-sm",
+        isCompleted ? "bg-[var(--color-surface-alt)]" : "bg-[var(--color-surface)]"
+      )}
+    >
       <button
-        onClick={handleComplete}
+        onClick={handleToggleComplete}
         disabled={isPending}
-        aria-label="Concluir"
-        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] hover:border-[var(--color-accent)]"
+        aria-label={isCompleted ? "Reabrir tarefa" : "Concluir"}
+        className={cn(
+          "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors",
+          isCompleted
+            ? "border-[var(--color-success)] bg-[var(--color-success)]"
+            : "border-[var(--color-border)] hover:border-[var(--color-accent)]"
+        )}
       >
-        <Check className="h-3 w-3 opacity-0 hover:opacity-60" />
+        {isCompleted && <Check className="h-3 w-3 text-white" />}
       </button>
-      <span className="min-w-0 flex-1 truncate text-[var(--color-ink)]">{task.title}</span>
-      <button
-        onClick={handleToggleImportant}
-        disabled={isPending}
-        aria-label="Marcar como importante"
-        className="shrink-0"
+      <span
+        className={cn(
+          "min-w-0 flex-1 truncate",
+          isCompleted ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]"
+        )}
       >
-        <Star
-          className={cn(
-            "h-3.5 w-3.5 transition-colors",
-            task.is_important ? "fill-[var(--color-warning)] text-[var(--color-warning)]" : "text-[var(--color-ink-muted)]"
-          )}
-        />
-      </button>
+        {task.title}
+      </span>
+      {isCompleted ? (
+        <button
+          onClick={handleDeletePermanently}
+          disabled={isPending}
+          aria-label="Eliminar definitivamente"
+          className="shrink-0 text-[var(--color-ink-muted)] hover:text-[var(--color-danger)]"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      ) : (
+        <button
+          onClick={handleToggleImportant}
+          disabled={isPending}
+          aria-label="Marcar como importante"
+          className="shrink-0"
+        >
+          <Star
+            className={cn(
+              "h-3.5 w-3.5 transition-colors",
+              task.is_important ? "fill-[var(--color-warning)] text-[var(--color-warning)]" : "text-[var(--color-ink-muted)]"
+            )}
+          />
+        </button>
+      )}
     </div>
   );
 }

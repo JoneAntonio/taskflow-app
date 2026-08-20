@@ -13,7 +13,7 @@ export default async function PomodoroPage() {
 
   const { data: tasks } = await supabase
     .from("tasks")
-    .select("id, title")
+    .select("id, title, due_time, due_time_end")
     .in("status", ["pendente", "em_progresso"])
     .order("created_at", { ascending: false })
     .limit(50);

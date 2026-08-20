@@ -12,6 +12,7 @@ export interface CreateTaskInput {
   priority?: TaskPriority;
   tagNames?: string[];
   isImportant?: boolean;
+  reminderAt?: string | null;
 }
 
 /**
@@ -44,6 +45,7 @@ export const tasksService = {
         priority: input.priority ?? "sem_prioridade",
         status: "pendente",
         is_important: input.isImportant ?? false,
+        reminder_at: input.reminderAt ?? null,
       })
       .select()
       .single();

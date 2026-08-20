@@ -19,6 +19,8 @@ export interface MaturityCriterion {
   user_id: string;
   name: string;
   weight: number; // 0-100
+  /** Quando true, uma pontuação mais alta significa pior desempenho (ex: TMA). */
+  inverted: boolean;
   position: number;
   archived: boolean;
   created_at: string;
@@ -28,7 +30,8 @@ export interface EvaluationScoreEntry {
   criterion_id: string;
   name: string;
   weight: number;
-  score: number; // 1-5
+  inverted: boolean;
+  score: number; // 1-5, valor bruto atribuído pelo supervisor
 }
 
 export interface MaturityEvaluation {
@@ -49,13 +52,13 @@ export interface MaturityEvaluation {
   created_at: string;
 }
 
-export const DEFAULT_CRITERIA: Array<{ name: string; weight: number }> = [
-  { name: "Qualidade", weight: 25 },
-  { name: "Produtividade", weight: 20 },
-  { name: "TMA", weight: 15 },
-  { name: "Conhecimento de processos", weight: 15 },
-  { name: "Autonomia", weight: 15 },
-  { name: "Comunicação", weight: 10 },
+export const DEFAULT_CRITERIA: Array<{ name: string; weight: number; inverted: boolean }> = [
+  { name: "Qualidade", weight: 25, inverted: false },
+  { name: "Produtividade", weight: 20, inverted: false },
+  { name: "TMA", weight: 15, inverted: true },
+  { name: "Conhecimento de processos", weight: 15, inverted: false },
+  { name: "Autonomia", weight: 15, inverted: false },
+  { name: "Comunicação", weight: 10, inverted: false },
 ];
 
 export const MATURITY_DESCRIPTIONS: Record<MaturityLevel, { title: string; description: string }> = {

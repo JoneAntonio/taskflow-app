@@ -40,7 +40,7 @@ export default async function AgentDetailPage({
   if (!criteria || criteria.length === 0) {
     const { data: seeded } = await supabase
       .from("maturity_criteria")
-      .insert(DEFAULT_CRITERIA.map((c, index) => ({ user_id: user.id, name: c.name, weight: c.weight, position: index })))
+      .insert(DEFAULT_CRITERIA.map((c, index) => ({ user_id: user.id, name: c.name, weight: c.weight, inverted: c.inverted, position: index })))
       .select();
     criteria = seeded ?? [];
   }

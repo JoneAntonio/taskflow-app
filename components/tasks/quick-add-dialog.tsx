@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CalendarClock, Flag, Repeat } from "lucide-react";
+import { CalendarClock, Flag, Repeat, Bell } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { HighlightedQuickInput } from "@/components/tasks/highlighted-quick-input";
@@ -12,7 +12,14 @@ import { tasksService } from "@/services/tasks.service";
 import { PRIORITY_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
-const EMPTY_SCHEDULE: ScheduleValue = { dueDate: null, dueTime: null, dueTimeEnd: null, priority: null, recurrence: null };
+const EMPTY_SCHEDULE: ScheduleValue = {
+  dueDate: null,
+  dueTime: null,
+  dueTimeEnd: null,
+  priority: null,
+  recurrence: null,
+  reminderMinutesBefore: null,
+};
 
 export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [value, setValue] = useState("");
@@ -30,6 +37,7 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
     dueTimeEnd: schedule.dueTimeEnd ?? textParsed?.dueTimeEnd ?? null,
     priority: schedule.priority ?? textParsed?.priority ?? null,
     recurrence: schedule.recurrence ?? textParsed?.recurrence ?? null,
+    reminderMinutesBefore: schedule.reminderMinutesBefore,
   };
 
   async function handleSubmit(event: React.FormEvent) {
@@ -39,6 +47,13 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
     if (!title) {
       toast.error("Escreve um título para a tarefa.");
       return;
+    }
+
+    let reminderAt: string | null = null;
+    if (effective.reminderMinutesBefore && effective.dueDate && effective.dueTime) {
+      const due = new Date(`${effective.dueDate}T${effective.dueTime}:00`);
+      due.setMinutes(due.getMinutes() - effective.reminderMinutesBefore);
+      reminderAt = due.toISOString();
     }
 
     setIsSubmitting(true);
@@ -51,6 +66,7 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
         dueTimeEnd: effective.dueTimeEnd,
         recurrence: effective.recurrence,
         tagNames: parsed.tagNames,
+        reminderAt,
       });
       toast.success("Tarefa adicionada à Inbox");
       setValue("");
@@ -73,7 +89,7 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
       open={open}
       onClose={handleClose}
       title="Adicionar tarefa"
-      description="Escreve em linguagem natural, ou usa os botões abaixo para escolher data, hora, prioridade e repetição."
+      description="Escreve em linguagem natural, ou usa os botões abaixo para escolher data, hora, prioridade, repetição e lembrete."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <HighlightedQuickInput
@@ -110,6 +126,12 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
           {effective.recurrence?.frequency && (
             <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-success)] px-3 py-1.5 text-xs font-medium text-[var(--color-success)]">
               <Repeat className="h-3.5 w-3.5" /> {RECURRENCE_LABELS[effective.recurrence.frequency]}
+            </span>
+          )}
+
+          {effective.reminderMinutesBefore && (
+            <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-accent)] px-3 py-1.5 text-xs font-medium text-[var(--color-accent)]">
+              <Bell className="h-3.5 w-3.5" /> {effective.reminderMinutesBefore} min antes
             </span>
           )}
 
