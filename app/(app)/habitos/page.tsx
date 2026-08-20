@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { toLocalISODate } from "@/lib/utils";
 import { NewHabitButton } from "@/components/habits/new-habit-button";
 import { HabitCard } from "@/components/habits/habit-card";
 import { calculateStreak } from "@/services/habits.service";
@@ -15,7 +16,7 @@ export default async function HabitosPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = toLocalISODate(new Date());
   const [{ data: habits }, { data: logs }] = await Promise.all([
     supabase.from("habits").select("*").eq("archived", false).order("created_at"),
     supabase.from("habit_logs").select("*").order("log_date", { ascending: false }),

@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
+import { toLocalISODate } from "@/lib/utils";
 import type { Task } from "@/types/database";
 
 function toISODate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return toLocalISODate(date);
 }
 
 function startOfWeek(date: Date): Date {

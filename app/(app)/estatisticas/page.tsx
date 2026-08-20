@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { toLocalISODate } from "@/lib/utils";
 import { getDashboardData } from "@/services/dashboard.queries";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { WeeklyProductivityChart } from "@/components/dashboard/weekly-productivity-chart";
@@ -15,7 +16,7 @@ export default async function EstatisticasPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = toLocalISODate(new Date());
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
   const monthStart = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-01`;

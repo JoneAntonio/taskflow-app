@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toLocalISODate } from "@/lib/utils";
 import type { Task } from "@/types/database";
 
 const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -28,7 +28,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
   const firstDay = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startOffset = firstDay.getDay();
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = toLocalISODate(new Date());
 
   const cells: { date: string | null; day: number | null }[] = [];
   for (let i = 0; i < startOffset; i++) cells.push({ date: null, day: null });

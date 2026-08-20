@@ -1,3 +1,4 @@
+import { toLocalISODate } from "@/lib/utils";
 import type { TaskPriority, Recurrence, RecurrenceFrequency } from "@/types/database";
 
 export interface ParsedQuickTask {
@@ -215,7 +216,7 @@ export function parseQuickTask(input: string, referenceDate = new Date()): Parse
 }
 
 function toISODate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return toLocalISODate(date);
 }
 
 function nextWeekday(from: Date, weekdayName: string): Date {

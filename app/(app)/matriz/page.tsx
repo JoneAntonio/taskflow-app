@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { toLocalISODate } from "@/lib/utils";
 import { QuadrantCard } from "@/components/eisenhower/quadrant-card";
 import type { Task } from "@/types/database";
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = { title: "Matriz de Eisenhower — JAFLOW" };
 function isUrgent(task: Task): boolean {
   if (task.priority === "urgente" || task.priority === "alta") return true;
   if (task.due_date) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = toLocalISODate(new Date());
     if (task.due_date <= today) return true;
   }
   return false;

@@ -6,7 +6,7 @@ import { Sun, Sunrise, CalendarPlus, Repeat } from "lucide-react";
 import { MiniCalendar } from "@/components/tasks/mini-calendar";
 import { Button } from "@/components/ui/button";
 import { RECURRENCE_LABELS } from "@/utils/parse-quick-task";
-import { cn } from "@/lib/utils";
+import { cn, toLocalISODate } from "@/lib/utils";
 import type { TaskPriority, Recurrence, RecurrenceFrequency } from "@/types/database";
 
 export interface ScheduleValue {
@@ -47,7 +47,7 @@ function addDays(date: Date, days: number) {
   return result;
 }
 function toISODate(date: Date) {
-  return date.toISOString().slice(0, 10);
+  return toLocalISODate(date);
 }
 
 export function SchedulePopover({

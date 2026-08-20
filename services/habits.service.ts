@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { toLocalISODate } from "@/lib/utils";
 import type { Habit } from "@/types/database";
 
 export const HABIT_COLORS = ["#3F9E6D", "#3F6FA8", "#F2A93B", "#E2504C", "#8B5CF6", "#0EA5A5"];
@@ -32,7 +33,7 @@ export const habitsService = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Utilizador não autenticado");
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = toLocalISODate(new Date());
 
     if (logId) {
       const { error } = await supabase.from("habit_logs").delete().eq("id", logId);
@@ -64,7 +65,7 @@ export function calculateStreak(logDates: string[]): number {
   const cursor = new Date(today);
 
   for (const dateStr of sorted) {
-    const cursorISO = cursor.toISOString().slice(0, 10);
+    const cursorISO = toLocalISODate(cursor);
     if (dateStr === cursorISO) {
       streak += 1;
       cursor.setDate(cursor.getDate() - 1);
@@ -72,7 +73,7 @@ export function calculateStreak(logDates: string[]): number {
       // Permite que a sequência comece ontem se ainda não marcou hoje
       const yesterday = new Date(today);
       yesterday.setDate(yesterday.getDate() - 1);
-      if (dateStr === yesterday.toISOString().slice(0, 10)) {
+      if (dateStr === toLocalISODate(yesterday)) {
         streak += 1;
         cursor.setTime(yesterday.getTime());
         cursor.setDate(cursor.getDate() - 1);

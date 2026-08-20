@@ -208,8 +208,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
 
   return (
     <div className="flex flex-col items-center gap-6">
-      {tasks.length > 0 && (
-        <div className="w-full max-w-xs space-y-2">
+      <div className="w-full max-w-xs space-y-2">
+        {tasks.length > 0 && (
           <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
             <ListTodo className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
             <select
@@ -225,33 +225,33 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
               ))}
             </select>
           </div>
+        )}
 
-          <label className="flex items-center gap-2 text-xs text-[var(--color-ink-muted)]">
+        <label className="flex items-center gap-2 text-xs text-[var(--color-ink-muted)]">
+          <input
+            type="checkbox"
+            checked={autoPlanEnabled}
+            onChange={(e) => setAutoPlanEnabled(e.target.checked)}
+            className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+          />
+          Plano automático (foco + pausas alternadas até completar a duração da atividade)
+        </label>
+
+        {autoPlanEnabled && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[var(--color-ink-muted)]">Duração total</span>
             <input
-              type="checkbox"
-              checked={autoPlanEnabled}
-              onChange={(e) => setAutoPlanEnabled(e.target.checked)}
-              className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+              type="number"
+              min={5}
+              max={480}
+              value={totalDuration}
+              onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
+              className="w-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
             />
-            Plano automático (foco + pausas alternadas até completar a duração da atividade)
-          </label>
-
-          {autoPlanEnabled && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[var(--color-ink-muted)]">Duração total</span>
-              <input
-                type="number"
-                min={5}
-                max={480}
-                value={totalDuration}
-                onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
-                className="w-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
-              />
-              <span className="text-xs text-[var(--color-ink-muted)]">min</span>
-            </div>
-          )}
-        </div>
-      )}
+            <span className="text-xs text-[var(--color-ink-muted)]">min</span>
+          </div>
+        )}
+      </div>
 
       {!plan && (
         <div className="flex gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1">

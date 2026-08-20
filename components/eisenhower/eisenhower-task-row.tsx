@@ -90,16 +90,7 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
           {task.recurrence && <Repeat className="h-3 w-3" />}
         </span>
       )}
-      {isCompleted ? (
-        <button
-          onClick={handleDeletePermanently}
-          disabled={isPending}
-          aria-label="Eliminar definitivamente"
-          className="shrink-0 text-[var(--color-ink-muted)] hover:text-[var(--color-danger)]"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      ) : (
+      {!isCompleted && (
         <button
           onClick={handleToggleImportant}
           disabled={isPending}
@@ -114,6 +105,14 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
           />
         </button>
       )}
+      <button
+        onClick={handleDeletePermanently}
+        disabled={isPending}
+        aria-label="Eliminar definitivamente"
+        className="shrink-0 text-[var(--color-ink-muted)] hover:text-[var(--color-danger)]"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }

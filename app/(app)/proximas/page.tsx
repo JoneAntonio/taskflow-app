@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { toLocalISODate } from "@/lib/utils";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import type { Task } from "@/types/database";
 
 export const metadata: Metadata = { title: "Próximas — JAFLOW" };
 
 function toISODate(date: Date) {
-  return date.toISOString().slice(0, 10);
+  return toLocalISODate(date);
 }
 
 export default async function ProximasPage() {
