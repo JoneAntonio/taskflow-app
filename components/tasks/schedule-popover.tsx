@@ -69,9 +69,17 @@ export function SchedulePopover({
   useEffect(() => {
     if (anchorRef.current) {
       const rect = anchorRef.current.getBoundingClientRect();
-      const panelWidth = 384; // w-96
+      const panelWidth = 320; // w-80
+      const estimatedPanelHeight = 520;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUpward = spaceBelow < estimatedPanelHeight && rect.top > spaceBelow;
+
       const left = Math.min(rect.left + window.scrollX, window.innerWidth - panelWidth - 16 + window.scrollX);
-      setPosition({ top: rect.bottom + window.scrollY + 8, left: Math.max(16, left) });
+      const top = openUpward
+        ? Math.max(16, rect.top + window.scrollY - estimatedPanelHeight - 8)
+        : rect.bottom + window.scrollY + 8;
+
+      setPosition({ top, left: Math.max(16, left) });
     }
   }, [anchorRef]);
 
@@ -115,7 +123,7 @@ export function SchedulePopover({
   return createPortal(
     <div
       ref={popoverRef}
-      className="fixed z-[60] w-80 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
+      className="fixed z-[60] max-h-[calc(100vh-2rem)] w-80 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
       style={{ top: position.top, left: position.left }}
     >
       <div className="mb-3 flex gap-1 rounded-full bg-[var(--color-surface-alt)] p-1">
