@@ -30,6 +30,21 @@ const PRIORITY_OPTIONS: TaskPriority[] = ["sem_prioridade", "baixa", "media", "a
 const RECURRENCE_OPTIONS: Exclude<RecurrenceFrequency, null>[] = ["diaria", "dias_uteis", "semanal", "mensal", "anual"];
 
 /**
+ * Cores da prioridade sincronizadas com as da Matriz de Eisenhower, para que
+ * a cor que vês ao escolher a prioridade já sugira para que zona da matriz
+ * a tarefa tende a ir: vermelho (Fazer) → laranja (Delegar) → azul
+ * (Agendar) → cinza (Eliminar). "Alta"/"Urgente" contam como urgentes na
+ * matriz; as restantes não.
+ */
+const PRIORITY_MATRIX_COLOR_VAR: Record<TaskPriority, string> = {
+  urgente: "--color-danger",
+  alta: "--color-warning",
+  media: "--color-secondary",
+  baixa: "--color-ink-muted",
+  sem_prioridade: "--color-ink-muted",
+};
+
+/**
  * Mapeamento pedido pelo utilizador entre "nível" e quadrante da Matriz:
  * Alto → Urgente e importante · Médio → Importante, não urgente ·
  * Baixo → Urgente, não importante · Muito Baixo → Nem urgente, nem importante.
@@ -71,7 +86,9 @@ export function SchedulePopover({
   useEffect(() => {
     if (anchorRef.current) {
       const rect = anchorRef.current.getBoundingClientRect();
-      setPosition({ top: rect.bottom + window.scrollY + 8, left: rect.left + window.scrollX });
+      const panelWidth = 384; // w-96
+      const left = Math.min(rect.left + window.scrollX, window.innerWidth - panelWidth - 16 + window.scrollX);
+      setPosition({ top: rect.bottom + window.scrollY + 8, left: Math.max(16, left) });
     }
   }, [anchorRef]);
 
@@ -220,6 +237,9 @@ export function SchedulePopover({
 
       {tab === "prioridade" && (
         <div className="space-y-1.5">
+          <p className="mb-2 text-xs text-[var(--color-ink-muted)]">
+            A cor de cada prioridade acompanha a Matriz de Eisenhower: vermelho/laranja tendem a ser urgentes, azul/cinza não.
+          </p>
           {PRIORITY_OPTIONS.map((p) => (
             <button
               key={p}
@@ -234,7 +254,7 @@ export function SchedulePopover({
             >
               <span
                 className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: `var(--color-priority-${p.replace("sem_prioridade", "none")})` }}
+                style={{ backgroundColor: `var(${PRIORITY_MATRIX_COLOR_VAR[p]})` }}
               />
               {PRIORITY_LABELS[p]}
             </button>

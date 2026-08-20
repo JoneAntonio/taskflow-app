@@ -319,16 +319,20 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
               min={1}
               max={90}
               value={customDurations[type]}
+              disabled={!!plan}
               onChange={(e) => handleDurationChange(type, Number(e.target.value) || 1)}
-              className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)]"
+              className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)] disabled:opacity-50"
             />
             min
           </label>
         ))}
       </div>
       {plan && (
-        <p className="-mt-4 text-[11px] text-[var(--color-ink-muted)]">
-          O plano automático usa estes valores para dividir a duração total em blocos.
+        <p className="-mt-4 max-w-xs text-center text-[11px] text-[var(--color-ink-muted)]">
+          O relógio mostra o bloco atual, não a duração total: com {customDurations.foco} min de foco definidos, uma
+          atividade de {totalDuration} min é dividida em {plan.length} blocos (foco + pausas) que somam ao todo{" "}
+          {totalDuration} min. Os campos acima ficam bloqueados enquanto o plano automático está ativo — desliga-o
+          para os voltares a editar livremente.
         </p>
       )}
 
