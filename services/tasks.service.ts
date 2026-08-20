@@ -13,6 +13,7 @@ export interface CreateTaskInput {
   tagNames?: string[];
   isImportant?: boolean;
   reminderAt?: string | null;
+  location?: string | null;
 }
 
 /**
@@ -46,6 +47,7 @@ export const tasksService = {
         status: "pendente",
         is_important: input.isImportant ?? false,
         reminder_at: input.reminderAt ?? null,
+        location: input.location ?? null,
       })
       .select()
       .single();

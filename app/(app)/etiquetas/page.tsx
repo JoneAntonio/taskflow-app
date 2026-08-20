@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Tag as TagIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { toLocalISODate } from "@/lib/utils";
 import { NewTagForm } from "@/components/tags/new-tag-form";
-import { TagChip } from "@/components/tags/tag-chip";
+import { TagCard } from "@/components/tags/tag-card";
 import type { Tag } from "@/types/database";
 
 export const metadata: Metadata = { title: "Etiquetas — JAFLOW" };
@@ -14,22 +15,35 @@ export default async function EtiquetasPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  const today = toLocalISODate(new Date());
+
   const [{ data: tags }, { data: taskTags }] = await Promise.all([
     supabase.from("tags").select("*").order("name"),
-    supabase.from("task_tags").select("tag_id"),
+    supabase
+      .from("task_tags")
+      .select("tag_id, tasks!inner(status, due_date)")
+      .in("tasks.status", ["pendente", "em_progresso"]),
   ]);
 
-  const counts = new Map<string, number>();
-  (taskTags ?? []).forEach((row) => counts.set(row.tag_id, (counts.get(row.tag_id) ?? 0) + 1));
+  const totalCounts = new Map<string, number>();
+  const overdueCounts = new Map<string, number>();
+  (taskTags ?? []).forEach((row) => {
+    totalCounts.set(row.tag_id, (totalCounts.get(row.tag_id) ?? 0) + 1);
+    const task = row.tasks as unknown as { due_date: string | null };
+    if (task?.due_date && task.due_date < today) {
+      overdueCounts.set(row.tag_id, (overdueCounts.get(row.tag_id) ?? 0) + 1);
+    }
+  });
 
   const tagList = (tags ?? []) as Tag[];
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Etiquetas</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-          Cria etiquetas para classificar e filtrar as tuas tarefas.
+          Cria etiquetas para classificar e filtrar as tuas tarefas. Uma etiqueta com tarefas atrasadas mostra um
+          alerta ⚠️.
         </p>
       </div>
 
@@ -44,9 +58,14 @@ export default async function EtiquetasPage() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tagList.map((tag) => (
-            <TagChip key={tag.id} tag={tag} taskCount={counts.get(tag.id) ?? 0} />
+            <TagCard
+              key={tag.id}
+              tag={tag}
+              taskCount={totalCounts.get(tag.id) ?? 0}
+              overdueCount={overdueCounts.get(tag.id) ?? 0}
+            />
           ))}
         </div>
       )}

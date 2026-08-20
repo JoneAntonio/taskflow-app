@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Sun, Sunrise, CalendarPlus, Repeat } from "lucide-react";
+import { Sun, Sunrise, CalendarPlus, Repeat, Check } from "lucide-react";
 import { MiniCalendar } from "@/components/tasks/mini-calendar";
 import { Button } from "@/components/ui/button";
 import { RECURRENCE_LABELS } from "@/utils/parse-quick-task";
@@ -17,6 +17,7 @@ export interface ScheduleValue {
   recurrence: Recurrence | null;
   reminderMinutesBefore: number | null;
   isImportant: boolean | null;
+  location: string | null;
 }
 
 const QUICK_DATE_OPTIONS = [
@@ -112,6 +113,7 @@ export function SchedulePopover({
       recurrence: null,
       reminderMinutesBefore: null,
       isImportant: null,
+      location: null,
     };
     setLocal(cleared);
     onChange(cleared);
@@ -223,6 +225,17 @@ export function SchedulePopover({
               <p className="mt-1 text-[11px] text-[var(--color-ink-muted)]">Define data e hora para poderes ativar um lembrete.</p>
             )}
           </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-[var(--color-ink-muted)]">Local (opcional)</p>
+            <input
+              type="text"
+              value={local.location ?? ""}
+              onChange={(e) => setLocal((prev) => ({ ...prev, location: e.target.value || null }))}
+              placeholder="Ex: Sala de reuniões, Escritório SIMAR"
+              className="h-9 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-sm text-[var(--color-ink)]"
+            />
+          </div>
         </div>
       )}
 
@@ -262,34 +275,39 @@ export function SchedulePopover({
             type="button"
             onClick={() => setLocal((prev) => ({ ...prev, recurrence: null }))}
             className={cn(
-              "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+              "flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
               !local.recurrence
-                ? "bg-[var(--color-surface-alt)] font-medium text-[var(--color-ink)]"
-                : "text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
+                ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium text-[var(--color-ink)]"
+                : "border-transparent text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
             )}
           >
+            {!local.recurrence && <Check className="h-3.5 w-3.5 text-[var(--color-accent)]" />}
             <Repeat className="h-3.5 w-3.5" /> Não repete
           </button>
-          {RECURRENCE_OPTIONS.map((freq) => (
-            <button
-              key={freq}
-              type="button"
-              onClick={() =>
-                setLocal((prev) => ({
-                  ...prev,
-                  recurrence: { frequency: freq, interval: 1, by_weekday: null, until: null },
-                }))
-              }
-              className={cn(
-                "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
-                local.recurrence?.frequency === freq
-                  ? "bg-[var(--color-surface-alt)] font-medium text-[var(--color-ink)]"
-                  : "text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
-              )}
-            >
-              <Repeat className="h-3.5 w-3.5" /> {RECURRENCE_LABELS[freq]}
-            </button>
-          ))}
+          {RECURRENCE_OPTIONS.map((freq) => {
+            const isActive = local.recurrence?.frequency === freq;
+            return (
+              <button
+                key={freq}
+                type="button"
+                onClick={() =>
+                  setLocal((prev) => ({
+                    ...prev,
+                    recurrence: { frequency: freq, interval: 1, by_weekday: null, until: null },
+                  }))
+                }
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                  isActive
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium text-[var(--color-ink)]"
+                    : "border-transparent text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
+                )}
+              >
+                {isActive && <Check className="h-3.5 w-3.5 text-[var(--color-accent)]" />}
+                <Repeat className="h-3.5 w-3.5" /> {RECURRENCE_LABELS[freq]}
+              </button>
+            );
+          })}
         </div>
       )}
 

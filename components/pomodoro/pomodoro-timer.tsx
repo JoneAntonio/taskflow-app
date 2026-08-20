@@ -24,7 +24,7 @@ const DURATIONS: Record<SessionType, number> = {
 
 const LABELS: Record<SessionType, string> = {
   foco: "Foco",
-  pausa_curta: "Pausa curta",
+  pausa_curta: "Pausa",
   pausa_longa: "Pausa longa",
 };
 
@@ -34,31 +34,17 @@ interface PlanSegment {
 }
 
 /**
- * Gera um plano automático de sessões a partir da duração total estimada de
- * uma atividade: alterna blocos de foco com pausas curtas, e insere UMA
- * pausa longa assim que o tempo de foco acumulado ultrapassa metade do
- * total (ex: atividade de 50 min, foco de 15 min → foco, pausa curta, foco,
- * pausa longa ao passar dos 25 min, foco...).
+ * Plano automático simples, tal como pedido: uma atividade de duração total
+ * X é dividida em UM bloco de trabalho focado + UMA pausa no final, sem
+ * repetições. Ex: atividade de 60 min com pausa de 10 min → 50 min de
+ * trabalho focado, depois 10 min de pausa; no final, notifica para retomar.
  */
-function buildAutoPlan(totalMinutes: number, focus: number, shortBreak: number, longBreak: number): PlanSegment[] {
-  const segments: PlanSegment[] = [];
-  let workDone = 0;
-  let longBreakInserted = false;
-
-  while (workDone < totalMinutes) {
-    const chunk = Math.min(focus, totalMinutes - workDone);
-    segments.push({ type: "foco", minutes: chunk });
-    workDone += chunk;
-    if (workDone >= totalMinutes) break;
-
-    if (!longBreakInserted && workDone >= totalMinutes / 2) {
-      segments.push({ type: "pausa_longa", minutes: longBreak });
-      longBreakInserted = true;
-    } else {
-      segments.push({ type: "pausa_curta", minutes: shortBreak });
-    }
-  }
-  return segments;
+function buildSimplePlan(totalMinutes: number, breakMinutes: number): PlanSegment[] {
+  const work = Math.max(1, totalMinutes - breakMinutes);
+  return [
+    { type: "foco", minutes: work },
+    { type: "pausa_curta", minutes: Math.max(1, breakMinutes) },
+  ];
 }
 
 function minutesBetween(start: string, end: string): number {
@@ -71,7 +57,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const [customDurations, setCustomDurations] = useState<Record<SessionType, number>>(DURATIONS);
   const [selectedTaskId, setSelectedTaskId] = useState<string>("");
   const [autoPlanEnabled, setAutoPlanEnabled] = useState(false);
-  const [totalDuration, setTotalDuration] = useState(50);
+  const [totalDuration, setTotalDuration] = useState(60);
+  const [breakDuration, setBreakDuration] = useState(10);
 
   const [sessionType, setSessionType] = useState<SessionType>("foco");
   const [segmentIndex, setSegmentIndex] = useState(0);
@@ -81,11 +68,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const plan = useMemo(
-    () =>
-      autoPlanEnabled
-        ? buildAutoPlan(totalDuration, customDurations.foco, customDurations.pausa_curta, customDurations.pausa_longa)
-        : null,
-    [autoPlanEnabled, totalDuration, customDurations]
+    () => (autoPlanEnabled ? buildSimplePlan(totalDuration, breakDuration) : null),
+    [autoPlanEnabled, totalDuration, breakDuration]
   );
 
   function handleTaskChange(taskId: string) {
@@ -97,7 +81,7 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
     }
   }
 
-  // Reinicia o plano do zero sempre que ele é (re)gerado (mudou a duração, os tempos, ou foi ativado/desativado)
+  // Reinicia o plano do zero sempre que ele é (re)gerado (mudou a duração, a pausa, ou foi ativado/desativado)
   useEffect(() => {
     if (plan) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -136,24 +120,36 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
 
   async function handleSessionComplete() {
     setIsRunning(false);
-    toast.success(`Sessão de ${LABELS[sessionType]} concluída!`);
-    await logSession(sessionType, customDurations[sessionType]);
 
     if (plan) {
+      const currentSegment = plan[segmentIndex];
+      await logSession(currentSegment.type, currentSegment.minutes);
+
       const nextIndex = segmentIndex + 1;
       if (nextIndex >= plan.length) {
-        toast.success("Plano concluído! 🎉");
+        // Terminou o trabalho E a pausa: notifica para retomar a atividade.
+        toast.success("Pausa terminada — hora de retomar a atividade! 🔔", { duration: 8000 });
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("JAFLOW — Pomodoro", { body: "A pausa terminou. Hora de retomares a atividade." });
+        }
         setSegmentIndex(0);
         setSessionType(plan[0].type);
         setSecondsLeft(plan[0].minutes * 60);
         return;
       }
+
+      toast.success(
+        currentSegment.type === "foco" ? "Bloco de trabalho concluído! Começa a pausa." : "Pausa concluída!"
+      );
       setSegmentIndex(nextIndex);
       setSessionType(plan[nextIndex].type);
       setSecondsLeft(plan[nextIndex].minutes * 60);
       setIsRunning(true); // avança automaticamente para o próximo bloco do plano
       return;
     }
+
+    toast.success(`Sessão de ${LABELS[sessionType]} concluída!`);
+    await logSession(sessionType, customDurations[sessionType]);
 
     if (sessionType === "foco") {
       const nextCount = sessionCount + 1;
@@ -205,6 +201,7 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const seconds = secondsLeft % 60;
   const currentTotalSeconds = (plan ? plan[segmentIndex]?.minutes ?? customDurations[sessionType] : customDurations[sessionType]) * 60;
   const progress = currentTotalSeconds > 0 ? ((currentTotalSeconds - secondsLeft) / currentTotalSeconds) * 100 : 0;
+  const workMinutes = plan ? plan[0].minutes : null;
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -234,22 +231,43 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
             onChange={(e) => setAutoPlanEnabled(e.target.checked)}
             className="h-3.5 w-3.5 accent-[var(--color-accent)]"
           />
-          Plano automático (foco + pausas alternadas até completar a duração da atividade)
+          Plano automático: divide a atividade em trabalho focado + uma pausa no fim
         </label>
 
         {autoPlanEnabled && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[var(--color-ink-muted)]">Duração total</span>
-            <input
-              type="number"
-              min={5}
-              max={480}
-              value={totalDuration}
-              onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
-              className="w-16 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
-            />
-            <span className="text-xs text-[var(--color-ink-muted)]">min</span>
+          <div className="flex items-center justify-center gap-3">
+            <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
+              Duração total
+              <input
+                type="number"
+                min={5}
+                max={480}
+                value={totalDuration}
+                onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
+                className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
+              />
+              min
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
+              Pausa
+              <input
+                type="number"
+                min={1}
+                max={totalDuration - 1}
+                value={breakDuration}
+                onChange={(e) => setBreakDuration(Math.min(totalDuration - 1, Math.max(1, Number(e.target.value) || 1)))}
+                className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
+              />
+              min
+            </span>
           </div>
+        )}
+
+        {plan && workMinutes && (
+          <p className="text-center text-[11px] text-[var(--color-ink-muted)]">
+            {workMinutes} min de trabalho focado, depois {plan[1].minutes} min de pausa. No final, avisamos-te para
+            retomares.
+          </p>
         )}
       </div>
 
@@ -272,27 +290,22 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
       )}
 
       {plan && (
-        <div className="flex flex-col items-center gap-1.5">
-          <p className="text-xs text-[var(--color-ink-muted)]">
-            Bloco {segmentIndex + 1} de {plan.length} · {LABELS[sessionType]}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-1">
-            {plan.map((seg, index) => (
-              <span
-                key={index}
-                className={cn(
-                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                  index === segmentIndex
-                    ? "bg-[var(--color-accent)] text-[var(--color-accent-ink)]"
-                    : index < segmentIndex
-                      ? "bg-[var(--color-surface-alt)] text-[var(--color-ink-muted)] line-through"
-                      : "bg-[var(--color-surface-alt)] text-[var(--color-ink-muted)]"
-                )}
-              >
-                {seg.minutes}m {LABELS[seg.type]}
-              </span>
-            ))}
-          </div>
+        <div className="flex items-center gap-2">
+          {plan.map((seg, index) => (
+            <span
+              key={index}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium",
+                index === segmentIndex
+                  ? "bg-[var(--color-accent)] text-[var(--color-accent-ink)]"
+                  : index < segmentIndex
+                    ? "bg-[var(--color-surface-alt)] text-[var(--color-ink-muted)] line-through"
+                    : "bg-[var(--color-surface-alt)] text-[var(--color-ink-muted)]"
+              )}
+            >
+              {LABELS[seg.type]} · {seg.minutes}m
+            </span>
+          ))}
         </div>
       )}
 
@@ -330,30 +343,23 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
         </Button>
       </div>
 
-      <div className="flex gap-6 text-xs text-[var(--color-ink-muted)]">
-        {(Object.keys(LABELS) as SessionType[]).map((type) => (
-          <label key={type} className="flex items-center gap-1.5">
-            {LABELS[type]}
-            <input
-              type="number"
-              min={1}
-              max={90}
-              value={customDurations[type]}
-              disabled={!!plan}
-              onChange={(e) => handleDurationChange(type, Number(e.target.value) || 1)}
-              className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)] disabled:opacity-50"
-            />
-            min
-          </label>
-        ))}
-      </div>
-      {plan && (
-        <p className="-mt-4 max-w-xs text-center text-[11px] text-[var(--color-ink-muted)]">
-          O relógio mostra o bloco atual, não a duração total: com {customDurations.foco} min de foco definidos, uma
-          atividade de {totalDuration} min é dividida em {plan.length} blocos (foco + pausas) que somam ao todo{" "}
-          {totalDuration} min. Os campos acima ficam bloqueados enquanto o plano automático está ativo — desliga-o
-          para os voltares a editar livremente.
-        </p>
+      {!plan && (
+        <div className="flex gap-6 text-xs text-[var(--color-ink-muted)]">
+          {(Object.keys(LABELS) as SessionType[]).map((type) => (
+            <label key={type} className="flex items-center gap-1.5">
+              {LABELS[type]}
+              <input
+                type="number"
+                min={1}
+                max={90}
+                value={customDurations[type]}
+                onChange={(e) => handleDurationChange(type, Number(e.target.value) || 1)}
+                className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)]"
+              />
+              min
+            </label>
+          ))}
+        </div>
       )}
 
       <p className="text-xs text-[var(--color-ink-muted)]">Sessões de foco concluídas hoje: {sessionCount}</p>

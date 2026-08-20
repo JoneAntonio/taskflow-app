@@ -20,6 +20,7 @@ const EMPTY_SCHEDULE: ScheduleValue = {
   recurrence: null,
   reminderMinutesBefore: null,
   isImportant: null,
+  location: null,
 };
 
 // Mesmo mapeamento usado no SchedulePopover, só para mostrar o nome do quadrante escolhido.
@@ -82,6 +83,7 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
         tagNames: parsed.tagNames,
         reminderAt,
         isImportant: effective.isImportant ?? undefined,
+        location: schedule.location,
       });
       toast.success("Tarefa adicionada à Inbox");
       setValue("");

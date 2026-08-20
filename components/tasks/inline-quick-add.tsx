@@ -18,6 +18,7 @@ const EMPTY_SCHEDULE: ScheduleValue = {
   recurrence: null,
   reminderMinutesBefore: null,
   isImportant: null,
+  location: null,
 };
 
 export function InlineQuickAdd({
@@ -64,6 +65,7 @@ export function InlineQuickAdd({
         projectId,
         reminderAt,
         isImportant: schedule.isImportant ?? undefined,
+        location: schedule.location,
       });
       setValue("");
       setSchedule(EMPTY_SCHEDULE);
