@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, User, ChevronDown } from "lucide-react";
 import { authService } from "@/services/auth.service";
+import { getGravatarUrl } from "@/lib/gravatar";
 import type { Profile } from "@/types/database";
 
 export function UserMenu({ profile }: { profile: Pick<Profile, "full_name" | "email" | "avatar_url"> }) {
@@ -26,12 +27,7 @@ export function UserMenu({ profile }: { profile: Pick<Profile, "full_name" | "em
     router.refresh();
   }
 
-  const initials = (profile.full_name || profile.email)
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const avatarUrl = profile.avatar_url || getGravatarUrl(profile.email, 64);
 
   return (
     <div className="relative" ref={menuRef}>
@@ -39,8 +35,9 @@ export function UserMenu({ profile }: { profile: Pick<Profile, "full_name" | "em
         onClick={() => setOpen((prev) => !prev)}
         className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] py-1 pl-1 pr-2.5 hover:bg-[var(--color-surface-alt)]"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-semibold text-[var(--color-accent-ink)]">
-          {initials}
+        <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-[var(--color-accent)] text-xs font-semibold text-[var(--color-accent-ink)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
         </span>
         <ChevronDown className="h-3.5 w-3.5 text-[var(--color-ink-muted)]" />
       </button>

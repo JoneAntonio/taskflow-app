@@ -26,4 +26,10 @@ export const profileService = {
     if (error) throw error;
     return data as Profile;
   },
+
+  async updateAvatar(userId: string, avatarUrl: string | null): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", userId);
+    if (error) throw error;
+  },
 };

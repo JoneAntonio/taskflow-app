@@ -29,14 +29,19 @@ export default async function DashboardPage() {
     .is("project_id", null)
     .in("status", ["pendente", "em_progresso"])
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(3);
+
+  const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+  const firstName = profile?.full_name?.trim().split(" ")[0] || "";
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Dashboard</h1>
-        <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-          O resumo do teu dia, num relance.
+        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
+          {firstName ? `Bem-vindo, ${firstName}` : "Dashboard"}
+        </h1>
+        <p className="mt-1 text-sm italic text-[var(--color-ink-muted)]">
+          &quot;Não se gere o que não se mede.&quot;
         </p>
       </div>
 
@@ -75,7 +80,7 @@ export default async function DashboardPage() {
           {(inboxTasks ?? []).length === 0 ? (
             <EmptyRow text="A tua Inbox está vazia." />
           ) : (
-            (inboxTasks as Task[]).map((task) => <TaskListItem key={task.id} task={task} />)
+            (inboxTasks as Task[]).map((task) => <TaskListItem key={task.id} task={task} compact />)
           )}
         </CardContent>
       </Card>
