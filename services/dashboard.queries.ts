@@ -21,7 +21,7 @@ export interface DashboardData {
   pendingCount: number;
   completedCount: number;
   completionRate: number; // 0-100
-  weeklyProductivity: { day: string; concluidas: number }[];
+  weeklyProductivity: { day: string; concluidas: number; atrasadas: number }[];
 }
 
 /**
@@ -44,6 +44,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     { count: completedCount },
     { count: completedTodayCount },
     { data: weekCompleted },
+    { data: weekOverdue },
   ] = await Promise.all([
     supabase
       .from("tasks")
@@ -90,17 +91,29 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       .eq("user_id", userId)
       .eq("status", "concluida")
       .gte("completed_at", `${weekStart}T00:00:00`),
+    supabase
+      .from("tasks")
+      .select("due_date")
+      .eq("user_id", userId)
+      .in("status", ["pendente", "em_progresso"])
+      .lt("due_date", today)
+      .gte("due_date", weekStart),
   ]);
 
   const total = (pendingCount ?? 0) + (completedCount ?? 0);
   const completionRate = total > 0 ? Math.round(((completedCount ?? 0) / total) * 100) : 0;
 
   const dayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-  const weeklyProductivity = dayLabels.map((day) => ({ day, concluidas: 0 }));
+  const weeklyProductivity = dayLabels.map((day) => ({ day, concluidas: 0, atrasadas: 0 }));
   (weekCompleted ?? []).forEach((row) => {
     if (!row.completed_at) return;
     const weekday = new Date(row.completed_at).getDay();
     weeklyProductivity[weekday].concluidas += 1;
+  });
+  (weekOverdue ?? []).forEach((row) => {
+    if (!row.due_date) return;
+    const weekday = new Date(row.due_date + "T00:00:00").getDay();
+    weeklyProductivity[weekday].atrasadas += 1;
   });
 
   return {

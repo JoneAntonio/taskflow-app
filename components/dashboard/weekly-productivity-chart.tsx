@@ -1,11 +1,11 @@
 "use client";
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from "recharts";
 
 export function WeeklyProductivityChart({
   data,
 }: {
-  data: { day: string; concluidas: number }[];
+  data: { day: string; concluidas: number; atrasadas: number }[];
 }) {
   return (
     <div className="h-56 w-full">
@@ -35,7 +35,12 @@ export function WeeklyProductivityChart({
             }}
             labelStyle={{ color: "var(--color-ink)" }}
           />
-          <Bar dataKey="concluidas" name="Concluídas" fill="var(--color-accent)" radius={[6, 6, 0, 0]} />
+          <Legend
+            wrapperStyle={{ fontSize: 12, color: "var(--color-ink-muted)" }}
+            formatter={(value) => (value === "concluidas" ? "Concluídas" : "Atrasadas")}
+          />
+          <Bar dataKey="concluidas" name="concluidas" fill="var(--color-accent)" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="atrasadas" name="atrasadas" fill="var(--color-danger)" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

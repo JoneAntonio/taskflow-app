@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { Sun, Sunrise, CalendarPlus, Repeat } from "lucide-react";
 import { MiniCalendar } from "@/components/tasks/mini-calendar";
 import { Button } from "@/components/ui/button";
-import { PRIORITY_LABELS } from "@/lib/labels";
 import { RECURRENCE_LABELS } from "@/utils/parse-quick-task";
 import { cn } from "@/lib/utils";
 import type { TaskPriority, Recurrence, RecurrenceFrequency } from "@/types/database";
@@ -26,30 +25,14 @@ const QUICK_DATE_OPTIONS = [
   { label: "Próxima semana", icon: CalendarPlus, getDate: () => addDays(new Date(), 7) },
 ];
 
-const PRIORITY_OPTIONS: TaskPriority[] = ["sem_prioridade", "baixa", "media", "alta", "urgente"];
 const RECURRENCE_OPTIONS: Exclude<RecurrenceFrequency, null>[] = ["diaria", "dias_uteis", "semanal", "mensal", "anual"];
 
 /**
- * Cores da prioridade sincronizadas com as da Matriz de Eisenhower, para que
- * a cor que vês ao escolher a prioridade já sugira para que zona da matriz
- * a tarefa tende a ir: vermelho (Fazer) → laranja (Delegar) → azul
- * (Agendar) → cinza (Eliminar). "Alta"/"Urgente" contam como urgentes na
- * matriz; as restantes não.
- */
-const PRIORITY_MATRIX_COLOR_VAR: Record<TaskPriority, string> = {
-  urgente: "--color-danger",
-  alta: "--color-warning",
-  media: "--color-secondary",
-  baixa: "--color-ink-muted",
-  sem_prioridade: "--color-ink-muted",
-};
-
-/**
- * Mapeamento pedido pelo utilizador entre "nível" e quadrante da Matriz:
- * Alto → Urgente e importante · Médio → Importante, não urgente ·
- * Baixo → Urgente, não importante · Muito Baixo → Nem urgente, nem importante.
- * Internamente usamos priority + isImportant para determinar o quadrante
- * (a mesma lógica usada em /matriz), sem depender do texto do nível.
+ * Mapeamento único entre "nível" e quadrante da Matriz — a MESMA escolha
+ * define tanto a prioridade como a importância, para a tarefa aparecer
+ * sempre no quadrante certo, seja onde for que a crias na app:
+ * Alto → Urgente e importante (Fazer) · Médio → Importante, não urgente (Agendar) ·
+ * Baixo → Urgente, não importante (Delegar) · Muito Baixo → Nem urgente, nem importante (Eliminar).
  */
 const MATRIX_LEVEL_OPTIONS: { label: string; quadrant: string; priority: TaskPriority; isImportant: boolean; color: string }[] = [
   { label: "Alto", quadrant: "Fazer", priority: "alta", isImportant: true, color: "var(--color-danger)" },
@@ -79,7 +62,7 @@ export function SchedulePopover({
   anchorRef: React.RefObject<HTMLElement | null>;
 }) {
   const popoverRef = useRef<HTMLDivElement>(null);
-  const [tab, setTab] = useState<"dados" | "prioridade" | "repetir" | "matriz">("dados");
+  const [tab, setTab] = useState<"dados" | "prioridade" | "repetir">("dados");
   const [local, setLocal] = useState<ScheduleValue>(value);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
 
@@ -132,11 +115,11 @@ export function SchedulePopover({
   return createPortal(
     <div
       ref={popoverRef}
-      className="fixed z-[60] w-96 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
+      className="fixed z-[60] w-80 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
       style={{ top: position.top, left: position.left }}
     >
       <div className="mb-3 flex gap-1 rounded-full bg-[var(--color-surface-alt)] p-1">
-        {(["dados", "prioridade", "repetir", "matriz"] as const).map((t) => (
+        {(["dados", "prioridade", "repetir"] as const).map((t) => (
           <button
             key={t}
             type="button"
@@ -238,27 +221,30 @@ export function SchedulePopover({
       {tab === "prioridade" && (
         <div className="space-y-1.5">
           <p className="mb-2 text-xs text-[var(--color-ink-muted)]">
-            A cor de cada prioridade acompanha a Matriz de Eisenhower: vermelho/laranja tendem a ser urgentes, azul/cinza não.
+            Escolhe o nível — determina também onde a tarefa aparece na Matriz de Eisenhower.
           </p>
-          {PRIORITY_OPTIONS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setLocal((prev) => ({ ...prev, priority: p }))}
-              className={cn(
-                "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
-                local.priority === p
-                  ? "bg-[var(--color-surface-alt)] font-medium text-[var(--color-ink)]"
-                  : "text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
-              )}
-            >
-              <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: `var(${PRIORITY_MATRIX_COLOR_VAR[p]})` }}
-              />
-              {PRIORITY_LABELS[p]}
-            </button>
-          ))}
+          {MATRIX_LEVEL_OPTIONS.map((opt) => {
+            const isActive = local.priority === opt.priority && local.isImportant === opt.isImportant;
+            return (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => setLocal((prev) => ({ ...prev, priority: opt.priority, isImportant: opt.isImportant }))}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                  isActive
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-ink)]"
+                    : "border-transparent text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-ink)]"
+                )}
+              >
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: opt.color }} />
+                <span className="flex-1 font-medium">{opt.label}</span>
+                <span className="text-xs" style={{ color: opt.color }}>
+                  {opt.quadrant}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -296,35 +282,6 @@ export function SchedulePopover({
               <Repeat className="h-3.5 w-3.5" /> {RECURRENCE_LABELS[freq]}
             </button>
           ))}
-        </div>
-      )}
-
-      {tab === "matriz" && (
-        <div className="space-y-1.5">
-          <p className="mb-2 text-xs text-[var(--color-ink-muted)]">
-            Escolhe onde esta tarefa deve aparecer na Matriz de Eisenhower.
-          </p>
-          {MATRIX_LEVEL_OPTIONS.map((opt) => {
-            const isActive = local.priority === opt.priority && local.isImportant === opt.isImportant;
-            return (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() => setLocal((prev) => ({ ...prev, priority: opt.priority, isImportant: opt.isImportant }))}
-                className={cn(
-                  "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors",
-                  isActive
-                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-ink)]"
-                    : "border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
-                )}
-              >
-                <span className="font-medium">{opt.label}</span>
-                <span className="text-xs" style={{ color: opt.color }}>
-                  {opt.quadrant}
-                </span>
-              </button>
-            );
-          })}
         </div>
       )}
 

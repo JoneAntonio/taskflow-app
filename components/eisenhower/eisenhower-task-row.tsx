@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Star, Check, Trash2 } from "lucide-react";
+import { Star, Check, Trash2, Repeat } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { taskActionsService } from "@/services/task-actions.service";
@@ -82,6 +82,14 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
       >
         {task.title}
       </span>
+      {(task.due_date || task.due_time) && !isCompleted && (
+        <span className="hidden shrink-0 items-center gap-1 text-xs text-[var(--color-ink-muted)] sm:flex">
+          {task.due_date && new Date(task.due_date + "T00:00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })}
+          {task.due_time ? ` · ${task.due_time}` : ""}
+          {task.due_time_end ? `–${task.due_time_end}` : ""}
+          {task.recurrence && <Repeat className="h-3 w-3" />}
+        </span>
+      )}
       {isCompleted ? (
         <button
           onClick={handleDeletePermanently}

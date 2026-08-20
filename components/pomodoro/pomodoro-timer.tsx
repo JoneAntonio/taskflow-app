@@ -5,6 +5,7 @@ import { Play, Pause, RotateCcw, ListTodo } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 export interface PomodoroTaskOption {
   id: string;
@@ -271,9 +272,28 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
       )}
 
       {plan && (
-        <p className="text-xs text-[var(--color-ink-muted)]">
-          Bloco {segmentIndex + 1} de {plan.length} · {LABELS[sessionType]}
-        </p>
+        <div className="flex flex-col items-center gap-1.5">
+          <p className="text-xs text-[var(--color-ink-muted)]">
+            Bloco {segmentIndex + 1} de {plan.length} · {LABELS[sessionType]}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1">
+            {plan.map((seg, index) => (
+              <span
+                key={index}
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                  index === segmentIndex
+                    ? "bg-[var(--color-accent)] text-[var(--color-accent-ink)]"
+                    : index < segmentIndex
+                      ? "bg-[var(--color-surface-alt)] text-[var(--color-ink-muted)] line-through"
+                      : "bg-[var(--color-surface-alt)] text-[var(--color-ink-muted)]"
+                )}
+              >
+                {seg.minutes}m {LABELS[seg.type]}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="relative flex h-64 w-64 items-center justify-center">

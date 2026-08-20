@@ -88,7 +88,7 @@ export default async function AgentDetailPage({
                 {MATURITY_DESCRIPTIONS[agentData.current_maturity].description}
               </p>
               <p className="mt-1.5 text-xs font-medium text-[var(--color-accent)]">
-                Liderança: {MATURITY_DESCRIPTIONS[agentData.current_maturity].leadershipStyle}
+                Tipo: {MATURITY_DESCRIPTIONS[agentData.current_maturity].leadershipStyle}
               </p>
             </div>
           )}
