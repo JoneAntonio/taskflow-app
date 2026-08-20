@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, Inbox, ArrowRight } from "lucide-react";
+import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardData } from "@/services/dashboard.queries";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { CompletionRing } from "@/components/dashboard/completion-ring";
 import { WeeklyProductivityChart } from "@/components/dashboard/weekly-productivity-chart";
 import { TaskListItem } from "@/components/tasks/task-list-item";
-import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import type { Task } from "@/types/database";
 
 export const metadata: Metadata = { title: "Dashboard — JAFLOW" };
 
@@ -22,14 +19,6 @@ export default async function DashboardPage() {
   if (!user) return null;
 
   const data = await getDashboardData(user.id);
-
-  const { data: inboxTasks } = await supabase
-    .from("tasks")
-    .select("*")
-    .is("project_id", null)
-    .in("status", ["pendente", "em_progresso"])
-    .order("created_at", { ascending: false })
-    .limit(3);
 
   const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
   const firstName = profile?.full_name?.trim().split(" ")[0] || "";
@@ -61,29 +50,6 @@ export default async function DashboardPage() {
           accent="success"
         />
       </div>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="flex items-center gap-2">
-            <Inbox className="h-4 w-4 text-[var(--color-accent)]" />
-            Inbox
-          </CardTitle>
-          <Link
-            href="/inbox"
-            className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
-          >
-            Ver tudo <ArrowRight className="h-3 w-3" />
-          </Link>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <InlineQuickAdd placeholder="Captura uma tarefa rapidamente..." />
-          {(inboxTasks ?? []).length === 0 ? (
-            <EmptyRow text="A tua Inbox está vazia." />
-          ) : (
-            (inboxTasks as Task[]).map((task) => <TaskListItem key={task.id} task={task} compact />)
-          )}
-        </CardContent>
-      </Card>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">

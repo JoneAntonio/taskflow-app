@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { toLocalISODate } from "@/lib/utils";
+import { getTodayISO } from "@/lib/server-date";
 import { QuadrantCard } from "@/components/eisenhower/quadrant-card";
 import type { Task } from "@/types/database";
 
@@ -12,10 +12,9 @@ export const metadata: Metadata = { title: "Matriz de Eisenhower — JAFLOW" };
  * ou já ultrapassada. Importância é uma marcação manual (is_important),
  * ativada/desativada com a estrela em cada tarefa.
  */
-function isUrgent(task: Task): boolean {
+function isUrgent(task: Task, today: string): boolean {
   if (task.priority === "urgente" || task.priority === "alta") return true;
   if (task.due_date) {
-    const today = toLocalISODate(new Date());
     if (task.due_date <= today) return true;
   }
   return false;
@@ -38,6 +37,7 @@ export default async function MatrizPage() {
 
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const today = await getTodayISO();
 
   const [{ data: activeTasks }, { data: recentlyCompleted }] = await Promise.all([
     supabase.from("tasks").select("*").in("status", ["pendente", "em_progresso"]).order("created_at", { ascending: false }),
@@ -51,10 +51,10 @@ export default async function MatrizPage() {
 
   const all = [...((activeTasks ?? []) as Task[]), ...((recentlyCompleted ?? []) as Task[])];
 
-  const doQuadrant = sortWithCompletedLast(all.filter((t) => isUrgent(t) && t.is_important));
-  const scheduleQuadrant = sortWithCompletedLast(all.filter((t) => !isUrgent(t) && t.is_important));
-  const delegateQuadrant = sortWithCompletedLast(all.filter((t) => isUrgent(t) && !t.is_important));
-  const eliminateQuadrant = sortWithCompletedLast(all.filter((t) => !isUrgent(t) && !t.is_important));
+  const doQuadrant = sortWithCompletedLast(all.filter((t) => isUrgent(t, today) && t.is_important));
+  const scheduleQuadrant = sortWithCompletedLast(all.filter((t) => !isUrgent(t, today) && t.is_important));
+  const delegateQuadrant = sortWithCompletedLast(all.filter((t) => isUrgent(t, today) && !t.is_important));
+  const eliminateQuadrant = sortWithCompletedLast(all.filter((t) => !isUrgent(t, today) && !t.is_important));
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">

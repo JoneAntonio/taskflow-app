@@ -29,16 +29,26 @@ export default async function ProjetosPage() {
     taskCounts.set(task.project_id, entry);
   });
 
+  const topLevel = projectList.filter((p) => !p.parent_id);
+  const childrenByParent = new Map<string, Project[]>();
+  projectList
+    .filter((p) => p.parent_id)
+    .forEach((p) => {
+      const list = childrenByParent.get(p.parent_id!) ?? [];
+      list.push(p);
+      childrenByParent.set(p.parent_id!, list);
+    });
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Projetos</h1>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-            Organiza as tuas tarefas por área da tua vida.
+            Organiza as tuas tarefas por área da tua vida. Cria subprojetos para agrupares dentro de um projeto maior.
           </p>
         </div>
-        <NewProjectButton />
+        <NewProjectButton availableParents={topLevel} />
       </div>
 
       {projectList.length === 0 ? (
@@ -50,16 +60,29 @@ export default async function ProjetosPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {projectList.map((project) => {
+        <div className="space-y-6">
+          {topLevel.map((project) => {
             const counts = taskCounts.get(project.id) ?? { total: 0, completed: 0 };
+            const children = childrenByParent.get(project.id) ?? [];
             return (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                totalTasks={counts.total}
-                completedTasks={counts.completed}
-              />
+              <div key={project.id}>
+                <ProjectCard project={project} totalTasks={counts.total} completedTasks={counts.completed} />
+                {children.length > 0 && (
+                  <div className="ml-6 mt-3 space-y-3 border-l-2 border-[var(--color-border)] pl-4">
+                    {children.map((child) => {
+                      const childCounts = taskCounts.get(child.id) ?? { total: 0, completed: 0 };
+                      return (
+                        <ProjectCard
+                          key={child.id}
+                          project={child}
+                          totalTasks={childCounts.total}
+                          completedTasks={childCounts.completed}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

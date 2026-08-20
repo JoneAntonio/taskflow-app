@@ -9,7 +9,7 @@ import { ProjectDialog } from "@/components/projects/project-dialog";
 import { projectsService } from "@/services/projects.service";
 import type { Project } from "@/types/database";
 
-export function ProjectHeaderActions({ project }: { project: Project }) {
+export function ProjectHeaderActions({ project, availableParents = [] }: { project: Project; availableParents?: Project[] }) {
   const [editOpen, setEditOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -36,7 +36,7 @@ export function ProjectHeaderActions({ project }: { project: Project }) {
       <Button variant="outline" size="sm" onClick={handleDelete} isLoading={isDeleting}>
         <Trash2 className="h-3.5 w-3.5" /> Eliminar
       </Button>
-      <ProjectDialog open={editOpen} onClose={() => setEditOpen(false)} project={project} />
+      <ProjectDialog open={editOpen} onClose={() => setEditOpen(false)} project={project} availableParents={availableParents} />
     </div>
   );
 }

@@ -25,6 +25,13 @@ export default async function ProjectDetailPage({
   const { data: project } = await supabase.from("projects").select("*").eq("id", projectId).single();
   if (!project) notFound();
 
+  const { data: topLevelProjects } = await supabase.from("projects").select("*").is("parent_id", null);
+
+  const projectData = project as Project;
+  const parentProject = projectData.parent_id
+    ? (topLevelProjects ?? []).find((p) => p.id === projectData.parent_id)
+    : null;
+
   const { data: tasks } = await supabase
     .from("tasks")
     .select("*")
@@ -32,7 +39,6 @@ export default async function ProjectDetailPage({
     .order("status")
     .order("created_at", { ascending: false });
 
-  const projectData = project as Project;
   const taskList = (tasks ?? []) as Task[];
   const pending = taskList.filter((t) => t.status !== "concluida" && t.status !== "arquivada");
   const completed = taskList.filter((t) => t.status === "concluida");
@@ -56,12 +62,20 @@ export default async function ProjectDetailPage({
           </span>
           <div>
             <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">{projectData.name}</h1>
+            {parentProject && (
+              <Link
+                href={`/projetos/${parentProject.id}`}
+                className="mt-0.5 block text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+              >
+                Dentro de {parentProject.name}
+              </Link>
+            )}
             {projectData.description && (
               <p className="mt-0.5 text-sm text-[var(--color-ink-muted)]">{projectData.description}</p>
             )}
           </div>
         </div>
-        <ProjectHeaderActions project={projectData} />
+        <ProjectHeaderActions project={projectData} availableParents={(topLevelProjects ?? []) as Project[]} />
       </div>
 
       <InlineQuickAdd placeholder="Adicionar tarefa a este projeto" projectId={projectId} />

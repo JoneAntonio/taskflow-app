@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { toLocalISODate } from "@/lib/utils";
+import { getTodayISO } from "@/lib/server-date";
 import { PomodoroTimer } from "@/components/pomodoro/pomodoro-timer";
 import { AgendaTimeline } from "@/components/pomodoro/agenda-timeline";
 import type { Task } from "@/types/database";
@@ -14,7 +14,7 @@ export default async function PomodoroPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const today = toLocalISODate(new Date());
+  const today = await getTodayISO();
 
   const [{ data: tasks }, { data: todayTasks }] = await Promise.all([
     supabase

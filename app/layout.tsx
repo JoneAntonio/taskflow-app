@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
+import { TimezoneSync } from "@/components/providers/timezone-sync";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           {children}
           <ToasterProvider />
+          <TimezoneSync />
         </ThemeProvider>
       </body>
     </html>

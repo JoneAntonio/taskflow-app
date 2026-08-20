@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { toLocalISODate } from "@/lib/utils";
+import { getTodayISO } from "@/lib/server-date";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { HojeView } from "@/components/tasks/hoje-view";
 import type { Task } from "@/types/database";
@@ -14,7 +14,7 @@ export default async function HojePage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const today = toLocalISODate(new Date());
+  const today = await getTodayISO();
 
   const [{ data: todayTasks }, { data: overdueTasks }] = await Promise.all([
     supabase

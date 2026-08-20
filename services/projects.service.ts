@@ -2,7 +2,13 @@ import { createClient } from "@/lib/supabase/client";
 import type { Project } from "@/types/database";
 
 export const projectsService = {
-  async createProject(input: { name: string; description?: string; color?: string; icon?: string }): Promise<Project> {
+  async createProject(input: {
+    name: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+    parentId?: string | null;
+  }): Promise<Project> {
     const supabase = createClient();
     const {
       data: { user },
@@ -17,6 +23,7 @@ export const projectsService = {
         description: input.description ?? null,
         color: input.color ?? "#3F6FA8",
         icon: input.icon ?? "folder",
+        parent_id: input.parentId ?? null,
       })
       .select()
       .single();
@@ -24,9 +31,16 @@ export const projectsService = {
     return data as Project;
   },
 
-  async updateProject(id: string, input: Partial<Pick<Project, "name" | "description" | "color" | "icon">>): Promise<void> {
+  async updateProject(
+    id: string,
+    input: Partial<Pick<Project, "name" | "description" | "color" | "icon">> & { parentId?: string | null }
+  ): Promise<void> {
     const supabase = createClient();
-    const { error } = await supabase.from("projects").update(input).eq("id", id);
+    const { parentId, ...rest } = input;
+    const { error } = await supabase
+      .from("projects")
+      .update({ ...rest, ...(parentId !== undefined ? { parent_id: parentId } : {}) })
+      .eq("id", id);
     if (error) throw error;
   },
 

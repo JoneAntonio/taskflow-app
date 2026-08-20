@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { toLocalISODate } from "@/lib/utils";
+import { getTodayISO } from "@/lib/server-date";
 import type { Task } from "@/types/database";
 
 function toISODate(date: Date): string {
@@ -33,9 +34,10 @@ export interface DashboardData {
  */
 export async function getDashboardData(userId: string): Promise<DashboardData> {
   const supabase = await createClient();
-  const today = toISODate(new Date());
-  const in7Days = toISODate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
-  const weekStart = toISODate(startOfWeek(new Date()));
+  const today = await getTodayISO();
+  const todayDate = new Date(today + "T00:00:00");
+  const in7Days = toISODate(new Date(todayDate.getTime() + 7 * 24 * 60 * 60 * 1000));
+  const weekStart = toISODate(startOfWeek(todayDate));
 
   const [
     { data: todayTasks },

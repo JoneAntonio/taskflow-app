@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
+  Inbox,
   CalendarCheck,
   CalendarDays,
   CalendarRange,
@@ -24,6 +25,7 @@ export interface NavItem {
 
 export const primaryNav: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, showOnMobile: true },
+  { label: "Inbox", href: "/inbox", icon: Inbox, showOnMobile: true },
   { label: "Hoje", href: "/hoje", icon: CalendarCheck, showOnMobile: true },
   { label: "Próximas", href: "/proximas", icon: CalendarRange },
   { label: "Calendário", href: "/calendario", icon: CalendarDays, showOnMobile: true },

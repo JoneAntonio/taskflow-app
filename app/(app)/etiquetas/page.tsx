@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Tag as TagIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { toLocalISODate } from "@/lib/utils";
+import { getTodayISO } from "@/lib/server-date";
 import { NewTagForm } from "@/components/tags/new-tag-form";
 import { TagCard } from "@/components/tags/tag-card";
 import type { Tag } from "@/types/database";
@@ -15,7 +15,7 @@ export default async function EtiquetasPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const today = toLocalISODate(new Date());
+  const today = await getTodayISO();
 
   const [{ data: tags }, { data: taskTags }] = await Promise.all([
     supabase.from("tags").select("*").order("name"),
