@@ -1,4 +1,5 @@
 import { EisenhowerTaskRow } from "@/components/eisenhower/eisenhower-task-row";
+import { QuadrantQuickAdd } from "@/components/eisenhower/quadrant-quick-add";
 import type { Task } from "@/types/database";
 
 export function QuadrantCard({
@@ -6,11 +7,15 @@ export function QuadrantCard({
   subtitle,
   accentVar,
   tasks,
+  important,
+  urgent,
 }: {
   title: string;
   subtitle: string;
   accentVar: string;
   tasks: Task[];
+  important: boolean;
+  urgent: boolean;
 }) {
   return (
     <div
@@ -22,6 +27,9 @@ export function QuadrantCard({
           {title}
         </p>
         <p className="text-xs text-[var(--color-ink-muted)]">{subtitle}</p>
+      </div>
+      <div className="mb-2">
+        <QuadrantQuickAdd important={important} urgent={urgent} placeholder="Adicionar tarefa aqui" />
       </div>
       <div className="flex-1 space-y-1.5">
         {tasks.length === 0 ? (

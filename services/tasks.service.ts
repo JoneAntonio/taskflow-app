@@ -11,6 +11,7 @@ export interface CreateTaskInput {
   recurrence?: Recurrence | null;
   priority?: TaskPriority;
   tagNames?: string[];
+  isImportant?: boolean;
 }
 
 /**
@@ -42,6 +43,7 @@ export const tasksService = {
         recurrence: input.recurrence ?? null,
         priority: input.priority ?? "sem_prioridade",
         status: "pendente",
+        is_important: input.isImportant ?? false,
       })
       .select()
       .single();

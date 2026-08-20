@@ -55,24 +55,32 @@ export default async function MatrizPage() {
           subtitle="Urgente e importante"
           accentVar="--color-danger"
           tasks={doQuadrant}
+          important
+          urgent
         />
         <QuadrantCard
           title="Agendar"
           subtitle="Importante, não urgente"
           accentVar="--color-secondary"
           tasks={scheduleQuadrant}
+          important
+          urgent={false}
         />
         <QuadrantCard
           title="Delegar"
           subtitle="Urgente, não importante"
           accentVar="--color-warning"
           tasks={delegateQuadrant}
+          important={false}
+          urgent
         />
         <QuadrantCard
           title="Eliminar"
           subtitle="Nem urgente, nem importante"
           accentVar="--color-ink-muted"
           tasks={eliminateQuadrant}
+          important={false}
+          urgent={false}
         />
       </div>
     </div>

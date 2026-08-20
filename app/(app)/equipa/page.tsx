@@ -31,6 +31,17 @@ export default async function EquipaPage() {
 
   const agentList = (agents ?? []) as TeamAgent[];
 
+  // Agrupa por operação/equipa, para deixar claro quando estás a gerir agentes
+  // de equipas diferentes da tua, mas que continuam sob a tua responsabilidade.
+  const groups = new Map<string, TeamAgent[]>();
+  agentList.forEach((agent) => {
+    const key = agent.operation?.trim() || "Sem operação atribuída";
+    const list = groups.get(key) ?? [];
+    list.push(agent);
+    groups.set(key, list);
+  });
+  const sortedGroupNames = [...groups.keys()].sort((a, b) => a.localeCompare(b, "pt"));
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -39,7 +50,9 @@ export default async function EquipaPage() {
             Maturidade da Equipa
           </h1>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-            Avalia cada agente segundo o modelo M1–M4 e acompanha a evolução ao longo do tempo.
+            Avalia cada agente segundo o modelo M1–M4 e acompanha a evolução ao longo do tempo. Podes gerir
+            agentes de outras equipas/operações que continuem sob a tua responsabilidade — basta indicares a
+            operação deles ao criares o agente.
           </p>
         </div>
         <AddAgentButton />
@@ -54,13 +67,23 @@ export default async function EquipaPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {agentList.map((agent) => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              lastEvaluationDate={lastEvaluationByAgent.get(agent.id) ?? null}
-            />
+        <div className="space-y-8">
+          {sortedGroupNames.map((groupName) => (
+            <div key={groupName}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+                {groupName} · {groups.get(groupName)!.length}{" "}
+                {groups.get(groupName)!.length === 1 ? "agente" : "agentes"}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {groups.get(groupName)!.map((agent) => (
+                  <AgentCard
+                    key={agent.id}
+                    agent={agent}
+                    lastEvaluationDate={lastEvaluationByAgent.get(agent.id) ?? null}
+                  />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}

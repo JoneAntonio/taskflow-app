@@ -42,7 +42,7 @@ export function NewAgentDialog({ open, onClose }: { open: boolean; onClose: () =
       open={open}
       onClose={onClose}
       title="Novo agente"
-      description="Adiciona um membro da equipa para começares a avaliar a maturidade."
+      description="Adiciona um membro da equipa para começares a avaliar a maturidade. Se o agente pertencer a outra equipa/operação mas continuar sob a tua responsabilidade, indica isso no campo Operação."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
