@@ -16,11 +16,16 @@ interface DialogProps {
 
 export function Dialog({ open, onClose, title, description, children, className }: DialogProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
     }
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
@@ -29,7 +34,7 @@ export function Dialog({ open, onClose, title, description, children, className 
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open || typeof document === "undefined") return null;
 
