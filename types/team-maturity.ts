@@ -61,22 +61,26 @@ export const DEFAULT_CRITERIA: Array<{ name: string; weight: number; inverted: b
   { name: "Comunicação", weight: 10, inverted: false },
 ];
 
-export const MATURITY_DESCRIPTIONS: Record<MaturityLevel, { title: string; description: string }> = {
+export const MATURITY_DESCRIPTIONS: Record<MaturityLevel, { title: string; description: string; leadershipStyle: string }> = {
   M1: {
-    title: "Baixa competência / baixa experiência",
-    description: "Necessita de orientação próxima e instruções claras e específicas.",
+    title: "Baixa maturidade",
+    description: "Pouca competência e pouca experiência; necessita de orientação próxima.",
+    leadershipStyle: "Dirigir",
   },
   M2: {
-    title: "Alguma competência / em desenvolvimento",
-    description: "Já conhece parte da operação, mas ainda precisa de acompanhamento e feedback.",
+    title: "Maturidade baixa a moderada",
+    description: "Começa a desenvolver competências, mas ainda precisa de acompanhamento e motivação.",
+    leadershipStyle: "Orientar / Coaching",
   },
   M3: {
-    title: "Boa competência / autonomia",
-    description: "Domina os processos e trabalha com pouca supervisão.",
+    title: "Maturidade moderada a alta",
+    description: "Possui competência, mas pode apresentar alguma insegurança ou necessitar de apoio pontual.",
+    leadershipStyle: "Apoiar",
   },
   M4: {
-    title: "Elevada competência / elevada autonomia",
-    description: "Trabalha de forma independente e pode apoiar e mentorizar outros agentes.",
+    title: "Alta maturidade",
+    description: "Elevada competência, autonomia e confiança; consegue executar as tarefas praticamente sem supervisão.",
+    leadershipStyle: "Delegar",
   },
 };
 

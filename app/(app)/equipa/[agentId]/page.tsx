@@ -83,9 +83,14 @@ export default async function AgentDetailPage({
             </div>
           </div>
           {agentData.current_maturity && (
-            <p className="max-w-[55%] text-right text-xs text-[var(--color-ink-muted)]">
-              {MATURITY_DESCRIPTIONS[agentData.current_maturity].description}
-            </p>
+            <div className="max-w-[55%] text-right">
+              <p className="text-xs text-[var(--color-ink-muted)]">
+                {MATURITY_DESCRIPTIONS[agentData.current_maturity].description}
+              </p>
+              <p className="mt-1.5 text-xs font-medium text-[var(--color-accent)]">
+                Liderança: {MATURITY_DESCRIPTIONS[agentData.current_maturity].leadershipStyle}
+              </p>
+            </div>
           )}
         </div>
         <div className="mt-5">

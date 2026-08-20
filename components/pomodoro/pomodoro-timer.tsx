@@ -310,23 +310,26 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
         </Button>
       </div>
 
-      {!plan && (
-        <div className="flex gap-6 text-xs text-[var(--color-ink-muted)]">
-          {(Object.keys(LABELS) as SessionType[]).map((type) => (
-            <label key={type} className="flex items-center gap-1.5">
-              {LABELS[type]}
-              <input
-                type="number"
-                min={1}
-                max={90}
-                value={customDurations[type]}
-                onChange={(e) => handleDurationChange(type, Number(e.target.value) || 1)}
-                className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)]"
-              />
-              min
-            </label>
-          ))}
-        </div>
+      <div className="flex gap-6 text-xs text-[var(--color-ink-muted)]">
+        {(Object.keys(LABELS) as SessionType[]).map((type) => (
+          <label key={type} className="flex items-center gap-1.5">
+            {LABELS[type]}
+            <input
+              type="number"
+              min={1}
+              max={90}
+              value={customDurations[type]}
+              onChange={(e) => handleDurationChange(type, Number(e.target.value) || 1)}
+              className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)]"
+            />
+            min
+          </label>
+        ))}
+      </div>
+      {plan && (
+        <p className="-mt-4 text-[11px] text-[var(--color-ink-muted)]">
+          O plano automático usa estes valores para dividir a duração total em blocos.
+        </p>
       )}
 
       <p className="text-xs text-[var(--color-ink-muted)]">Sessões de foco concluídas hoje: {sessionCount}</p>

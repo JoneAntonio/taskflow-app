@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CalendarClock, Flag, Repeat, Bell } from "lucide-react";
+import { CalendarClock, Flag, Repeat, Bell, LayoutGrid } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { HighlightedQuickInput } from "@/components/tasks/highlighted-quick-input";
@@ -19,7 +19,18 @@ const EMPTY_SCHEDULE: ScheduleValue = {
   priority: null,
   recurrence: null,
   reminderMinutesBefore: null,
+  isImportant: null,
 };
+
+// Mesmo mapeamento usado no SchedulePopover, só para mostrar o nome do quadrante escolhido.
+function matrixQuadrantLabel(priority: string | null, isImportant: boolean | null): string | null {
+  if (isImportant === null) return null;
+  const urgent = priority === "alta" || priority === "urgente";
+  if (urgent && isImportant) return "Fazer";
+  if (!urgent && isImportant) return "Agendar";
+  if (urgent && !isImportant) return "Delegar";
+  return "Eliminar";
+}
 
 export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [value, setValue] = useState("");
@@ -38,7 +49,10 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
     priority: schedule.priority ?? textParsed?.priority ?? null,
     recurrence: schedule.recurrence ?? textParsed?.recurrence ?? null,
     reminderMinutesBefore: schedule.reminderMinutesBefore,
+    isImportant: schedule.isImportant,
   };
+
+  const quadrantLabel = matrixQuadrantLabel(schedule.priority, schedule.isImportant);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -67,6 +81,7 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
         recurrence: effective.recurrence,
         tagNames: parsed.tagNames,
         reminderAt,
+        isImportant: effective.isImportant ?? undefined,
       });
       toast.success("Tarefa adicionada à Inbox");
       setValue("");
@@ -89,7 +104,7 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
       open={open}
       onClose={handleClose}
       title="Adicionar tarefa"
-      description="Escreve em linguagem natural, ou usa os botões abaixo para escolher data, hora, prioridade, repetição e lembrete."
+      description="Escreve em linguagem natural, ou usa os botões abaixo para escolher data, hora, prioridade, repetição, lembrete e onde aparece na Matriz de Eisenhower."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <HighlightedQuickInput
@@ -132,6 +147,12 @@ export function QuickAddDialog({ open, onClose }: { open: boolean; onClose: () =
           {effective.reminderMinutesBefore && (
             <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-accent)] px-3 py-1.5 text-xs font-medium text-[var(--color-accent)]">
               <Bell className="h-3.5 w-3.5" /> {effective.reminderMinutesBefore} min antes
+            </span>
+          )}
+
+          {quadrantLabel && (
+            <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-ink)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink)]">
+              <LayoutGrid className="h-3.5 w-3.5" /> {quadrantLabel}
             </span>
           )}
 

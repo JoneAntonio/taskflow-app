@@ -17,6 +17,7 @@ export interface ScheduleValue {
   priority: TaskPriority | null;
   recurrence: Recurrence | null;
   reminderMinutesBefore: number | null;
+  isImportant: boolean | null;
 }
 
 const QUICK_DATE_OPTIONS = [
@@ -27,6 +28,20 @@ const QUICK_DATE_OPTIONS = [
 
 const PRIORITY_OPTIONS: TaskPriority[] = ["sem_prioridade", "baixa", "media", "alta", "urgente"];
 const RECURRENCE_OPTIONS: Exclude<RecurrenceFrequency, null>[] = ["diaria", "dias_uteis", "semanal", "mensal", "anual"];
+
+/**
+ * Mapeamento pedido pelo utilizador entre "nível" e quadrante da Matriz:
+ * Alto → Urgente e importante · Médio → Importante, não urgente ·
+ * Baixo → Urgente, não importante · Muito Baixo → Nem urgente, nem importante.
+ * Internamente usamos priority + isImportant para determinar o quadrante
+ * (a mesma lógica usada em /matriz), sem depender do texto do nível.
+ */
+const MATRIX_LEVEL_OPTIONS: { label: string; quadrant: string; priority: TaskPriority; isImportant: boolean; color: string }[] = [
+  { label: "Alto", quadrant: "Fazer", priority: "alta", isImportant: true, color: "var(--color-danger)" },
+  { label: "Médio", quadrant: "Agendar", priority: "baixa", isImportant: true, color: "var(--color-secondary)" },
+  { label: "Baixo", quadrant: "Delegar", priority: "alta", isImportant: false, color: "var(--color-warning)" },
+  { label: "Muito Baixo", quadrant: "Eliminar", priority: "baixa", isImportant: false, color: "var(--color-ink-muted)" },
+];
 
 function addDays(date: Date, days: number) {
   const result = new Date(date);
@@ -49,7 +64,7 @@ export function SchedulePopover({
   anchorRef: React.RefObject<HTMLElement | null>;
 }) {
   const popoverRef = useRef<HTMLDivElement>(null);
-  const [tab, setTab] = useState<"dados" | "prioridade" | "repetir">("dados");
+  const [tab, setTab] = useState<"dados" | "prioridade" | "repetir" | "matriz">("dados");
   const [local, setLocal] = useState<ScheduleValue>(value);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
 
@@ -88,6 +103,7 @@ export function SchedulePopover({
       priority: null,
       recurrence: null,
       reminderMinutesBefore: null,
+      isImportant: null,
     };
     setLocal(cleared);
     onChange(cleared);
@@ -99,11 +115,11 @@ export function SchedulePopover({
   return createPortal(
     <div
       ref={popoverRef}
-      className="fixed z-[60] w-80 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
+      className="fixed z-[60] w-96 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
       style={{ top: position.top, left: position.left }}
     >
       <div className="mb-3 flex gap-1 rounded-full bg-[var(--color-surface-alt)] p-1">
-        {(["dados", "prioridade", "repetir"] as const).map((t) => (
+        {(["dados", "prioridade", "repetir", "matriz"] as const).map((t) => (
           <button
             key={t}
             type="button"
@@ -260,6 +276,35 @@ export function SchedulePopover({
               <Repeat className="h-3.5 w-3.5" /> {RECURRENCE_LABELS[freq]}
             </button>
           ))}
+        </div>
+      )}
+
+      {tab === "matriz" && (
+        <div className="space-y-1.5">
+          <p className="mb-2 text-xs text-[var(--color-ink-muted)]">
+            Escolhe onde esta tarefa deve aparecer na Matriz de Eisenhower.
+          </p>
+          {MATRIX_LEVEL_OPTIONS.map((opt) => {
+            const isActive = local.priority === opt.priority && local.isImportant === opt.isImportant;
+            return (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => setLocal((prev) => ({ ...prev, priority: opt.priority, isImportant: opt.isImportant }))}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                  isActive
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-ink)]"
+                    : "border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                )}
+              >
+                <span className="font-medium">{opt.label}</span>
+                <span className="text-xs" style={{ color: opt.color }}>
+                  {opt.quadrant}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 
