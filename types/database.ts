@@ -76,7 +76,8 @@ export interface Task {
   is_important: boolean;
   recurrence: Recurrence | null;
   reminder_at: string | null;
-  location: string | null; // timestamptz
+  location: string | null;
+  estimated_duration_minutes: number | null; // timestamptz
   position: number;
   completed_at: string | null;
   created_at: string;

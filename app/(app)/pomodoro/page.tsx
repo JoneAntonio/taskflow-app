@@ -19,7 +19,7 @@ export default async function PomodoroPage() {
   const [{ data: tasks }, { data: todayTasks }] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id, title, due_time, due_time_end")
+      .select("id, title, due_time, due_time_end, estimated_duration_minutes")
       .in("status", ["pendente", "em_progresso"])
       .order("created_at", { ascending: false })
       .limit(50),

@@ -11,6 +11,7 @@ export interface PomodoroTaskOption {
   title: string;
   due_time: string | null;
   due_time_end: string | null;
+  estimated_duration_minutes: number | null;
 }
 
 const LABELS = POMODORO_LABELS;
@@ -36,6 +37,7 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const [totalDuration, setTotalDuration] = useState(60);
   const [breakDuration, setBreakDuration] = useState(10);
   const [notes, setNotes] = useState("");
+  const [lockedDuration, setLockedDuration] = useState<number | null>(null);
 
   const plan = store.plan;
   const isRunning = store.isRunning;
@@ -71,6 +73,16 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   function handleTaskChange(taskId: string) {
     setSelectedTaskId(taskId);
     const task = tasks.find((t) => t.id === taskId);
+
+    if (task?.estimated_duration_minutes) {
+      // A tarefa já tem uma duração definida: o Pomodoro fica limitado a esse tempo.
+      setLockedDuration(task.estimated_duration_minutes);
+      setTotalDuration(task.estimated_duration_minutes);
+      setAutoPlanEnabled(true);
+      return;
+    }
+
+    setLockedDuration(null);
     if (task?.due_time && task?.due_time_end) {
       const diff = minutesBetween(task.due_time, task.due_time_end);
       if (diff > 0) setTotalDuration(diff);
@@ -141,8 +153,9 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
           <input
             type="checkbox"
             checked={autoPlanEnabled}
+            disabled={!!lockedDuration}
             onChange={(e) => setAutoPlanEnabled(e.target.checked)}
-            className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+            className="h-3.5 w-3.5 accent-[var(--color-accent)] disabled:opacity-50"
           />
           Plano automático: divide a atividade em trabalho focado + uma pausa no fim
         </label>
@@ -156,8 +169,9 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
                 min={5}
                 max={480}
                 value={totalDuration}
+                disabled={!!lockedDuration}
                 onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
-                className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
+                className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)] disabled:opacity-60"
               />
               min
             </span>
@@ -174,6 +188,13 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
               min
             </span>
           </div>
+        )}
+
+        {lockedDuration && (
+          <p className="text-center text-[11px] font-medium text-[var(--color-accent)]">
+            🔒 Duração limitada a {lockedDuration} min, definida nesta tarefa. Para mudar, edita a duração estimada
+            da tarefa (ou escolhe &quot;Sem tarefa associada&quot;).
+          </p>
         )}
 
         {plan && workMinutes && (

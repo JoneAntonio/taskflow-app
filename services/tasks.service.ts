@@ -14,6 +14,7 @@ export interface CreateTaskInput {
   isImportant?: boolean;
   reminderAt?: string | null;
   location?: string | null;
+  estimatedDurationMinutes?: number | null;
 }
 
 /**
@@ -48,6 +49,7 @@ export const tasksService = {
         is_important: input.isImportant ?? false,
         reminder_at: input.reminderAt ?? null,
         location: input.location ?? null,
+        estimated_duration_minutes: input.estimatedDurationMinutes ?? null,
       })
       .select()
       .single();

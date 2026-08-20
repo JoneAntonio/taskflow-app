@@ -19,6 +19,7 @@ const EMPTY_SCHEDULE: ScheduleValue = {
   reminderMinutesBefore: null,
   isImportant: null,
   location: null,
+  estimatedDurationMinutes: null,
 };
 
 export function InlineQuickAdd({
@@ -66,6 +67,7 @@ export function InlineQuickAdd({
         reminderAt,
         isImportant: schedule.isImportant ?? undefined,
         location: schedule.location,
+        estimatedDurationMinutes: schedule.estimatedDurationMinutes,
       });
       setValue("");
       setSchedule(EMPTY_SCHEDULE);

@@ -18,6 +18,7 @@ export interface ScheduleValue {
   reminderMinutesBefore: number | null;
   isImportant: boolean | null;
   location: string | null;
+  estimatedDurationMinutes: number | null;
 }
 
 const QUICK_DATE_OPTIONS = [
@@ -114,6 +115,7 @@ export function SchedulePopover({
       reminderMinutesBefore: null,
       isImportant: null,
       location: null,
+      estimatedDurationMinutes: null,
     };
     setLocal(cleared);
     onChange(cleared);
@@ -235,6 +237,33 @@ export function SchedulePopover({
               placeholder="Ex: Sala de reuniões, Escritório SIMAR"
               className="h-9 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-sm text-[var(--color-ink)]"
             />
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-[var(--color-ink-muted)]">
+              Duração estimada (opcional)
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                max={480}
+                value={local.estimatedDurationMinutes ?? ""}
+                onChange={(e) =>
+                  setLocal((prev) => ({
+                    ...prev,
+                    estimatedDurationMinutes: e.target.value ? Number(e.target.value) : null,
+                  }))
+                }
+                placeholder="Ex: 30"
+                className="h-9 w-20 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-sm text-[var(--color-ink)]"
+              />
+              <span className="text-xs text-[var(--color-ink-muted)]">min</span>
+            </div>
+            <p className="mt-1 text-[11px] text-[var(--color-ink-muted)]">
+              Se definires isto, o Pomodoro fica limitado a este tempo quando associares esta tarefa — não conseguirás
+              exceder o limite.
+            </p>
           </div>
         </div>
       )}
