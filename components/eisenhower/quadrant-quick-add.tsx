@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { parseQuickTask } from "@/utils/parse-quick-task";
 import { tasksService } from "@/services/tasks.service";
+import { SchedulePopover, type ScheduleValue } from "@/components/tasks/schedule-popover";
+import { cn } from "@/lib/utils";
+
+const EMPTY_SCHEDULE: ScheduleValue = {
+  dueDate: null,
+  dueTime: null,
+  dueTimeEnd: null,
+  priority: null,
+  recurrence: null,
+  reminderMinutesBefore: null,
+  isImportant: null,
+  location: null,
+  estimatedDurationMinutes: null,
+};
 
 export function QuadrantQuickAdd({
   important,
@@ -17,8 +31,13 @@ export function QuadrantQuickAdd({
   placeholder: string;
 }) {
   const [value, setValue] = useState("");
+  const [schedule, setSchedule] = useState<ScheduleValue>(EMPTY_SCHEDULE);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+
+  const hasSchedule = schedule.dueDate || schedule.dueTime;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -27,24 +46,40 @@ export function QuadrantQuickAdd({
     const parsed = parseQuickTask(value);
     if (!parsed.title.trim()) return;
 
-    // Se o texto não trouxer indicação própria de urgência, aplica a do quadrante:
-    // prioridade "alta" força urgente; "baixa" força não-urgente (na ausência de data/prioridade explícita).
-    const parsedIsUrgent = parsed.priority === "alta" || parsed.priority === "urgente" || !!parsed.dueDate;
-    const priority = parsed.priority ?? (urgent && !parsedIsUrgent ? "alta" : !urgent ? "baixa" : undefined);
+    const dueDate = schedule.dueDate ?? parsed.dueDate;
+    const dueTime = schedule.dueTime ?? parsed.dueTime;
+
+    // Se nada indicar urgência (nem o texto, nem uma data/hora escolhida no painel),
+    // aplica a urgência do quadrante onde a tarefa está a ser criada.
+    const explicitlyUrgent =
+      parsed.priority === "alta" || parsed.priority === "urgente" || !!dueDate;
+    const priority =
+      schedule.priority ?? parsed.priority ?? (urgent && !explicitlyUrgent ? "alta" : !urgent ? "baixa" : undefined);
+
+    let reminderAt: string | null = null;
+    if (schedule.reminderMinutesBefore && dueDate && dueTime) {
+      const due = new Date(`${dueDate}T${dueTime}:00`);
+      due.setMinutes(due.getMinutes() - schedule.reminderMinutesBefore);
+      reminderAt = due.toISOString();
+    }
 
     setIsSubmitting(true);
     try {
       await tasksService.createQuickTask({
         title: parsed.title,
         priority,
-        dueDate: parsed.dueDate,
-        dueTime: parsed.dueTime,
-        dueTimeEnd: parsed.dueTimeEnd,
-        recurrence: parsed.recurrence,
+        dueDate,
+        dueTime,
+        dueTimeEnd: schedule.dueTimeEnd ?? parsed.dueTimeEnd,
+        recurrence: schedule.recurrence ?? parsed.recurrence,
         tagNames: parsed.tagNames,
         isImportant: important,
+        location: schedule.location,
+        estimatedDurationMinutes: schedule.estimatedDurationMinutes,
+        reminderAt,
       });
       setValue("");
+      setSchedule(EMPTY_SCHEDULE);
       toast.success("Tarefa adicionada");
       router.refresh();
     } catch (error) {
@@ -55,18 +90,48 @@ export function QuadrantQuickAdd({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--color-border)] px-2.5 py-1.5"
-    >
-      <Plus className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-muted)]" />
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder={placeholder}
-        disabled={isSubmitting}
-        className="w-full bg-transparent text-xs text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] outline-none"
-      />
-    </form>
+    <div className="relative">
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--color-border)] px-2.5 py-1.5"
+      >
+        <Plus className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-muted)]" />
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={placeholder}
+          disabled={isSubmitting}
+          className="w-full bg-transparent text-xs text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] outline-none"
+        />
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => setPopoverOpen((prev) => !prev)}
+          aria-label="Escolher dia e hora"
+          className={cn(
+            "shrink-0 rounded-md p-1 transition-colors",
+            hasSchedule ? "text-[var(--color-secondary)]" : "text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+          )}
+        >
+          <CalendarClock className="h-3.5 w-3.5" />
+        </button>
+      </form>
+
+      {hasSchedule && (
+        <p className="mt-1 pl-1 text-[10px] text-[var(--color-secondary)]">
+          {schedule.dueDate}
+          {schedule.dueTime ? ` · ${schedule.dueTime}` : ""}
+        </p>
+      )}
+
+      {popoverOpen && (
+        <SchedulePopover
+          value={schedule}
+          onChange={setSchedule}
+          onClose={() => setPopoverOpen(false)}
+          anchorRef={triggerRef}
+        />
+      )}
+    </div>
   );
 }

@@ -5,12 +5,19 @@ import type { Habit } from "@/types/database";
 export const HABIT_COLORS = ["#3F9E6D", "#3F6FA8", "#F2A93B", "#E2504C", "#8B5CF6", "#0EA5A5"];
 
 export const habitsService = {
-  async createHabit(input: { name: string; description?: string; color?: string }): Promise<Habit> {
+  async createHabit(input: {
+    name: string;
+    description?: string;
+    color?: string;
+    targetDays?: number[];
+  }): Promise<Habit> {
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Utilizador não autenticado");
+
+    const targetDays = input.targetDays && input.targetDays.length > 0 ? input.targetDays : [0, 1, 2, 3, 4, 5, 6];
 
     const { data, error } = await supabase
       .from("habits")
@@ -19,6 +26,8 @@ export const habitsService = {
         name: input.name,
         description: input.description ?? null,
         color: input.color ?? HABIT_COLORS[0],
+        frequency_type: targetDays.length === 7 ? "diaria" : "personalizada",
+        target_days: targetDays,
       })
       .select()
       .single();

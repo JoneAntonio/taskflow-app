@@ -40,24 +40,24 @@ export function AgentCard({ agent, lastEvaluationDate }: { agent: TeamAgent; las
   return (
     <div className="relative">
       <Link href={`/equipa/${agent.id}`}>
-        <Card className="p-4 transition-colors hover:border-[var(--color-accent)]/60">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-surface-alt)] font-display text-sm font-semibold text-[var(--color-ink)]">
-                {initials}
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-[var(--color-ink)]">{agent.name}</p>
-                {agent.operation && (
-                  <p className="truncate text-xs text-[var(--color-ink-muted)]">{agent.operation}</p>
-                )}
-              </div>
+        <Card className="p-4 pr-10 transition-colors hover:border-[var(--color-accent)]/60">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-surface-alt)] font-display text-sm font-semibold text-[var(--color-ink)]">
+              {initials}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-[var(--color-ink)]">{agent.name}</p>
+              {agent.operation && (
+                <p className="truncate text-xs text-[var(--color-ink-muted)]">{agent.operation}</p>
+              )}
             </div>
-            <MaturityBadge level={agent.current_maturity} />
           </div>
-          <p className="mt-3 text-xs text-[var(--color-ink-muted)]">
-            {lastEvaluationDate ? `Última avaliação: ${lastEvaluationDate}` : "Ainda sem avaliações"}
-          </p>
+          <div className="mt-3 flex items-center justify-between">
+            <MaturityBadge level={agent.current_maturity} />
+            <p className="text-xs text-[var(--color-ink-muted)]">
+              {lastEvaluationDate ? `Última avaliação: ${lastEvaluationDate}` : "Ainda sem avaliações"}
+            </p>
+          </div>
         </Card>
       </Link>
 
