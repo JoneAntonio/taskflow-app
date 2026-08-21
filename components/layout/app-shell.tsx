@@ -7,6 +7,7 @@ import { Topbar } from "@/components/layout/topbar";
 import { QuickAddDialog } from "@/components/tasks/quick-add-dialog";
 import { ReminderWatcher } from "@/components/notifications/reminder-watcher";
 import { PomodoroMiniWidget } from "@/components/pomodoro/pomodoro-mini-widget";
+import { InstallAppPrompt } from "@/components/providers/install-app-prompt";
 import type { Profile, Project } from "@/types/database";
 
 export function AppShell({
@@ -33,6 +34,7 @@ export function AppShell({
       <QuickAddDialog open={quickAddOpen} onClose={() => setQuickAddOpen(false)} />
       <ReminderWatcher />
       <PomodoroMiniWidget />
+      <InstallAppPrompt />
     </div>
   );
 }
