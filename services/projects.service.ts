@@ -8,6 +8,9 @@ export const projectsService = {
     color?: string;
     icon?: string;
     parentId?: string | null;
+    objective?: string | null;
+    successMetric?: string | null;
+    targetDate?: string | null;
   }): Promise<Project> {
     const supabase = createClient();
     const {
@@ -24,6 +27,9 @@ export const projectsService = {
         color: input.color ?? "#3F6FA8",
         icon: input.icon ?? "folder",
         parent_id: input.parentId ?? null,
+        objective: input.objective ?? null,
+        success_metric: input.successMetric ?? null,
+        target_date: input.targetDate ?? null,
       })
       .select()
       .single();
@@ -33,7 +39,9 @@ export const projectsService = {
 
   async updateProject(
     id: string,
-    input: Partial<Pick<Project, "name" | "description" | "color" | "icon">> & { parentId?: string | null }
+    input: Partial<Pick<Project, "name" | "description" | "color" | "icon" | "objective" | "success_metric" | "target_date">> & {
+      parentId?: string | null;
+    }
   ): Promise<void> {
     const supabase = createClient();
     const { parentId, ...rest } = input;

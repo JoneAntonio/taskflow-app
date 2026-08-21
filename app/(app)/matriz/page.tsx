@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getTodayISO } from "@/lib/server-date";
-import { QuadrantCard } from "@/components/eisenhower/quadrant-card";
-import type { Task } from "@/types/database";
+import { MatrixProjectFilter } from "@/components/eisenhower/matrix-project-filter";
+import type { Task, Project } from "@/types/database";
 
 export const metadata: Metadata = { title: "Matriz de Eisenhower — JAFLOW" };
 
@@ -39,7 +39,7 @@ export default async function MatrizPage() {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const today = await getTodayISO();
 
-  const [{ data: activeTasks }, { data: recentlyCompleted }] = await Promise.all([
+  const [{ data: activeTasks }, { data: recentlyCompleted }, { data: projects }] = await Promise.all([
     supabase.from("tasks").select("*").in("status", ["pendente", "em_progresso"]).order("created_at", { ascending: false }),
     supabase
       .from("tasks")
@@ -47,6 +47,7 @@ export default async function MatrizPage() {
       .eq("status", "concluida")
       .gte("completed_at", thirtyDaysAgo.toISOString())
       .order("completed_at", { ascending: false }),
+    supabase.from("projects").select("*").order("name"),
   ]);
 
   const all = [...((activeTasks ?? []) as Task[]), ...((recentlyCompleted ?? []) as Task[])];
@@ -62,44 +63,17 @@ export default async function MatrizPage() {
         <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Matriz de Eisenhower</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           A urgência vem da prioridade e da data; marca a estrela ⭐ numa tarefa para a definires como importante.
-          Tarefas concluídas ficam riscadas aqui durante 30 dias, com opção de eliminar em definitivo.
+          Filtra por projeto para veres só o que é preciso fazer para um objetivo específico.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <QuadrantCard
-          title="Fazer"
-          subtitle="Urgente e importante"
-          accentVar="--color-danger"
-          tasks={doQuadrant}
-          important
-          urgent
-        />
-        <QuadrantCard
-          title="Agendar"
-          subtitle="Importante, não urgente"
-          accentVar="--color-secondary"
-          tasks={scheduleQuadrant}
-          important
-          urgent={false}
-        />
-        <QuadrantCard
-          title="Delegar"
-          subtitle="Urgente, não importante"
-          accentVar="--color-warning"
-          tasks={delegateQuadrant}
-          important={false}
-          urgent
-        />
-        <QuadrantCard
-          title="Eliminar"
-          subtitle="Nem urgente, nem importante"
-          accentVar="--color-ink-muted"
-          tasks={eliminateQuadrant}
-          important={false}
-          urgent={false}
-        />
-      </div>
+      <MatrixProjectFilter
+        doQuadrant={doQuadrant}
+        scheduleQuadrant={scheduleQuadrant}
+        delegateQuadrant={delegateQuadrant}
+        eliminateQuadrant={eliminateQuadrant}
+        projects={(projects ?? []) as Project[]}
+      />
     </div>
   );
 }

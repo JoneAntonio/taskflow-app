@@ -9,6 +9,7 @@ export function QuadrantCard({
   tasks,
   important,
   urgent,
+  projectId,
 }: {
   title: string;
   subtitle: string;
@@ -16,6 +17,7 @@ export function QuadrantCard({
   tasks: Task[];
   important: boolean;
   urgent: boolean;
+  projectId?: string | null;
 }) {
   return (
     <div
@@ -29,7 +31,7 @@ export function QuadrantCard({
         <p className="text-xs text-[var(--color-ink-muted)]">{subtitle}</p>
       </div>
       <div className="mb-2">
-        <QuadrantQuickAdd important={important} urgent={urgent} placeholder="Adicionar tarefa aqui" />
+        <QuadrantQuickAdd important={important} urgent={urgent} placeholder="Adicionar tarefa aqui" projectId={projectId} />
       </div>
       <div className="flex-1 space-y-1.5">
         {tasks.length === 0 ? (

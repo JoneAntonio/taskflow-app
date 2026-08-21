@@ -25,10 +25,12 @@ export function QuadrantQuickAdd({
   important,
   urgent,
   placeholder,
+  projectId,
 }: {
   important: boolean;
   urgent: boolean;
   placeholder: string;
+  projectId?: string | null;
 }) {
   const [value, setValue] = useState("");
   const [schedule, setSchedule] = useState<ScheduleValue>(EMPTY_SCHEDULE);
@@ -77,6 +79,7 @@ export function QuadrantQuickAdd({
         location: schedule.location,
         estimatedDurationMinutes: schedule.estimatedDurationMinutes,
         reminderAt,
+        projectId: projectId ?? undefined,
       });
       setValue("");
       setSchedule(EMPTY_SCHEDULE);

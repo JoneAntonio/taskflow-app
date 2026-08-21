@@ -42,9 +42,26 @@ export interface Project {
   position: number;
   created_at: string;
   updated_at: string;
+  // Objetivo SMART: Specific + Achievable + Relevant ficam no "objective";
+  // Measurable é o "success_metric"; Time-bound é o "target_date".
+  objective: string | null;
+  success_metric: string | null;
+  target_date: string | null;
   // Campos calculados (via view / agregação), não colunas reais
   task_count?: number;
   completed_task_count?: number;
+}
+
+export interface ProjectReview {
+  id: string;
+  user_id: string;
+  project_id: string;
+  review_date: string;
+  plan_text: string | null;
+  do_text: string | null;
+  check_text: string | null;
+  act_text: string | null;
+  created_at: string;
 }
 
 export interface Tag {

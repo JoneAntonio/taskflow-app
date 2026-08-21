@@ -6,7 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { ProjectHeaderActions } from "@/components/projects/project-header-actions";
-import type { Project, Task } from "@/types/database";
+import { ProjectSmartCard } from "@/components/projects/project-smart-card";
+import { ProjectReviews } from "@/components/projects/project-reviews";
+import type { Project, Task, ProjectReview } from "@/types/database";
 
 export const metadata: Metadata = { title: "Projeto — JAFLOW" };
 
@@ -38,6 +40,12 @@ export default async function ProjectDetailPage({
     .eq("project_id", projectId)
     .order("status")
     .order("created_at", { ascending: false });
+
+  const { data: reviews } = await supabase
+    .from("project_reviews")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("review_date", { ascending: false });
 
   const taskList = (tasks ?? []) as Task[];
   const pending = taskList.filter((t) => t.status !== "concluida" && t.status !== "arquivada");
@@ -80,6 +88,8 @@ export default async function ProjectDetailPage({
 
       <InlineQuickAdd placeholder="Adicionar tarefa a este projeto" projectId={projectId} />
 
+      <ProjectSmartCard project={projectData} />
+
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
           Pendentes ({pending.length})
@@ -107,6 +117,8 @@ export default async function ProjectDetailPage({
           </div>
         </div>
       )}
+
+      <ProjectReviews projectId={projectId} initialReviews={(reviews ?? []) as ProjectReview[]} />
     </div>
   );
 }

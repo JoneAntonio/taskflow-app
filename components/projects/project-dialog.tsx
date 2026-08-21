@@ -28,6 +28,9 @@ export function ProjectDialog({
   const [description, setDescription] = useState(project?.description ?? "");
   const [color, setColor] = useState(project?.color ?? PROJECT_COLORS[0]);
   const [parentId, setParentId] = useState<string>(project?.parent_id ?? "");
+  const [objective, setObjective] = useState(project?.objective ?? "");
+  const [successMetric, setSuccessMetric] = useState(project?.success_metric ?? "");
+  const [targetDate, setTargetDate] = useState(project?.target_date ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parentOptions = availableParents.filter((p) => p.id !== project?.id);
@@ -37,12 +40,20 @@ export function ProjectDialog({
     if (!name.trim()) return;
     setIsSubmitting(true);
     try {
+      const smartFields = {
+        objective: objective.trim() || null,
+        successMetric: successMetric.trim() || null,
+        targetDate: targetDate || null,
+      };
       if (project) {
         await projectsService.updateProject(project.id, {
           name: name.trim(),
           description: description || null,
           color,
           parentId: parentId || null,
+          objective: smartFields.objective,
+          success_metric: smartFields.successMetric,
+          target_date: smartFields.targetDate,
         });
         toast.success("Projeto atualizado");
       } else {
@@ -51,6 +62,7 @@ export function ProjectDialog({
           description: description || undefined,
           color,
           parentId: parentId || null,
+          ...smartFields,
         });
         toast.success("Projeto criado");
       }
@@ -64,8 +76,8 @@ export function ProjectDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title={project ? "Editar projeto" : "Novo projeto"}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Dialog open={open} onClose={onClose} title={project ? "Editar projeto" : "Novo projeto"} className="max-w-lg">
+      <form onSubmit={handleSubmit} className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
         <div>
           <Label htmlFor="project-name">Nome</Label>
           <Input id="project-name" autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Trabalho" />
@@ -90,9 +102,6 @@ export function ProjectDialog({
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-              Torna este projeto numa subpasta dentro de outro, para organizares por áreas.
-            </p>
           </div>
         )}
         <div>
@@ -113,6 +122,42 @@ export function ProjectDialog({
             ))}
           </div>
         </div>
+
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3.5">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+            Objetivo SMART (opcional)
+          </p>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="project-objective">Objetivo (o quê e porquê)</Label>
+              <Input
+                id="project-objective"
+                value={objective}
+                onChange={(e) => setObjective(e.target.value)}
+                placeholder="Ex: Reduzir o TMA da equipa SIMAR"
+              />
+            </div>
+            <div>
+              <Label htmlFor="project-metric">Métrica de sucesso</Label>
+              <Input
+                id="project-metric"
+                value={successMetric}
+                onChange={(e) => setSuccessMetric(e.target.value)}
+                placeholder="Ex: TMA médio ≤ 4 min"
+              />
+            </div>
+            <div>
+              <Label htmlFor="project-target-date">Prazo do projeto</Label>
+              <Input
+                id="project-target-date"
+                type="date"
+                value={targetDate ?? ""}
+                onChange={(e) => setTargetDate(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancelar
