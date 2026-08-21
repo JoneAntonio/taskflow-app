@@ -84,6 +84,25 @@ export const MATURITY_DESCRIPTIONS: Record<MaturityLevel, { title: string; descr
   },
 };
 
+export interface TeamOperation {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string;
+  created_at: string;
+}
+
+export const OPERATION_COLORS = [
+  "#3F6FA8",
+  "#F2A93B",
+  "#E2504C",
+  "#3F9E6D",
+  "#8B5CF6",
+  "#EC4899",
+  "#0EA5A5",
+  "#6B7280",
+];
+
 /**
  * Calcula a maturidade recomendada a partir do resultado ponderado (escala 1-5).
  */

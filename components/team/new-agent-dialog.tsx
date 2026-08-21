@@ -2,23 +2,26 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { teamMaturityService } from "@/services/team-maturity.service";
-import type { TeamAgent } from "@/types/team-maturity";
+import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 
 export function NewAgentDialog({
   open,
   onClose,
   agent,
+  operations = [],
 }: {
   open: boolean;
   onClose: () => void;
   /** Quando fornecido, o diálogo passa a editar este agente em vez de criar um novo. */
   agent?: TeamAgent;
+  operations?: TeamOperation[];
 }) {
   const [name, setName] = useState(agent?.name ?? "");
   const [operation, setOperation] = useState(agent?.operation ?? "");
@@ -76,10 +79,23 @@ export function NewAgentDialog({
           <Label htmlFor="agent-operation">Operação / equipa (opcional)</Label>
           <Input
             id="agent-operation"
+            list="operation-suggestions"
             placeholder="Ex: SIMAR"
             value={operation}
             onChange={(event) => setOperation(event.target.value)}
           />
+          <datalist id="operation-suggestions">
+            {operations.map((op) => (
+              <option key={op.id} value={op.name} />
+            ))}
+          </datalist>
+          <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
+            Personaliza a cor de cada operação em{" "}
+            <Link href="/equipa/operacoes" className="text-[var(--color-secondary)] hover:underline">
+              Operações
+            </Link>
+            .
+          </p>
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="ghost" onClick={onClose}>

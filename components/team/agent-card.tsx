@@ -9,12 +9,22 @@ import { MaturityBadge } from "@/components/team/maturity-badge";
 import { NewAgentDialog } from "@/components/team/new-agent-dialog";
 import { Card } from "@/components/ui/card";
 import { teamMaturityService } from "@/services/team-maturity.service";
-import type { TeamAgent } from "@/types/team-maturity";
+import { getOperationColor } from "@/lib/operation-colors";
+import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 
-export function AgentCard({ agent, lastEvaluationDate }: { agent: TeamAgent; lastEvaluationDate: string | null }) {
+export function AgentCard({
+  agent,
+  lastEvaluationDate,
+  operations = [],
+}: {
+  agent: TeamAgent;
+  lastEvaluationDate: string | null;
+  operations?: TeamOperation[];
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const router = useRouter();
+  const operationColor = getOperationColor(agent.operation, operations);
 
   const initials = agent.name
     .split(" ")
@@ -40,7 +50,10 @@ export function AgentCard({ agent, lastEvaluationDate }: { agent: TeamAgent; las
   return (
     <div className="relative">
       <Link href={`/equipa/${agent.id}`}>
-        <Card className="p-4 pr-10 transition-colors hover:border-[var(--color-accent)]/60">
+        <Card
+          className="border-l-4 p-4 pr-10 transition-colors hover:border-[var(--color-accent)]/60"
+          style={{ borderLeftColor: operationColor }}
+        >
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-surface-alt)] font-display text-sm font-semibold text-[var(--color-ink)]">
               {initials}
@@ -48,7 +61,12 @@ export function AgentCard({ agent, lastEvaluationDate }: { agent: TeamAgent; las
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-[var(--color-ink)]">{agent.name}</p>
               {agent.operation && (
-                <p className="truncate text-xs text-[var(--color-ink-muted)]">{agent.operation}</p>
+                <span
+                  className="mt-0.5 inline-block truncate rounded-full px-2 py-0.5 text-[11px] font-medium"
+                  style={{ backgroundColor: `color-mix(in srgb, ${operationColor} 16%, transparent)`, color: operationColor }}
+                >
+                  {agent.operation}
+                </span>
               )}
             </div>
           </div>
@@ -98,7 +116,7 @@ export function AgentCard({ agent, lastEvaluationDate }: { agent: TeamAgent; las
         </div>
       )}
 
-      <NewAgentDialog open={editOpen} onClose={() => setEditOpen(false)} agent={agent} />
+      <NewAgentDialog open={editOpen} onClose={() => setEditOpen(false)} agent={agent} operations={operations} />
     </div>
   );
 }
