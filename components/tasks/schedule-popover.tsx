@@ -66,22 +66,29 @@ export function SchedulePopover({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<"dados" | "prioridade" | "repetir">("dados");
   const [local, setLocal] = useState<ScheduleValue>(value);
-  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number; maxHeight: number } | null>(null);
 
   useEffect(() => {
     if (anchorRef.current) {
       const rect = anchorRef.current.getBoundingClientRect();
       const panelWidth = 320; // w-80
-      const estimatedPanelHeight = 520;
+      const margin = 16;
+      const estimatedPanelHeight = 560;
       const spaceBelow = window.innerHeight - rect.bottom;
-      const openUpward = spaceBelow < estimatedPanelHeight && rect.top > spaceBelow;
+      const spaceAbove = rect.top;
+      const openUpward = spaceBelow < estimatedPanelHeight && spaceAbove > spaceBelow;
 
-      const left = Math.min(rect.left + window.scrollX, window.innerWidth - panelWidth - 16 + window.scrollX);
-      const top = openUpward
-        ? Math.max(16, rect.top + window.scrollY - estimatedPanelHeight - 8)
-        : rect.bottom + window.scrollY + 8;
+      const left = Math.min(rect.left + window.scrollX, window.innerWidth - panelWidth - margin + window.scrollX);
+      const top = openUpward ? margin : rect.bottom + window.scrollY + 8;
 
-      setPosition({ top, left: Math.max(16, left) });
+      // Altura máxima calculada a partir de onde o painel REALMENTE começa
+      // (não do ecrã inteiro), para o rodapé "Limpar/OK" nunca ficar
+      // inalcançável, seja o painel aberto para cima ou para baixo.
+      const maxHeight = openUpward
+        ? Math.max(240, spaceAbove - margin - 8)
+        : Math.max(240, window.innerHeight - (rect.bottom + 8) - margin);
+
+      setPosition({ top, left: Math.max(margin, left), maxHeight });
     }
   }, [anchorRef]);
 
@@ -127,8 +134,8 @@ export function SchedulePopover({
   return createPortal(
     <div
       ref={popoverRef}
-      className="fixed z-[60] max-h-[calc(100vh-2rem)] w-80 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
-      style={{ top: position.top, left: position.left }}
+      className="fixed z-[60] w-80 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
+      style={{ top: position.top, left: position.left, maxHeight: position.maxHeight }}
     >
       <div className="mb-3 flex gap-1 rounded-full bg-[var(--color-surface-alt)] p-1">
         {(["dados", "prioridade", "repetir"] as const).map((t) => (
