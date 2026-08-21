@@ -152,4 +152,46 @@ export const teamMaturityService = {
     const { error } = await supabase.from("team_agents").update({ archived: true }).eq("id", agentId);
     if (error) throw error;
   },
+
+  async createCriterion(input: { name: string; weight: number; inverted: boolean }): Promise<MaturityCriterion> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Utilizador não autenticado");
+
+    const { count } = await supabase
+      .from("maturity_criteria")
+      .select("id", { count: "exact", head: true })
+      .eq("archived", false);
+
+    const { data, error } = await supabase
+      .from("maturity_criteria")
+      .insert({
+        user_id: user.id,
+        name: input.name,
+        weight: input.weight,
+        inverted: input.inverted,
+        position: count ?? 0,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data as MaturityCriterion;
+  },
+
+  async updateCriterion(
+    criterionId: string,
+    input: Partial<{ name: string; weight: number; inverted: boolean }>
+  ): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("maturity_criteria").update(input).eq("id", criterionId);
+    if (error) throw error;
+  },
+
+  async archiveCriterion(criterionId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("maturity_criteria").update({ archived: true }).eq("id", criterionId);
+    if (error) throw error;
+  },
 };

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Users } from "lucide-react";
+import Link from "next/link";
+import { Users, SlidersHorizontal } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AgentCard } from "@/components/team/agent-card";
 import { AddAgentButton } from "@/components/team/add-agent-button";
@@ -55,7 +56,16 @@ export default async function EquipaPage() {
             operação deles ao criares o agente.
           </p>
         </div>
-        <AddAgentButton />
+        <div className="flex shrink-0 gap-2">
+          <Link
+            href="/equipa/criterios"
+            className="flex h-10 items-center gap-1.5 rounded-xl border border-[var(--color-border)] px-4 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-alt)]"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Critérios
+          </Link>
+          <AddAgentButton />
+        </div>
       </div>
 
       {agentList.length === 0 ? (
