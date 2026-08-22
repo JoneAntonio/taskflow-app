@@ -7,17 +7,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { projectsService } from "@/services/projects.service";
-import type { Project, Team } from "@/types/database";
+import type { Project } from "@/types/database";
 
-export function ProjectHeaderActions({
-  project,
-  availableParents = [],
-  availableTeams = [],
-}: {
-  project: Project;
-  availableParents?: Project[];
-  availableTeams?: Team[];
-}) {
+export function ProjectHeaderActions({ project, availableParents = [] }: { project: Project; availableParents?: Project[] }) {
   const [editOpen, setEditOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -44,13 +36,7 @@ export function ProjectHeaderActions({
       <Button variant="outline" size="sm" onClick={handleDelete} isLoading={isDeleting}>
         <Trash2 className="h-3.5 w-3.5" /> Eliminar
       </Button>
-      <ProjectDialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        project={project}
-        availableParents={availableParents}
-        availableTeams={availableTeams}
-      />
+      <ProjectDialog open={editOpen} onClose={() => setEditOpen(false)} project={project} availableParents={availableParents} />
     </div>
   );
 }

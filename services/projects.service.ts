@@ -8,7 +8,6 @@ export const projectsService = {
     color?: string;
     icon?: string;
     parentId?: string | null;
-    teamId?: string | null;
     objective?: string | null;
     successMetric?: string | null;
     targetDate?: string | null;
@@ -34,7 +33,6 @@ export const projectsService = {
         color: input.color ?? "#3F6FA8",
         icon: input.icon ?? "folder",
         parent_id: input.parentId ?? null,
-        team_id: input.teamId ?? null,
         objective: input.objective ?? null,
         success_metric: input.successMetric ?? null,
         target_date: input.targetDate ?? null,
@@ -70,17 +68,13 @@ export const projectsService = {
         | "smart_priority"
         | "action_plan"
       >
-    > & { parentId?: string | null; teamId?: string | null }
+    > & { parentId?: string | null }
   ): Promise<void> {
     const supabase = createClient();
-    const { parentId, teamId, ...rest } = input;
+    const { parentId, ...rest } = input;
     const { error } = await supabase
       .from("projects")
-      .update({
-        ...rest,
-        ...(parentId !== undefined ? { parent_id: parentId } : {}),
-        ...(teamId !== undefined ? { team_id: teamId } : {}),
-      })
+      .update({ ...rest, ...(parentId !== undefined ? { parent_id: parentId } : {}) })
       .eq("id", id);
     if (error) throw error;
   },

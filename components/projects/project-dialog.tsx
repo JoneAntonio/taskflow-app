@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { projectsService, PROJECT_COLORS } from "@/services/projects.service";
 import { PRIORITY_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
-import type { Project, TaskPriority, Team } from "@/types/database";
+import type { Project, TaskPriority } from "@/types/database";
 
 const PRIORITY_OPTIONS: TaskPriority[] = ["sem_prioridade", "baixa", "media", "alta", "urgente"];
 
@@ -19,22 +19,18 @@ export function ProjectDialog({
   onClose,
   project,
   availableParents = [],
-  availableTeams = [],
 }: {
   open: boolean;
   onClose: () => void;
   project?: Project;
   /** Projetos de topo que podem servir de "projeto principal" (exclui o próprio, se estiveres a editar). */
   availableParents?: Project[];
-  /** Equipas onde és admin — só essas podem "receber" este projeto. */
-  availableTeams?: Team[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(project?.name ?? "");
   const [description, setDescription] = useState(project?.description ?? "");
   const [color, setColor] = useState(project?.color ?? PROJECT_COLORS[0]);
   const [parentId, setParentId] = useState<string>(project?.parent_id ?? "");
-  const [teamId, setTeamId] = useState<string>(project?.team_id ?? "");
   const [objective, setObjective] = useState(project?.objective ?? "");
   const [successMetric, setSuccessMetric] = useState(project?.success_metric ?? "");
   const [targetDate, setTargetDate] = useState(project?.target_date ?? "");
@@ -70,7 +66,6 @@ export function ProjectDialog({
           description: description || null,
           color,
           parentId: parentId || null,
-          teamId: teamId || null,
           objective: smartFields.objective,
           success_metric: smartFields.successMetric,
           target_date: smartFields.targetDate,
@@ -88,7 +83,6 @@ export function ProjectDialog({
           description: description || undefined,
           color,
           parentId: parentId || null,
-          teamId: teamId || null,
           ...smartFields,
         });
         toast.success("Projeto criado");
@@ -129,27 +123,6 @@ export function ProjectDialog({
                 </option>
               ))}
             </select>
-          </div>
-        )}
-        {availableTeams.length > 0 && (
-          <div>
-            <Label htmlFor="project-team">Equipa (opcional)</Label>
-            <select
-              id="project-team"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
-            >
-              <option value="">Nenhuma (projeto pessoal)</option>
-              {availableTeams.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-              Se escolheres uma equipa, todos os membros passam a ver este objetivo e as suas tarefas.
-            </p>
           </div>
         )}
         <div>

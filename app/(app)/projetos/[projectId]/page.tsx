@@ -9,7 +9,7 @@ import { ProjectHeaderActions } from "@/components/projects/project-header-actio
 import { ProjectSmartCard } from "@/components/projects/project-smart-card";
 import { DeadlineCountdown } from "@/components/projects/deadline-countdown";
 import { ProjectTimelineChart } from "@/components/projects/project-timeline-chart";
-import type { Project, Task, Team } from "@/types/database";
+import type { Project, Task } from "@/types/database";
 
 export const metadata: Metadata = { title: "Método SMART — JAFLOW" };
 
@@ -29,14 +29,6 @@ export default async function ProjectDetailPage({
   if (!project) notFound();
 
   const { data: topLevelProjects } = await supabase.from("projects").select("*").is("parent_id", null);
-  const { data: adminMemberships } = await supabase
-    .from("team_memberships")
-    .select("team:teams(*)")
-    .eq("user_id", user.id)
-    .eq("role", "admin");
-  const adminTeams = (adminMemberships ?? [])
-    .map((m) => (m as unknown as { team: Team | null }).team)
-    .filter((t): t is Team => !!t);
 
   const projectData = project as Project;
   const parentProject = projectData.parent_id
@@ -86,11 +78,7 @@ export default async function ProjectDetailPage({
             )}
           </div>
         </div>
-        <ProjectHeaderActions
-          project={projectData}
-          availableParents={(topLevelProjects ?? []) as Project[]}
-          availableTeams={adminTeams}
-        />
+        <ProjectHeaderActions project={projectData} availableParents={(topLevelProjects ?? []) as Project[]} />
       </div>
 
       <InlineQuickAdd placeholder="Adicionar tarefa a este projeto" projectId={projectId} />
