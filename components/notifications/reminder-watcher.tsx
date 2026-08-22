@@ -55,6 +55,14 @@ export function ReminderWatcher() {
           new Notification("JAFLOW — lembrete", { body: task.title });
         }
 
+        // Notificação push real — chega mesmo que este separador seja fechado
+        // a seguir, desde que o dispositivo tenha as push notifications ativas.
+        fetch("/api/push/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: "JAFLOW — lembrete", body: task.title, url: "/hoje" }),
+        }).catch(() => {});
+
         await supabase.from("notifications").insert({
           user_id: user.id,
           type: "lembrete",
