@@ -30,4 +30,10 @@ export const taskActionsService = {
     const { error } = await supabase.from("tasks").delete().eq("id", taskId);
     if (error) throw error;
   },
+
+  async updateDescription(taskId: string, description: string | null): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("tasks").update({ description }).eq("id", taskId);
+    if (error) throw error;
+  },
 };

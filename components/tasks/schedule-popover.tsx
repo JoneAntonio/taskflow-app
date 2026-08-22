@@ -19,6 +19,7 @@ export interface ScheduleValue {
   isImportant: boolean | null;
   location: string | null;
   estimatedDurationMinutes: number | null;
+  description: string | null;
 }
 
 const QUICK_DATE_OPTIONS = [
@@ -123,6 +124,7 @@ export function SchedulePopover({
       isImportant: null,
       location: null,
       estimatedDurationMinutes: null,
+      description: null,
     };
     setLocal(cleared);
     onChange(cleared);
@@ -271,6 +273,17 @@ export function SchedulePopover({
               Se definires isto, o Pomodoro fica limitado a este tempo quando associares esta tarefa — não conseguirás
               exceder o limite.
             </p>
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-[var(--color-ink-muted)]">Nota (opcional)</p>
+            <textarea
+              rows={2}
+              value={local.description ?? ""}
+              onChange={(e) => setLocal((prev) => ({ ...prev, description: e.target.value || null }))}
+              placeholder="Detalhes, contexto ou instruções sobre esta tarefa..."
+              className="w-full resize-none rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+            />
           </div>
         </div>
       )}

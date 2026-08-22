@@ -21,6 +21,7 @@ const EMPTY_SCHEDULE: ScheduleValue = {
   isImportant: null,
   location: null,
   estimatedDurationMinutes: null,
+  description: null,
 };
 
 export function InlineQuickAdd({
@@ -69,6 +70,7 @@ export function InlineQuickAdd({
         isImportant: schedule.isImportant ?? undefined,
         location: schedule.location,
         estimatedDurationMinutes: schedule.estimatedDurationMinutes,
+        description: schedule.description,
       });
       setValue("");
       setSchedule(EMPTY_SCHEDULE);

@@ -19,6 +19,7 @@ const EMPTY_SCHEDULE: ScheduleValue = {
   isImportant: null,
   location: null,
   estimatedDurationMinutes: null,
+  description: null,
 };
 
 export function QuadrantQuickAdd({
@@ -78,6 +79,7 @@ export function QuadrantQuickAdd({
         isImportant: important,
         location: schedule.location,
         estimatedDurationMinutes: schedule.estimatedDurationMinutes,
+        description: schedule.description,
         reminderAt,
         projectId: projectId ?? undefined,
       });

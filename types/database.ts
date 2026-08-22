@@ -115,6 +115,17 @@ export interface Task {
   project?: Project | null;
 }
 
+export interface TaskAttachment {
+  id: string;
+  task_id: string;
+  user_id: string;
+  file_name: string;
+  file_path: string;
+  file_size: number | null;
+  mime_type: string | null;
+  created_at: string;
+}
+
 export type TeamRole = "admin" | "member";
 
 export interface Team {

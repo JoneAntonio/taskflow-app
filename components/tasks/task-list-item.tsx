@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Check, Repeat } from "lucide-react";
+import { Check, Repeat, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PRIORITY_COLOR_VAR } from "@/lib/labels";
 import { TaskCountdownBadge } from "@/components/tasks/task-countdown-badge";
+import { TaskDetailDialog } from "@/components/tasks/task-detail-dialog";
 import { taskActionsService } from "@/services/task-actions.service";
 import type { Task } from "@/types/database";
 
@@ -21,6 +22,7 @@ export function TaskListItem({
 }) {
   const [isPending, setIsPending] = useState(false);
   const [isCompleted, setIsCompleted] = useState(task.status === "concluida");
+  const [detailOpen, setDetailOpen] = useState(false);
   const router = useRouter();
 
   async function handleToggleComplete(event: React.MouseEvent) {
@@ -65,15 +67,20 @@ export function TaskListItem({
         {isCompleted && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
       </button>
       <div className="min-w-0 flex-1">
-        <p
-          className={cn(
-            "truncate font-medium",
-            isCompleted ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]",
-            compact ? "text-sm" : "text-sm"
-          )}
-        >
-          {task.title}
-        </p>
+        <button type="button" onClick={() => setDetailOpen(true)} className="text-left">
+          <p
+            className={cn(
+              "flex items-center gap-1.5 truncate font-medium hover:underline",
+              isCompleted ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]",
+              compact ? "text-sm" : "text-sm"
+            )}
+          >
+            {task.title}
+            {task.description && (
+              <FileText className="h-3 w-3 shrink-0 text-[var(--color-ink-muted)]" aria-label="Tem nota" />
+            )}
+          </p>
+        </button>
         {!compact && (task.due_date || task.due_time) && (
           <p className="flex items-center gap-1 text-xs text-[var(--color-ink-muted)]">
             {task.due_date}
@@ -89,6 +96,7 @@ export function TaskListItem({
         </span>
       )}
       {!isCompleted && <TaskCountdownBadge task={task} />}
+      <TaskDetailDialog task={task} open={detailOpen} onClose={() => setDetailOpen(false)} />
     </div>
   );
 }

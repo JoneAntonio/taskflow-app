@@ -45,12 +45,21 @@ export function ProjectDialog({
   const [smartPriority, setSmartPriority] = useState<TaskPriority>(project?.smart_priority ?? "sem_prioridade");
   const [actionPlan, setActionPlan] = useState(project?.action_plan ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [smartError, setSmartError] = useState<string | null>(null);
 
   const parentOptions = availableParents.filter((p) => p.id !== project?.id);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim()) return;
+
+    // Se a pessoa começou a definir um objetivo SMART, exigimos a Meta e o
+    // Prazo — sem isso não há forma de medir se o objetivo foi cumprido.
+    if (objective.trim() && (!targetValue.trim() || !targetDate)) {
+      setSmartError("Preenche a Meta e o Prazo para guardares este objetivo SMART.");
+      return;
+    }
+    setSmartError(null);
     setIsSubmitting(true);
     try {
       const smartFields = {
@@ -207,7 +216,7 @@ export function ProjectDialog({
                 />
               </div>
               <div>
-                <Label htmlFor="project-target-value">🏆 Meta (opcional)</Label>
+                <Label htmlFor="project-target-value">🏆 Meta{smartError ? "" : " (opcional)"}</Label>
                 <Input
                   id="project-target-value"
                   type="number"
@@ -215,6 +224,7 @@ export function ProjectDialog({
                   value={targetValue}
                   onChange={(e) => setTargetValue(e.target.value)}
                   placeholder="Ex: 4"
+                  error={smartError && !targetValue.trim() ? "Obrigatório" : undefined}
                 />
               </div>
             </div>
@@ -234,6 +244,7 @@ export function ProjectDialog({
                 type="date"
                 value={targetDate ?? ""}
                 onChange={(e) => setTargetDate(e.target.value)}
+                error={smartError && !targetDate ? "Obrigatório" : undefined}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -275,6 +286,12 @@ export function ProjectDialog({
             </div>
           </div>
         </div>
+
+        {smartError && (
+          <p className="rounded-lg bg-[var(--color-danger)]/10 px-3 py-2 text-xs text-[var(--color-danger)]">
+            {smartError}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="ghost" onClick={onClose}>
