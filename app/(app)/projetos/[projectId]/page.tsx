@@ -8,6 +8,7 @@ import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { ProjectHeaderActions } from "@/components/projects/project-header-actions";
 import { ProjectSmartCard } from "@/components/projects/project-smart-card";
 import { DeadlineCountdown } from "@/components/projects/deadline-countdown";
+import { ProjectForecastCard } from "@/components/projects/project-forecast-card";
 import { ProjectTimelineChart } from "@/components/projects/project-timeline-chart";
 import type { Project, Task, Team } from "@/types/database";
 
@@ -100,7 +101,12 @@ export default async function ProjectDetailPage({
           project={projectData}
           taskProgress={{ total: taskList.length, completed: completed.length }}
         />
-        {projectData.target_date && <DeadlineCountdown targetDate={projectData.target_date} />}
+        {projectData.target_date && (
+          <div className="space-y-4">
+            <DeadlineCountdown targetDate={projectData.target_date} />
+            <ProjectForecastCard project={projectData} tasks={taskList} />
+          </div>
+        )}
       </div>
 
       <div>

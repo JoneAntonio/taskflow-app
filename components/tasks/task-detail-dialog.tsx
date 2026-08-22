@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Paperclip, Upload, Trash2, Download, X } from "lucide-react";
+import { Paperclip, Upload, Trash2, Download, X, MessageSquare, Activity } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { attachmentsService } from "@/services/attachments.service";
 import { taskActionsService } from "@/services/task-actions.service";
-import type { Task, TaskAttachment } from "@/types/database";
+import { taskCommentsService } from "@/services/task-comments.service";
+import { getGravatarUrl } from "@/lib/gravatar";
+import type { Task, TaskAttachment, TaskComment, TaskActivity as TaskActivityRow } from "@/types/database";
 
 function formatBytes(bytes: number | null): string {
   if (!bytes) return "";
@@ -22,6 +24,10 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [attachments, setAttachments] = useState<TaskAttachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [comments, setComments] = useState<TaskComment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [activity, setActivity] = useState<TaskActivityRow[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -30,7 +36,30 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
       .list(task.id)
       .then(setAttachments)
       .catch(() => {});
+    taskCommentsService
+      .list(task.id)
+      .then(setComments)
+      .catch(() => {});
+    taskCommentsService
+      .listActivity(task.id)
+      .then(setActivity)
+      .catch(() => {});
   }, [open, task.id]);
+
+  async function handleAddComment(event: React.FormEvent) {
+    event.preventDefault();
+    if (!newComment.trim()) return;
+    setIsCommenting(true);
+    try {
+      const created = await taskCommentsService.create(task.id, newComment.trim(), task.team_id);
+      setComments((prev) => [...prev, created]);
+      setNewComment("");
+    } catch {
+      toast.error("Não foi possível publicar o comentário.");
+    } finally {
+      setIsCommenting(false);
+    }
+  }
 
   async function handleSaveNote() {
     setIsSavingNote(true);
@@ -147,6 +176,71 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
             </div>
           )}
         </div>
+
+        <div>
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--color-ink-muted)]">
+            <MessageSquare className="h-3.5 w-3.5" /> Comentários ({comments.length})
+          </p>
+          <div className="max-h-52 space-y-2 overflow-y-auto">
+            {comments.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-[var(--color-border)] px-3 py-3 text-center text-xs text-[var(--color-ink-muted)]">
+                Sem comentários ainda. Usa @Nome para mencionar alguém da equipa.
+              </p>
+            ) : (
+              comments.map((comment) => {
+                const avatarUrl = comment.author?.avatar_url || getGravatarUrl(comment.author?.email ?? "", 48);
+                return (
+                  <div key={comment.id} className="flex items-start gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={avatarUrl} alt="" className="mt-0.5 h-6 w-6 shrink-0 rounded-full object-cover" />
+                    <div className="min-w-0 flex-1 rounded-xl bg-[var(--color-surface-alt)] px-3 py-2">
+                      <p className="text-xs font-medium text-[var(--color-ink)]">
+                        {comment.author?.full_name || comment.author?.email}
+                      </p>
+                      <p className="whitespace-pre-wrap break-words text-sm text-[var(--color-ink)]">{comment.body}</p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <form onSubmit={handleAddComment} className="mt-2 flex items-center gap-2">
+            <input
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Escreve um comentário... use @Nome para mencionar"
+              disabled={isCommenting}
+              className="h-9 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+            />
+            <Button type="submit" size="sm" isLoading={isCommenting} disabled={!newComment.trim()}>
+              Enviar
+            </Button>
+          </form>
+        </div>
+
+        {activity.length > 0 && (
+          <div>
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-[var(--color-ink-muted)]">
+              <Activity className="h-3.5 w-3.5" /> Atividade
+            </p>
+            <div className="space-y-1.5 border-l-2 border-[var(--color-border)] pl-3">
+              {activity.map((entry) => (
+                <p key={entry.id} className="text-xs text-[var(--color-ink-muted)]">
+                  <span className="font-medium text-[var(--color-ink)]">
+                    {entry.author?.full_name || entry.author?.email || "Alguém"}
+                  </span>{" "}
+                  {entry.detail?.toLowerCase() ?? entry.action} ·{" "}
+                  {new Date(entry.created_at).toLocaleDateString("pt-PT", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end pt-1">
           <Button variant="ghost" size="sm" onClick={onClose}>

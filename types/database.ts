@@ -126,6 +126,25 @@ export interface TaskAttachment {
   created_at: string;
 }
 
+export interface TaskComment {
+  id: string;
+  task_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+  author?: Profile;
+}
+
+export interface TaskActivity {
+  id: string;
+  task_id: string;
+  user_id: string | null;
+  action: string;
+  detail: string | null;
+  created_at: string;
+  author?: Profile;
+}
+
 export type TeamRole = "admin" | "member";
 
 export interface Team {
