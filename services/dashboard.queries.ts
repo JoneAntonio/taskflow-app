@@ -19,6 +19,7 @@ export interface DashboardData {
   todayTasks: Task[];
   overdueTasks: Task[];
   upcomingTasks: Task[];
+  teamTasks: (Task & { teamName: string })[];
   completedTodayCount: number;
   pendingCount: number;
   completedCount: number;
@@ -48,6 +49,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     { count: completedTodayCount },
     { data: weekCompleted },
     { data: weekOverdue },
+    { data: teamTasksRaw },
   ] = await Promise.all([
     supabase
       .from("tasks")
@@ -101,6 +103,17 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       .in("status", ["pendente", "em_progresso"])
       .lt("due_date", today)
       .gte("due_date", weekStart),
+    // Tarefas que outra pessoa te atribuiu dentro de uma equipa — distintas
+    // das tuas tarefas pessoais (user_id), por isso filtramos por
+    // "assigned_to", não por "user_id".
+    supabase
+      .from("tasks")
+      .select("*, team:teams(name)")
+      .eq("assigned_to", userId)
+      .not("team_id", "is", null)
+      .in("status", ["pendente", "em_progresso"])
+      .order("due_date", { ascending: true, nullsFirst: false })
+      .limit(10),
   ]);
 
   const total = (pendingCount ?? 0) + (completedCount ?? 0);
@@ -119,10 +132,16 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     weeklyProductivity[weekday].atrasadas += 1;
   });
 
+  const teamTasks = (teamTasksRaw ?? []).map((row) => {
+    const { team, ...task } = row as Task & { team: { name: string } | null };
+    return { ...task, teamName: team?.name ?? "Equipa" };
+  });
+
   return {
     todayTasks: todayTasks ?? [],
     overdueTasks: overdueTasks ?? [],
     upcomingTasks: upcomingTasks ?? [],
+    teamTasks,
     completedTodayCount: completedTodayCount ?? 0,
     pendingCount: pendingCount ?? 0,
     completedCount: completedCount ?? 0,

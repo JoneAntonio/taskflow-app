@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles } from "lucide-react";
+import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles, Users2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTodayISO } from "@/lib/server-date";
 import { getDashboardData } from "@/services/dashboard.queries";
@@ -120,6 +120,22 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {data.teamTasks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users2 className="h-4 w-4 text-[var(--color-accent)]" />
+              Tarefas da equipa
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {data.teamTasks.map((task) => (
+              <TaskListItem key={task.id} task={task} assigneeName={task.teamName} />
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {data.overdueTasks.length > 0 && (
         <Card className="border-[var(--color-danger)]/30">
