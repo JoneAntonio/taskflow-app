@@ -29,11 +29,31 @@ export function TaskListItem({
     event.preventDefault();
     event.stopPropagation();
     setIsPending(true);
+
+    // Tarefas recorrentes nunca ficam "concluídas" de vez — avançam para a
+    // próxima ocorrência, por isso não têm um estado de "desmarcar".
+    if (task.recurrence?.frequency && !isCompleted) {
+      try {
+        const result = await taskActionsService.markComplete(task);
+        toast.success(
+          result.recurred && result.nextDate
+            ? `Concluída — próxima ocorrência em ${new Date(result.nextDate + "T00:00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })}`
+            : "Tarefa concluída"
+        );
+        router.refresh();
+      } catch {
+        toast.error("Não foi possível atualizar a tarefa.");
+      } finally {
+        setIsPending(false);
+      }
+      return;
+    }
+
     const next = !isCompleted;
     setIsCompleted(next);
     try {
       if (next) {
-        await taskActionsService.markComplete(task.id);
+        await taskActionsService.markComplete(task);
         toast.success("Tarefa concluída");
       } else {
         await taskActionsService.reopenTask(task.id);

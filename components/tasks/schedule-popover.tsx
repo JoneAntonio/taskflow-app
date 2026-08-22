@@ -188,6 +188,17 @@ export function SchedulePopover({
             onSelect={(date) => setLocal((prev) => ({ ...prev, dueDate: date }))}
           />
 
+          {local.recurrence?.frequency && (
+            <button
+              type="button"
+              onClick={() => setTab("repetir")}
+              className="flex w-full items-center gap-1.5 rounded-lg bg-[var(--color-accent)]/10 px-2.5 py-1.5 text-xs font-medium text-[var(--color-accent)]"
+            >
+              <Repeat className="h-3.5 w-3.5" />
+              Repete: {RECURRENCE_LABELS[local.recurrence.frequency]}
+            </button>
+          )}
+
           <div>
             <p className="mb-1.5 text-xs font-medium text-[var(--color-ink-muted)]">Hora</p>
             <div className="flex items-center gap-2">

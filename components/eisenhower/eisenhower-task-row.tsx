@@ -31,8 +31,12 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
       if (isCompleted) {
         await taskActionsService.reopenTask(task.id);
       } else {
-        await taskActionsService.markComplete(task.id);
-        toast.success("Tarefa concluída");
+        const result = await taskActionsService.markComplete(task);
+        toast.success(
+          result.recurred && result.nextDate
+            ? `Concluída — próxima ocorrência em ${new Date(result.nextDate + "T00:00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })}`
+            : "Tarefa concluída"
+        );
       }
       router.refresh();
     } catch {

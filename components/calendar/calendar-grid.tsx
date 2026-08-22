@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, MapPin, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, CalendarDays, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TaskListItem } from "@/components/tasks/task-list-item";
+import { projectOccurrences } from "@/lib/recurrence";
 import { cn, toLocalISODate } from "@/lib/utils";
 import type { Task } from "@/types/database";
 
@@ -32,6 +33,25 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
   const startOffset = firstDay.getDay();
   const todayISO = toLocalISODate(new Date());
 
+  // Dias em que uma tarefa recorrente também ocorre neste mês, além do seu
+  // due_date original — só para pré-visualização (não são linhas reais).
+  const projectedByDate = useMemo(() => {
+    const map = new Map<string, Task[]>();
+    const rangeStart = `${year}-${String(month + 1).padStart(2, "0")}-01`;
+    const rangeEnd = `${year}-${String(month + 1).padStart(2, "0")}-${String(daysInMonth).padStart(2, "0")}`;
+    tasks.forEach((task) => {
+      if (!task.due_date || !task.recurrence?.frequency) return;
+      const dates = projectOccurrences(task.due_date, task.recurrence, rangeStart, rangeEnd);
+      dates.forEach((date) => {
+        if (tasksByDate.has(date)) return; // já existe uma ocorrência real nesse dia
+        const list = map.get(date) ?? [];
+        list.push(task);
+        map.set(date, list);
+      });
+    });
+    return map;
+  }, [tasks, tasksByDate, year, month, daysInMonth]);
+
   const cells: { date: string | null; day: number | null }[] = [];
   for (let i = 0; i < startOffset; i++) cells.push({ date: null, day: null });
   for (let d = 1; d <= daysInMonth; d++) {
@@ -41,6 +61,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
 
   const monthLabel = cursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
   const selectedTasks = selectedDate ? tasksByDate.get(selectedDate) ?? [] : [];
+  const selectedProjected = selectedDate ? projectedByDate.get(selectedDate) ?? [] : [];
 
   return (
     <div className="flex flex-col-reverse gap-4 md:flex-row md:items-start">
@@ -60,7 +81,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                 month: "long",
               })}
             </p>
-            {selectedTasks.length === 0 ? (
+            {selectedTasks.length === 0 && selectedProjected.length === 0 ? (
               <p className="mt-3 text-sm text-[var(--color-ink-muted)]">Sem tarefas neste dia.</p>
             ) : (
               <div className="mt-3 space-y-2">
@@ -73,6 +94,16 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                         {task.location}
                       </p>
                     )}
+                  </div>
+                ))}
+                {selectedProjected.map((task) => (
+                  <div
+                    key={`projected-${task.id}`}
+                    className="flex items-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] px-3 py-2 text-sm text-[var(--color-ink-muted)]"
+                  >
+                    <Repeat className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{task.title}</span>
+                    <span className="ml-auto shrink-0 text-[10px] uppercase tracking-wide">Prevista</span>
                   </div>
                 ))}
               </div>
@@ -114,6 +145,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
           {cells.map((cell, index) => {
             if (!cell.date) return <div key={index} />;
             const dayTasks = tasksByDate.get(cell.date) ?? [];
+            const dayProjected = projectedByDate.get(cell.date) ?? [];
             const isToday = cell.date === todayISO;
             const isSelected = cell.date === selectedDate;
             return (
@@ -133,6 +165,9 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                 </span>
                 {dayTasks.length > 0 && (
                   <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-[var(--color-secondary)]" />
+                )}
+                {dayTasks.length === 0 && dayProjected.length > 0 && (
+                  <span className="mt-0.5 h-1.5 w-1.5 rounded-full border border-[var(--color-secondary)]" />
                 )}
               </button>
             );
