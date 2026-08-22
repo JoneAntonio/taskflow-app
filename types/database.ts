@@ -138,12 +138,14 @@ export interface TeamMembership {
 export interface TeamInvite {
   id: string;
   team_id: string;
-  email: string;
+  email: string | null;
   role: TeamRole;
   invited_by: string;
   status: "pending" | "accepted" | "revoked";
   created_at: string;
   accepted_at: string | null;
+  token: string | null;
+  expires_at: string | null;
 }
 
 export interface Conversation {

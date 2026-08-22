@@ -106,6 +106,15 @@ export function QuadrantQuickAdd({
           disabled={isSubmitting}
           className="w-full bg-transparent text-xs text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] outline-none"
         />
+        {value.trim() && (
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="shrink-0 rounded-full bg-[var(--color-accent)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-accent-ink)]"
+          >
+            {isSubmitting ? "..." : "Criar"}
+          </button>
+        )}
         <button
           ref={triggerRef}
           type="button"

@@ -77,7 +77,14 @@ export function LoginForm() {
       </Button>
       <p className="text-center text-sm text-[var(--color-ink-muted)]">
         Ainda não tens conta?{" "}
-        <Link href="/registo" className="font-medium text-[var(--color-ink)] hover:underline">
+        <Link
+          href={
+            searchParams.get("redirectTo")
+              ? `/registo?redirectTo=${encodeURIComponent(searchParams.get("redirectTo")!)}`
+              : "/registo"
+          }
+          className="font-medium text-[var(--color-ink)] hover:underline"
+        >
           Cria uma agora
         </Link>
       </p>

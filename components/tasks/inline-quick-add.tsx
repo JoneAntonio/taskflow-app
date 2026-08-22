@@ -8,6 +8,7 @@ import { parseQuickTask } from "@/utils/parse-quick-task";
 import { tasksService } from "@/services/tasks.service";
 import { HighlightedQuickInput } from "@/components/tasks/highlighted-quick-input";
 import { SchedulePopover, type ScheduleValue } from "@/components/tasks/schedule-popover";
+import { QuickCreatePill } from "@/components/tasks/quick-create-pill";
 import { cn } from "@/lib/utils";
 
 const EMPTY_SCHEDULE: ScheduleValue = {
@@ -90,6 +91,7 @@ export function InlineQuickAdd({
           disabled={isSubmitting}
         />
       </div>
+      <QuickCreatePill visible={!!value.trim()} isLoading={isSubmitting} />
       <div className="relative">
         <button
           ref={triggerRef}

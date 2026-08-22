@@ -117,4 +117,71 @@ export const teamsService = {
     const { error } = await supabase.from("team_invites").update({ status: "revoked" }).eq("id", inviteId);
     if (error) throw error;
   },
+
+  async getActiveInviteLink(teamId: string): Promise<TeamInvite | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("team_invites")
+      .select("*")
+      .eq("team_id", teamId)
+      .eq("status", "pending")
+      .not("token", "is", null)
+      .gt("expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false })
+      .maybeSingle();
+    if (error) throw error;
+    return data as TeamInvite | null;
+  },
+
+  async generateInviteLink(teamId: string, role: TeamRole = "member"): Promise<TeamInvite> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Utilizador não autenticado");
+
+    const token = crypto.randomUUID().replace(/-/g, "");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const { data, error } = await supabase
+      .from("team_invites")
+      .insert({ team_id: teamId, role, invited_by: user.id, token, expires_at: expiresAt })
+      .select()
+      .single();
+    if (error) throw error;
+    return data as TeamInvite;
+  },
+
+  async revokeInviteLink(inviteId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("team_invites").update({ status: "revoked" }).eq("id", inviteId);
+    if (error) throw error;
+  },
+
+  async getInviteByToken(token: string): Promise<(TeamInvite & { teamName: string }) | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("team_invites")
+      .select("*, team:teams(name)")
+      .eq("token", token)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    const { team, ...invite } = data as TeamInvite & { team: { name: string } | null };
+    return { ...invite, teamName: team?.name ?? "Equipa" };
+  },
+
+  async acceptLinkInvite(invite: TeamInvite): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Utilizador não autenticado");
+
+    const { error } = await supabase
+      .from("team_memberships")
+      .upsert({ team_id: invite.team_id, user_id: user.id, role: invite.role }, { onConflict: "team_id,user_id" });
+    if (error) throw error;
+  },
 };

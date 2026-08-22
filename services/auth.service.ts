@@ -14,14 +14,17 @@ export const authService = {
     return data;
   },
 
-  async signUp({ email, password, fullName }: RegisterInput) {
+  async signUp({ email, password, fullName }: RegisterInput, redirectTo?: string) {
     const supabase = createClient();
+    const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+    if (redirectTo) callbackUrl.searchParams.set("next", redirectTo);
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: callbackUrl.toString(),
       },
     });
     if (error) throw error;

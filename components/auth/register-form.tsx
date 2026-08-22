@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
@@ -12,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function RegisterForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -24,7 +27,7 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterInput) {
     setIsSubmitting(true);
     try {
-      await authService.signUp(values);
+      await authService.signUp(values, redirectTo);
       setSubmitted(true);
     } catch (error) {
       toast.error(
@@ -96,7 +99,10 @@ export function RegisterForm() {
       </Button>
       <p className="text-center text-sm text-[var(--color-ink-muted)]">
         Já tens conta?{" "}
-        <Link href="/login" className="font-medium text-[var(--color-ink)] hover:underline">
+        <Link
+          href={redirectTo ? `/login?redirectTo=${encodeURIComponent(redirectTo)}` : "/login"}
+          className="font-medium text-[var(--color-ink)] hover:underline"
+        >
           Inicia sessão
         </Link>
       </p>

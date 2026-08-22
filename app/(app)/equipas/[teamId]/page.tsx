@@ -5,6 +5,7 @@ import { ArrowLeft, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { MemberList } from "@/components/teams/member-list";
 import { InviteMemberForm } from "@/components/teams/invite-member-form";
+import { InviteLinkCard } from "@/components/teams/invite-link-card";
 import { TeamTaskCreator } from "@/components/teams/team-task-creator";
 import { TeamChatSection } from "@/components/chat/team-chat-section";
 import { TaskListItem } from "@/components/tasks/task-list-item";
@@ -76,9 +77,12 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
       </div>
 
       {isAdmin && (
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <p className="mb-3 text-sm font-medium text-[var(--color-ink)]">Convidar novo membro</p>
-          <InviteMemberForm teamId={teamId} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+            <p className="mb-3 text-sm font-medium text-[var(--color-ink)]">Convidar por email</p>
+            <InviteMemberForm teamId={teamId} />
+          </div>
+          <InviteLinkCard teamId={teamId} />
         </div>
       )}
 
