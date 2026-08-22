@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Shield, User, X } from "lucide-react";
+import { Shield, User, X, MessageCircle } from "lucide-react";
 import { teamsService } from "@/services/teams.service";
 import { getGravatarUrl } from "@/lib/gravatar";
 import { cn } from "@/lib/utils";
@@ -77,6 +78,15 @@ export function MemberList({
               {membership.role === "admin" ? <Shield className="h-3 w-3" /> : <User className="h-3 w-3" />}
               {membership.role === "admin" ? "Admin" : "Membro"}
             </span>
+            {membership.user_id !== currentUserId && (
+              <Link
+                href={`/mensagens/${membership.user_id}`}
+                aria-label={`Enviar mensagem a ${profile?.full_name || profile?.email}`}
+                className="rounded-md p-1.5 text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-secondary)]"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+              </Link>
+            )}
             {isAdmin && membership.user_id !== currentUserId && (
               <>
                 <button

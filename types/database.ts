@@ -145,6 +145,23 @@ export interface TeamInvite {
   accepted_at: string | null;
 }
 
+export interface Conversation {
+  id: string;
+  team_id: string | null;
+  dm_user_a: string | null;
+  dm_user_b: string | null;
+  created_at: string;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  body: string;
+  created_at: string;
+  sender?: Profile;
+}
+
 export interface Subtask {
   id: string;
   task_id: string;

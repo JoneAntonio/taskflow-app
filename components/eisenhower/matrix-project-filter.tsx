@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { FolderKanban } from "lucide-react";
 import { QuadrantCard } from "@/components/eisenhower/quadrant-card";
+import { DeadlineCountdown } from "@/components/projects/deadline-countdown";
 import type { Task, Project } from "@/types/database";
 
 export function MatrixProjectFilter({
@@ -19,6 +20,7 @@ export function MatrixProjectFilter({
   projects: Project[];
 }) {
   const [projectId, setProjectId] = useState<string>("");
+  const selectedProject = projects.find((p) => p.id === projectId) ?? null;
 
   const filter = (tasks: Task[]) => (projectId ? tasks.filter((t) => t.project_id === projectId) : tasks);
 
@@ -36,22 +38,29 @@ export function MatrixProjectFilter({
   return (
     <div className="space-y-4">
       {projects.length > 0 && (
-        <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
-          <FolderKanban className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
-          <select
-            value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-            className="w-full max-w-xs bg-transparent text-sm text-[var(--color-ink)] outline-none"
-          >
-            <option value="">Todos os projetos</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-          {projectId && (
-            <span className="text-xs text-[var(--color-ink-muted)]">Novas tarefas ficam ligadas a este projeto</span>
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+          <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+            <FolderKanban className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
+            <select
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+              className="w-full max-w-xs bg-transparent text-sm text-[var(--color-ink)] outline-none"
+            >
+              <option value="">Todos os projetos</option>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            {projectId && (
+              <span className="text-xs text-[var(--color-ink-muted)]">Novas tarefas ficam ligadas a este projeto</span>
+            )}
+          </div>
+          {selectedProject?.target_date && (
+            <div className="sm:w-56">
+              <DeadlineCountdown targetDate={selectedProject.target_date} />
+            </div>
           )}
         </div>
       )}

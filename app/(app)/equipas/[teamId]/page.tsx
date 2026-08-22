@@ -5,7 +5,10 @@ import { ArrowLeft, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { MemberList } from "@/components/teams/member-list";
 import { InviteMemberForm } from "@/components/teams/invite-member-form";
-import type { Team, TeamMembership, TeamInvite } from "@/types/database";
+import { TeamTaskCreator } from "@/components/teams/team-task-creator";
+import { TeamChatSection } from "@/components/chat/team-chat-section";
+import { TaskListItem } from "@/components/tasks/task-list-item";
+import type { Team, TeamMembership, TeamInvite, Task } from "@/types/database";
 
 export const metadata: Metadata = { title: "Equipa — JAFLOW" };
 
@@ -20,15 +23,41 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
   const { data: team } = await supabase.from("teams").select("*").eq("id", teamId).single();
   if (!team) notFound();
 
-  const [{ data: members }, { data: pendingInvites }, { data: isAdminResult }] = await Promise.all([
-    supabase.from("team_memberships").select("*, profile:profiles(*)").eq("team_id", teamId).order("joined_at"),
-    supabase.from("team_invites").select("*").eq("team_id", teamId).eq("status", "pending").order("created_at", { ascending: false }),
-    supabase.rpc("is_team_admin", { _team_id: teamId }),
-  ]);
+  const [{ data: members }, { data: pendingInvites }, { data: isAdminResult }, { data: teamTasks }] =
+    await Promise.all([
+      supabase.from("team_memberships").select("*, profile:profiles(*)").eq("team_id", teamId).order("joined_at"),
+      supabase
+        .from("team_invites")
+        .select("*")
+        .eq("team_id", teamId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false }),
+      supabase.rpc("is_team_admin", { _team_id: teamId }),
+      supabase
+        .from("tasks")
+        .select("*")
+        .eq("team_id", teamId)
+        .order("status")
+        .order("due_date", { ascending: true, nullsFirst: false }),
+    ]);
 
   const isAdmin = !!isAdminResult;
   const memberList = (members ?? []) as unknown as TeamMembership[];
   const inviteList = (pendingInvites ?? []) as TeamInvite[];
+  const taskList = (teamTasks ?? []) as Task[];
+
+  // Carga de trabalho atual de cada membro — quantas tarefas ativas já tem
+  // nesta equipa — para ajudar a decidir a quem atribuir a próxima.
+  const membersWithLoad = memberList.map((membership) => ({
+    membership,
+    activeTaskCount: taskList.filter(
+      (t) => t.assigned_to === membership.user_id && t.status !== "concluida"
+    ).length,
+  }));
+
+  const memberNameById = new Map(
+    memberList.map((m) => [m.user_id, m.profile?.full_name || m.profile?.email || "Alguém"])
+  );
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -78,6 +107,37 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
           </div>
         </div>
       )}
+
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+          Tarefas da equipa ({taskList.length})
+        </p>
+        <div className="space-y-3">
+          <TeamTaskCreator teamId={teamId} membersWithLoad={membersWithLoad} />
+          {taskList.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-8 text-center text-sm text-[var(--color-ink-muted)]">
+              Ainda sem tarefas nesta equipa.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {taskList.map((task) => (
+                <TaskListItem
+                  key={task.id}
+                  task={task}
+                  assigneeName={task.assigned_to ? memberNameById.get(task.assigned_to) : null}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+          Chat da equipa
+        </p>
+        <TeamChatSection teamId={teamId} currentUserId={user.id} />
+      </div>
     </div>
   );
 }

@@ -15,6 +15,8 @@ export interface CreateTaskInput {
   reminderAt?: string | null;
   location?: string | null;
   estimatedDurationMinutes?: number | null;
+  teamId?: string | null;
+  assignedTo?: string | null;
 }
 
 /**
@@ -50,6 +52,8 @@ export const tasksService = {
         reminder_at: input.reminderAt ?? null,
         location: input.location ?? null,
         estimated_duration_minutes: input.estimatedDurationMinutes ?? null,
+        team_id: input.teamId ?? null,
+        assigned_to: input.assignedTo ?? null,
       })
       .select()
       .single();

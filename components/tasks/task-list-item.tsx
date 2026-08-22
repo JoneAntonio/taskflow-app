@@ -10,7 +10,15 @@ import { TaskCountdownBadge } from "@/components/tasks/task-countdown-badge";
 import { taskActionsService } from "@/services/task-actions.service";
 import type { Task } from "@/types/database";
 
-export function TaskListItem({ task, compact = false }: { task: Task; compact?: boolean }) {
+export function TaskListItem({
+  task,
+  compact = false,
+  assigneeName,
+}: {
+  task: Task;
+  compact?: boolean;
+  assigneeName?: string | null;
+}) {
   const [isPending, setIsPending] = useState(false);
   const [isCompleted, setIsCompleted] = useState(task.status === "concluida");
   const router = useRouter();
@@ -75,6 +83,11 @@ export function TaskListItem({ task, compact = false }: { task: Task; compact?: 
           </p>
         )}
       </div>
+      {!isCompleted && assigneeName && (
+        <span className="hidden shrink-0 rounded-full bg-[var(--color-surface-alt)] px-2 py-0.5 text-[11px] text-[var(--color-ink-muted)] sm:inline">
+          {assigneeName}
+        </span>
+      )}
       {!isCompleted && <TaskCountdownBadge task={task} />}
     </div>
   );
