@@ -8,6 +8,7 @@ import { QuickAddDialog } from "@/components/tasks/quick-add-dialog";
 import { ReminderWatcher } from "@/components/notifications/reminder-watcher";
 import { PomodoroMiniWidget } from "@/components/pomodoro/pomodoro-mini-widget";
 import { InstallAppPrompt } from "@/components/providers/install-app-prompt";
+import { PendingInvitesBanner } from "@/components/teams/pending-invites-banner";
 import type { Profile, Project } from "@/types/database";
 
 export function AppShell({
@@ -27,7 +28,10 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar profile={profile} />
-        <main className="flex-1 px-4 pb-24 pt-5 sm:px-6 lg:pb-8">{children}</main>
+        <main className="flex-1 px-4 pb-24 pt-5 sm:px-6 lg:pb-8">
+          <PendingInvitesBanner />
+          {children}
+        </main>
       </div>
 
       <BottomNav onQuickAdd={() => setQuickAddOpen(true)} />

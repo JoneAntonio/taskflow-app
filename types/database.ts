@@ -27,6 +27,7 @@ export interface Profile {
   theme: ThemePreference;
   timezone: string;
   notifications_enabled: boolean;
+  is_platform_admin: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -89,6 +90,8 @@ export interface Task {
   id: string;
   user_id: string;
   project_id: string | null;
+  team_id: string | null;
+  assigned_to: string | null;
   title: string;
   description: string | null;
   due_date: string | null; // YYYY-MM-DD
@@ -109,6 +112,37 @@ export interface Task {
   subtasks?: Subtask[];
   tags?: Tag[];
   project?: Project | null;
+}
+
+export type TeamRole = "admin" | "member";
+
+export interface Team {
+  id: string;
+  name: string;
+  description: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+export interface TeamMembership {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: TeamRole;
+  joined_at: string;
+  // Relações carregadas via join
+  profile?: Profile;
+}
+
+export interface TeamInvite {
+  id: string;
+  team_id: string;
+  email: string;
+  role: TeamRole;
+  invited_by: string;
+  status: "pending" | "accepted" | "revoked";
+  created_at: string;
+  accepted_at: string | null;
 }
 
 export interface Subtask {

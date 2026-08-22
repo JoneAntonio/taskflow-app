@@ -11,6 +11,7 @@ import {
   TimerReset,
   Search,
   Users,
+  Users2,
   LayoutGrid,
 } from "lucide-react";
 
@@ -42,6 +43,7 @@ export const focusNav: NavItem[] = [
 ];
 
 export const teamNav: NavItem[] = [
+  { label: "Equipas", href: "/equipas", icon: Users2 },
   { label: "Maturidade da Equipa", href: "/equipa", icon: Users },
 ];
 
