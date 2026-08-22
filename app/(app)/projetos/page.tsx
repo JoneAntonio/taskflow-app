@@ -3,7 +3,7 @@ import { FolderKanban } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ProjectCard } from "@/components/projects/project-card";
 import { NewProjectButton } from "@/components/projects/new-project-button";
-import type { Project, Team } from "@/types/database";
+import type { Project } from "@/types/database";
 
 export const metadata: Metadata = { title: "Método SMART — JAFLOW" };
 
@@ -14,18 +14,10 @@ export default async function ProjetosPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: projects }, { data: tasks }, { data: adminMemberships }, { data: allMyTeams }] = await Promise.all([
+  const [{ data: projects }, { data: tasks }] = await Promise.all([
     supabase.from("projects").select("*").order("created_at", { ascending: false }),
     supabase.from("tasks").select("id, project_id, status"),
-    supabase.from("team_memberships").select("team:teams(*)").eq("user_id", user.id).eq("role", "admin"),
-    supabase.from("teams").select("id, name"),
   ]);
-
-  const teamNameById = new Map((allMyTeams ?? []).map((t) => [t.id, t.name]));
-
-  const adminTeams = (adminMemberships ?? [])
-    .map((m) => (m as unknown as { team: Team | null }).team)
-    .filter((t): t is Team => !!t);
 
   const projectList = (projects ?? []) as Project[];
   const taskCounts = new Map<string, { total: number; completed: number }>();
@@ -57,7 +49,7 @@ export default async function ProjetosPage() {
             Cria subprojetos para agrupares dentro de um objetivo maior.
           </p>
         </div>
-        <NewProjectButton availableParents={topLevel} availableTeams={adminTeams} />
+        <NewProjectButton availableParents={topLevel} />
       </div>
 
       {projectList.length === 0 ? (
@@ -75,12 +67,7 @@ export default async function ProjetosPage() {
             const children = childrenByParent.get(project.id) ?? [];
             return (
               <div key={project.id}>
-                <ProjectCard
-                  project={project}
-                  totalTasks={counts.total}
-                  completedTasks={counts.completed}
-                  teamName={project.team_id ? teamNameById.get(project.team_id) : null}
-                />
+                <ProjectCard project={project} totalTasks={counts.total} completedTasks={counts.completed} />
                 {children.length > 0 && (
                   <div className="ml-6 mt-3 space-y-3 border-l-2 border-[var(--color-border)] pl-4">
                     {children.map((child) => {
@@ -91,7 +78,6 @@ export default async function ProjetosPage() {
                           project={child}
                           totalTasks={childCounts.total}
                           completedTasks={childCounts.completed}
-                          teamName={child.team_id ? teamNameById.get(child.team_id) : null}
                         />
                       );
                     })}
