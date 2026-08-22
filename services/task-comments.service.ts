@@ -40,7 +40,11 @@ export const taskCommentsService = {
     if (error) throw error;
 
     if (teamId) {
-      await notifyMentions({ taskId, teamId, body, authorId: user.id });
+      try {
+        await notifyMentions({ taskId, teamId, body, authorId: user.id });
+      } catch {
+        // Uma falha a notificar não deve impedir o comentário de ficar publicado.
+      }
     }
 
     return data as unknown as TaskComment;
