@@ -31,6 +31,9 @@ export function ProjectDialog({
   const [objective, setObjective] = useState(project?.objective ?? "");
   const [successMetric, setSuccessMetric] = useState(project?.success_metric ?? "");
   const [targetDate, setTargetDate] = useState(project?.target_date ?? "");
+  const [currentValue, setCurrentValue] = useState(project?.current_value?.toString() ?? "");
+  const [targetValue, setTargetValue] = useState(project?.target_value?.toString() ?? "");
+  const [lowerIsBetter, setLowerIsBetter] = useState(project?.lower_is_better ?? false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parentOptions = availableParents.filter((p) => p.id !== project?.id);
@@ -44,6 +47,9 @@ export function ProjectDialog({
         objective: objective.trim() || null,
         successMetric: successMetric.trim() || null,
         targetDate: targetDate || null,
+        currentValue: currentValue.trim() ? Number(currentValue) : null,
+        targetValue: targetValue.trim() ? Number(targetValue) : null,
+        lowerIsBetter,
       };
       if (project) {
         await projectsService.updateProject(project.id, {
@@ -54,6 +60,9 @@ export function ProjectDialog({
           objective: smartFields.objective,
           success_metric: smartFields.successMetric,
           target_date: smartFields.targetDate,
+          current_value: smartFields.currentValue,
+          target_value: smartFields.targetValue,
+          lower_is_better: smartFields.lowerIsBetter,
         });
         toast.success("Projeto atualizado");
       } else {
@@ -146,6 +155,39 @@ export function ProjectDialog({
                 placeholder="Ex: TMA médio ≤ 4 min"
               />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="project-current-value">Valor atual (opcional)</Label>
+                <Input
+                  id="project-current-value"
+                  type="number"
+                  step="any"
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(e.target.value)}
+                  placeholder="Ex: 6.2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="project-target-value">Valor alvo (opcional)</Label>
+                <Input
+                  id="project-target-value"
+                  type="number"
+                  step="any"
+                  value={targetValue}
+                  onChange={(e) => setTargetValue(e.target.value)}
+                  placeholder="Ex: 4"
+                />
+              </div>
+            </div>
+            <label className="flex items-center gap-2 text-xs text-[var(--color-ink-muted)]">
+              <input
+                type="checkbox"
+                checked={lowerIsBetter}
+                onChange={(e) => setLowerIsBetter(e.target.checked)}
+                className="h-3.5 w-3.5 accent-[var(--color-accent)]"
+              />
+              Quanto menor o valor, melhor (ex: TMA, tempo, custo)
+            </label>
             <div>
               <Label htmlFor="project-target-date">Prazo do projeto</Label>
               <Input

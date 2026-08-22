@@ -7,6 +7,7 @@ import { TaskListItem } from "@/components/tasks/task-list-item";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { ProjectHeaderActions } from "@/components/projects/project-header-actions";
 import { ProjectSmartCard } from "@/components/projects/project-smart-card";
+import { DeadlineCountdown } from "@/components/projects/deadline-countdown";
 import { ProjectReviews } from "@/components/projects/project-reviews";
 import type { Project, Task, ProjectReview } from "@/types/database";
 
@@ -88,7 +89,13 @@ export default async function ProjectDetailPage({
 
       <InlineQuickAdd placeholder="Adicionar tarefa a este projeto" projectId={projectId} />
 
-      <ProjectSmartCard project={projectData} />
+      <div className={projectData.target_date ? "grid gap-4 sm:grid-cols-[1fr_260px]" : ""}>
+        <ProjectSmartCard
+          project={projectData}
+          taskProgress={{ total: taskList.length, completed: completed.length }}
+        />
+        {projectData.target_date && <DeadlineCountdown targetDate={projectData.target_date} />}
+      </div>
 
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">

@@ -11,6 +11,9 @@ export const projectsService = {
     objective?: string | null;
     successMetric?: string | null;
     targetDate?: string | null;
+    currentValue?: number | null;
+    targetValue?: number | null;
+    lowerIsBetter?: boolean;
   }): Promise<Project> {
     const supabase = createClient();
     const {
@@ -30,6 +33,9 @@ export const projectsService = {
         objective: input.objective ?? null,
         success_metric: input.successMetric ?? null,
         target_date: input.targetDate ?? null,
+        current_value: input.currentValue ?? null,
+        target_value: input.targetValue ?? null,
+        lower_is_better: input.lowerIsBetter ?? false,
       })
       .select()
       .single();
@@ -39,9 +45,21 @@ export const projectsService = {
 
   async updateProject(
     id: string,
-    input: Partial<Pick<Project, "name" | "description" | "color" | "icon" | "objective" | "success_metric" | "target_date">> & {
-      parentId?: string | null;
-    }
+    input: Partial<
+      Pick<
+        Project,
+        | "name"
+        | "description"
+        | "color"
+        | "icon"
+        | "objective"
+        | "success_metric"
+        | "target_date"
+        | "current_value"
+        | "target_value"
+        | "lower_is_better"
+      >
+    > & { parentId?: string | null }
   ): Promise<void> {
     const supabase = createClient();
     const { parentId, ...rest } = input;

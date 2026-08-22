@@ -47,6 +47,9 @@ export interface Project {
   objective: string | null;
   success_metric: string | null;
   target_date: string | null;
+  current_value: number | null;
+  target_value: number | null;
+  lower_is_better: boolean;
   // Campos calculados (via view / agregação), não colunas reais
   task_count?: number;
   completed_task_count?: number;
