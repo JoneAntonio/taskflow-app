@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { projectsService, PROJECT_COLORS } from "@/services/projects.service";
+import { PRIORITY_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
-import type { Project } from "@/types/database";
+import type { Project, TaskPriority } from "@/types/database";
+
+const PRIORITY_OPTIONS: TaskPriority[] = ["sem_prioridade", "baixa", "media", "alta", "urgente"];
 
 export function ProjectDialog({
   open,
@@ -34,6 +37,9 @@ export function ProjectDialog({
   const [currentValue, setCurrentValue] = useState(project?.current_value?.toString() ?? "");
   const [targetValue, setTargetValue] = useState(project?.target_value?.toString() ?? "");
   const [lowerIsBetter, setLowerIsBetter] = useState(project?.lower_is_better ?? false);
+  const [responsible, setResponsible] = useState(project?.responsible ?? "");
+  const [smartPriority, setSmartPriority] = useState<TaskPriority>(project?.smart_priority ?? "sem_prioridade");
+  const [actionPlan, setActionPlan] = useState(project?.action_plan ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parentOptions = availableParents.filter((p) => p.id !== project?.id);
@@ -50,6 +56,9 @@ export function ProjectDialog({
         currentValue: currentValue.trim() ? Number(currentValue) : null,
         targetValue: targetValue.trim() ? Number(targetValue) : null,
         lowerIsBetter,
+        responsible: responsible.trim() || null,
+        smartPriority,
+        actionPlan: actionPlan.trim() || null,
       };
       if (project) {
         await projectsService.updateProject(project.id, {
@@ -63,6 +72,9 @@ export function ProjectDialog({
           current_value: smartFields.currentValue,
           target_value: smartFields.targetValue,
           lower_is_better: smartFields.lowerIsBetter,
+          responsible: smartFields.responsible,
+          smart_priority: smartFields.smartPriority,
+          action_plan: smartFields.actionPlan,
         });
         toast.success("Projeto atualizado");
       } else {
@@ -134,11 +146,11 @@ export function ProjectDialog({
 
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3.5">
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
-            Objetivo SMART (opcional)
+            Método SMART (opcional)
           </p>
           <div className="space-y-3">
             <div>
-              <Label htmlFor="project-objective">Objetivo (o quê e porquê)</Label>
+              <Label htmlFor="project-objective">🎯 Objetivo (o quê e porquê)</Label>
               <Input
                 id="project-objective"
                 value={objective}
@@ -147,7 +159,7 @@ export function ProjectDialog({
               />
             </div>
             <div>
-              <Label htmlFor="project-metric">Métrica de sucesso</Label>
+              <Label htmlFor="project-metric">📊 Métrica de sucesso</Label>
               <Input
                 id="project-metric"
                 value={successMetric}
@@ -157,7 +169,7 @@ export function ProjectDialog({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="project-current-value">Valor atual (opcional)</Label>
+                <Label htmlFor="project-current-value">📍 Ponto de partida (opcional)</Label>
                 <Input
                   id="project-current-value"
                   type="number"
@@ -168,7 +180,7 @@ export function ProjectDialog({
                 />
               </div>
               <div>
-                <Label htmlFor="project-target-value">Valor alvo (opcional)</Label>
+                <Label htmlFor="project-target-value">🏆 Meta (opcional)</Label>
                 <Input
                   id="project-target-value"
                   type="number"
@@ -189,12 +201,49 @@ export function ProjectDialog({
               Quanto menor o valor, melhor (ex: TMA, tempo, custo)
             </label>
             <div>
-              <Label htmlFor="project-target-date">Prazo do projeto</Label>
+              <Label htmlFor="project-target-date">📅 Prazo do projeto</Label>
               <Input
                 id="project-target-date"
                 type="date"
                 value={targetDate ?? ""}
                 onChange={(e) => setTargetDate(e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="project-responsible">👤 Responsável</Label>
+                <Input
+                  id="project-responsible"
+                  value={responsible}
+                  onChange={(e) => setResponsible(e.target.value)}
+                  placeholder="Ex: Jone António"
+                />
+              </div>
+              <div>
+                <Label htmlFor="project-priority">⚡ Prioridade</Label>
+                <select
+                  id="project-priority"
+                  value={smartPriority}
+                  onChange={(e) => setSmartPriority(e.target.value as TaskPriority)}
+                  className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+                >
+                  {PRIORITY_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {PRIORITY_LABELS[p]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="project-action-plan">🔧 Plano de ação</Label>
+              <textarea
+                id="project-action-plan"
+                rows={2}
+                value={actionPlan}
+                onChange={(e) => setActionPlan(e.target.value)}
+                placeholder="Os passos principais para lá chegares..."
+                className="w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
               />
             </div>
           </div>

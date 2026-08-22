@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Project } from "@/types/database";
+import type { Project, TaskPriority } from "@/types/database";
 
 export const projectsService = {
   async createProject(input: {
@@ -14,6 +14,9 @@ export const projectsService = {
     currentValue?: number | null;
     targetValue?: number | null;
     lowerIsBetter?: boolean;
+    responsible?: string | null;
+    smartPriority?: TaskPriority;
+    actionPlan?: string | null;
   }): Promise<Project> {
     const supabase = createClient();
     const {
@@ -36,6 +39,9 @@ export const projectsService = {
         current_value: input.currentValue ?? null,
         target_value: input.targetValue ?? null,
         lower_is_better: input.lowerIsBetter ?? false,
+        responsible: input.responsible ?? null,
+        smart_priority: input.smartPriority ?? "sem_prioridade",
+        action_plan: input.actionPlan ?? null,
       })
       .select()
       .single();
@@ -58,6 +64,9 @@ export const projectsService = {
         | "current_value"
         | "target_value"
         | "lower_is_better"
+        | "responsible"
+        | "smart_priority"
+        | "action_plan"
       >
     > & { parentId?: string | null }
   ): Promise<void> {

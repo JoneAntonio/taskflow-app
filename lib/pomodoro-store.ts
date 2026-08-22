@@ -20,7 +20,11 @@ export interface PomodoroPlanSegment {
 interface PomodoroState {
   isRunning: boolean;
   isActive: boolean;
+  /** Segundos restantes, sempre recalculados a partir de segmentEndAt — nunca decrementados "à mão". */
   secondsLeft: number;
+  /** Timestamp (Date.now()) em que o bloco atual termina. Fonte da verdade do tempo real. */
+  segmentEndAt: number | null;
+  segmentStartAt: number | null;
   sessionType: PomodoroSessionType;
   plan: PomodoroPlanSegment[] | null;
   segmentIndex: number;
@@ -64,10 +68,20 @@ async function logSession(taskId: string | null, type: PomodoroSessionType, minu
   }
 }
 
+function startNextSegment(
+  set: (partial: Partial<PomodoroState>) => void,
+  seconds: number
+) {
+  const now = Date.now();
+  set({ secondsLeft: seconds, segmentStartAt: now, segmentEndAt: now + seconds * 1000 });
+}
+
 export const usePomodoroStore = create<PomodoroState>((set, get) => ({
   isRunning: false,
   isActive: false,
   secondsLeft: 25 * 60,
+  segmentEndAt: null,
+  segmentStartAt: null,
   sessionType: "foco",
   plan: null,
   segmentIndex: 0,
@@ -85,6 +99,8 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
       sessionType,
       secondsLeft,
       segmentIndex: 0,
+      segmentStartAt: null,
+      segmentEndAt: null,
       isRunning: false,
       selectedTaskId,
       selectedTaskTitle,
@@ -95,17 +111,26 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
   setCustomDurations: (customDurations) => set({ customDurations }),
 
   start: () => {
-    const { intervalId, isRunning } = get();
+    const { intervalId, isRunning, secondsLeft } = get();
     if (isRunning) return;
     if (intervalId) clearInterval(intervalId);
+
+    const now = Date.now();
+    set({ segmentStartAt: now, segmentEndAt: now + secondsLeft * 1000 });
+
+    // O intervalo só serve para FORÇAR um novo cálculo a cada segundo — o
+    // valor real vem sempre de segmentEndAt, por isso mesmo que o browser
+    // atrase o intervalo (ex: separador em segundo plano), o próximo tick
+    // corrige-se sozinho para o tempo real decorrido, sem "perder" tempo.
     const id = setInterval(() => get().tick(), 1000);
     set({ isRunning: true, isActive: true, intervalId: id });
   },
 
   pause: () => {
-    const { intervalId } = get();
+    const { intervalId, segmentEndAt } = get();
     if (intervalId) clearInterval(intervalId);
-    set({ isRunning: false, intervalId: null });
+    const remaining = segmentEndAt ? Math.max(0, Math.round((segmentEndAt - Date.now()) / 1000)) : get().secondsLeft;
+    set({ isRunning: false, intervalId: null, secondsLeft: remaining, segmentEndAt: null, segmentStartAt: null });
   },
 
   reset: () => {
@@ -118,16 +143,23 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
       segmentIndex: 0,
       sessionType: plan ? plan[0].type : sessionType,
       secondsLeft: seconds,
+      segmentStartAt: null,
+      segmentEndAt: null,
     });
   },
 
   tick: () => {
     const state = get();
-    if (state.secondsLeft > 1) {
-      set({ secondsLeft: state.secondsLeft - 1 });
+    if (!state.segmentEndAt) return;
+
+    // Recalcula sempre a partir do tempo real decorrido, não de um contador manual.
+    const remaining = Math.round((state.segmentEndAt - Date.now()) / 1000);
+    if (remaining > 0) {
+      set({ secondsLeft: remaining });
       return;
     }
 
+    // Bloco terminou
     const { plan, segmentIndex, sessionType, customDurations, selectedTaskId, sessionCount } = state;
 
     if (plan) {
@@ -148,6 +180,8 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
           segmentIndex: 0,
           sessionType: plan[0].type,
           secondsLeft: plan[0].minutes * 60,
+          segmentStartAt: null,
+          segmentEndAt: null,
         });
         return;
       }
@@ -155,11 +189,8 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
       toast.success(
         currentSegment.type === "foco" ? "Bloco de trabalho concluído! Começa a pausa." : "Pausa concluída!"
       );
-      set({
-        segmentIndex: nextIndex,
-        sessionType: plan[nextIndex].type,
-        secondsLeft: plan[nextIndex].minutes * 60,
-      });
+      set({ segmentIndex: nextIndex, sessionType: plan[nextIndex].type });
+      startNextSegment(set, plan[nextIndex].minutes * 60);
       return;
     }
 
@@ -169,9 +200,11 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
     if (sessionType === "foco") {
       const nextCount = sessionCount + 1;
       const next: PomodoroSessionType = nextCount % 4 === 0 ? "pausa_longa" : "pausa_curta";
-      set({ sessionCount: nextCount, sessionType: next, secondsLeft: customDurations[next] * 60 });
+      set({ sessionCount: nextCount, sessionType: next });
+      startNextSegment(set, customDurations[next] * 60);
     } else {
-      set({ sessionType: "foco", secondsLeft: customDurations.foco * 60 });
+      set({ sessionType: "foco" });
+      startNextSegment(set, customDurations.foco * 60);
     }
   },
 }));

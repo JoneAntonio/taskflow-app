@@ -1,10 +1,42 @@
-import { Circle, Repeat } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Check, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PRIORITY_COLOR_VAR } from "@/lib/labels";
 import { TaskCountdownBadge } from "@/components/tasks/task-countdown-badge";
+import { taskActionsService } from "@/services/task-actions.service";
 import type { Task } from "@/types/database";
 
 export function TaskListItem({ task, compact = false }: { task: Task; compact?: boolean }) {
+  const [isPending, setIsPending] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(task.status === "concluida");
+  const router = useRouter();
+
+  async function handleToggleComplete(event: React.MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsPending(true);
+    const next = !isCompleted;
+    setIsCompleted(next);
+    try {
+      if (next) {
+        await taskActionsService.markComplete(task.id);
+        toast.success("Tarefa concluída");
+      } else {
+        await taskActionsService.reopenTask(task.id);
+      }
+      router.refresh();
+    } catch {
+      toast.error("Não foi possível atualizar a tarefa.");
+      setIsCompleted(!next);
+    } finally {
+      setIsPending(false);
+    }
+  }
+
   return (
     <div
       className={cn(
@@ -12,13 +44,26 @@ export function TaskListItem({ task, compact = false }: { task: Task; compact?: 
         compact ? "px-3 py-2" : "px-4 py-3"
       )}
     >
-      <Circle
-        className="h-4 w-4 shrink-0"
-        style={{ color: `var(${PRIORITY_COLOR_VAR[task.priority]})` }}
-        strokeWidth={2.5}
-      />
+      <button
+        onClick={handleToggleComplete}
+        disabled={isPending}
+        aria-label={isCompleted ? "Reabrir tarefa" : "Concluir tarefa"}
+        className={cn(
+          "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+          isCompleted ? "border-[var(--color-success)] bg-[var(--color-success)]" : "hover:border-[var(--color-accent)]"
+        )}
+        style={!isCompleted ? { borderColor: `var(${PRIORITY_COLOR_VAR[task.priority]})` } : undefined}
+      >
+        {isCompleted && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
+      </button>
       <div className="min-w-0 flex-1">
-        <p className={cn("truncate font-medium text-[var(--color-ink)]", compact ? "text-sm" : "text-sm")}>
+        <p
+          className={cn(
+            "truncate font-medium",
+            isCompleted ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]",
+            compact ? "text-sm" : "text-sm"
+          )}
+        >
           {task.title}
         </p>
         {!compact && (task.due_date || task.due_time) && (
@@ -30,7 +75,7 @@ export function TaskListItem({ task, compact = false }: { task: Task; compact?: 
           </p>
         )}
       </div>
-      <TaskCountdownBadge task={task} />
+      {!isCompleted && <TaskCountdownBadge task={task} />}
     </div>
   );
 }

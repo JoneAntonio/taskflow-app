@@ -45,7 +45,7 @@ export function ReminderWatcher() {
         .gte("reminder_at", lookback.toISOString())
         .lte("reminder_at", now.toISOString());
 
-      (tasks ?? []).forEach((task) => {
+      (tasks ?? []).forEach(async (task) => {
         if (notifiedIds.current.has(task.id)) return;
         notifiedIds.current.add(task.id);
 
@@ -54,6 +54,14 @@ export function ReminderWatcher() {
         if ("Notification" in window && Notification.permission === "granted") {
           new Notification("JAFLOW — lembrete", { body: task.title });
         }
+
+        await supabase.from("notifications").insert({
+          user_id: user.id,
+          type: "lembrete",
+          title: task.title,
+          body: "Está prestes a começar.",
+          related_task_id: task.id,
+        });
       });
     }
 

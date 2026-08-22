@@ -50,6 +50,9 @@ export interface Project {
   current_value: number | null;
   target_value: number | null;
   lower_is_better: boolean;
+  responsible: string | null;
+  smart_priority: TaskPriority;
+  action_plan: string | null;
   // Campos calculados (via view / agregação), não colunas reais
   task_count?: number;
   completed_task_count?: number;

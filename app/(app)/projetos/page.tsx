@@ -5,7 +5,7 @@ import { ProjectCard } from "@/components/projects/project-card";
 import { NewProjectButton } from "@/components/projects/new-project-button";
 import type { Project } from "@/types/database";
 
-export const metadata: Metadata = { title: "Projetos — JAFLOW" };
+export const metadata: Metadata = { title: "Método SMART — JAFLOW" };
 
 export default async function ProjetosPage() {
   const supabase = await createClient();
@@ -43,9 +43,10 @@ export default async function ProjetosPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Projetos</h1>
+          <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Método SMART</h1>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-            Organiza as tuas tarefas por área da tua vida. Cria subprojetos para agrupares dentro de um projeto maior.
+            Cada projeto é um objetivo SMART: define-o, acompanha o progresso, e organiza as tuas tarefas lá dentro.
+            Cria subprojetos para agrupares dentro de um objetivo maior.
           </p>
         </div>
         <NewProjectButton availableParents={topLevel} />

@@ -267,6 +267,14 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
         </div>
       </div>
 
+      {store.segmentStartAt && store.segmentEndAt && (
+        <p className="-mt-4 font-mono-data text-xs text-[var(--color-ink-muted)]">
+          {new Date(store.segmentStartAt).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
+          {" → "}
+          {new Date(store.segmentEndAt).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
+        </p>
+      )}
+
       <div className="flex items-center gap-3">
         <Button variant="outline" size="icon" onClick={() => store.reset()} aria-label="Reiniciar">
           <RotateCcw className="h-4 w-4" />

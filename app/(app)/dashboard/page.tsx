@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2 } from "lucide-react";
+import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getTodayISO } from "@/lib/server-date";
 import { getDashboardData } from "@/services/dashboard.queries";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { CompletionRing } from "@/components/dashboard/completion-ring";
@@ -18,9 +19,26 @@ export default async function DashboardPage() {
 
   if (!user) return null;
 
-  const data = await getDashboardData(user.id);
+  const today = await getTodayISO();
+  const monthStart = `${today.slice(0, 7)}-01`;
 
-  const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+  const [data, { data: profile }, { count: completedThisMonth }, { count: pomodoroSessions }, { count: habitsCompletedToday }] =
+    await Promise.all([
+      getDashboardData(user.id),
+      supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+      supabase
+        .from("tasks")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "concluida")
+        .gte("completed_at", `${monthStart}T00:00:00`),
+      supabase
+        .from("pomodoro_sessions")
+        .select("id", { count: "exact", head: true })
+        .eq("session_type", "foco")
+        .not("completed_at", "is", null),
+      supabase.from("habit_logs").select("id", { count: "exact", head: true }).eq("log_date", today),
+    ]);
+
   const firstName = profile?.full_name?.trim().split(" ")[0] || "";
 
   return (
@@ -43,12 +61,13 @@ export default async function DashboardPage() {
           accent={data.overdueTasks.length > 0 ? "danger" : "default"}
         />
         <StatCard icon={CalendarClock} label="Para hoje" value={data.todayTasks.length} accent="accent" />
-        <StatCard
-          icon={CheckCircle2}
-          label="Concluídas hoje"
-          value={data.completedTodayCount}
-          accent="success"
-        />
+        <StatCard icon={CheckCircle2} label="Concluídas hoje" value={data.completedTodayCount} accent="success" />
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard icon={CheckCircle2} label="Concluídas este mês" value={completedThisMonth ?? 0} accent="success" />
+        <StatCard icon={TimerReset} label="Sessões Pomodoro" value={pomodoroSessions ?? 0} />
+        <StatCard icon={Sparkles} label="Hábitos hoje" value={habitsCompletedToday ?? 0} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

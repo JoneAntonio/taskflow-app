@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, MapPin, CalendarDays, Repeat } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TaskListItem } from "@/components/tasks/task-list-item";
 import { cn, toLocalISODate } from "@/lib/utils";
-import { PRIORITY_COLOR_VAR } from "@/lib/labels";
 import type { Task } from "@/types/database";
 
 const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -63,37 +63,16 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
             {selectedTasks.length === 0 ? (
               <p className="mt-3 text-sm text-[var(--color-ink-muted)]">Sem tarefas neste dia.</p>
             ) : (
-              <div className="mt-3 space-y-3">
+              <div className="mt-3 space-y-2">
                 {selectedTasks.map((task) => (
-                  <div key={task.id} className="rounded-xl bg-[var(--color-surface-alt)] p-3">
-                    <div className="flex items-start gap-2">
-                      <span
-                        className="mt-1 h-2 w-2 shrink-0 rounded-full"
-                        style={{ backgroundColor: `var(${PRIORITY_COLOR_VAR[task.priority]})` }}
-                      />
-                      <p className="text-sm font-medium text-[var(--color-ink)]">{task.title}</p>
-                    </div>
-                    <div className="mt-1.5 space-y-1 pl-4 text-xs text-[var(--color-ink-muted)]">
-                      {task.due_time && (
-                        <p className="flex items-center gap-1.5">
-                          <Clock className="h-3 w-3 shrink-0" />
-                          {task.due_time}
-                          {task.due_time_end ? ` – ${task.due_time_end}` : ""}
-                        </p>
-                      )}
-                      {task.location && (
-                        <p className="flex items-center gap-1.5">
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          {task.location}
-                        </p>
-                      )}
-                      {task.recurrence && (
-                        <p className="flex items-center gap-1.5">
-                          <Repeat className="h-3 w-3 shrink-0" />
-                          Recorrente
-                        </p>
-                      )}
-                    </div>
+                  <div key={task.id}>
+                    <TaskListItem task={task} compact />
+                    {task.location && (
+                      <p className="ml-8 mt-0.5 flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        {task.location}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

@@ -1,4 +1,5 @@
-import { Target } from "lucide-react";
+import { Target, User, Flag, Wrench } from "lucide-react";
+import { PRIORITY_LABELS, PRIORITY_COLOR_VAR } from "@/lib/labels";
 import type { Project } from "@/types/database";
 
 function calculateProgress(project: Project): number | null {
@@ -6,8 +7,6 @@ function calculateProgress(project: Project): number | null {
   const { current_value: current, target_value: target, lower_is_better: lowerIsBetter } = project;
 
   if (lowerIsBetter) {
-    // Ex: TMA atual 6.2, alvo 4 → progresso conforme te aproximas do alvo, a partir de um ponto de partida indefinido.
-    // Sem "valor inicial" guardado, aproximamos: 0% se ainda estás no valor atual (>=target já seria 100%).
     if (current <= target) return 100;
     if (current <= 0) return 0;
     return Math.max(0, Math.min(100, Math.round((target / current) * 100)));
@@ -32,7 +31,7 @@ export function ProjectSmartCard({
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
       <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
-        Objetivo SMART
+        🎯 Objetivo SMART
       </p>
       {project.objective && <p className="mb-3 text-sm font-medium text-[var(--color-ink)]">{project.objective}</p>}
 
@@ -45,12 +44,40 @@ export function ProjectSmartCard({
         </div>
       )}
 
+      <div className="mb-3 flex flex-wrap gap-2 text-xs">
+        {project.responsible && (
+          <span className="flex items-center gap-1.5 rounded-full bg-[var(--color-surface-alt)] px-2.5 py-1 text-[var(--color-ink)]">
+            <User className="h-3 w-3" /> {project.responsible}
+          </span>
+        )}
+        {project.smart_priority && project.smart_priority !== "sem_prioridade" && (
+          <span
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1"
+            style={{
+              backgroundColor: `color-mix(in srgb, var(${PRIORITY_COLOR_VAR[project.smart_priority]}) 15%, transparent)`,
+              color: `var(${PRIORITY_COLOR_VAR[project.smart_priority]})`,
+            }}
+          >
+            <Flag className="h-3 w-3" /> {PRIORITY_LABELS[project.smart_priority]}
+          </span>
+        )}
+      </div>
+
+      {project.action_plan && (
+        <div className="mb-3 rounded-xl bg-[var(--color-surface-alt)] p-3">
+          <p className="mb-1 flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
+            <Wrench className="h-3.5 w-3.5" /> Plano de ação
+          </p>
+          <p className="text-sm text-[var(--color-ink)]">{project.action_plan}</p>
+        </div>
+      )}
+
       <div className="space-y-3">
         {valueProgress !== null && (
           <div>
             <div className="mb-1 flex items-center justify-between text-xs">
               <span className="text-[var(--color-ink-muted)]">
-                Progresso do valor ({project.current_value} → {project.target_value})
+                📍 Ponto de partida {project.current_value} → 🏆 Meta {project.target_value}
               </span>
               <span className="font-mono-data font-medium text-[var(--color-ink)]">{valueProgress}%</span>
             </div>

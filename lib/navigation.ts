@@ -5,11 +5,10 @@ import {
   CalendarCheck,
   CalendarDays,
   CalendarRange,
-  FolderKanban,
+  Target,
   Tag,
   Sparkles,
   TimerReset,
-  BarChart3,
   Search,
   Users,
   LayoutGrid,
@@ -32,7 +31,7 @@ export const primaryNav: NavItem[] = [
 ];
 
 export const organizeNav: NavItem[] = [
-  { label: "Projetos", href: "/projetos", icon: FolderKanban },
+  { label: "Método SMART", href: "/projetos", icon: Target },
   { label: "Etiquetas", href: "/etiquetas", icon: Tag },
 ];
 
@@ -40,7 +39,6 @@ export const focusNav: NavItem[] = [
   { label: "Matriz de Eisenhower", href: "/matriz", icon: LayoutGrid },
   { label: "Hábitos", href: "/habitos", icon: Sparkles },
   { label: "Pomodoro", href: "/pomodoro", icon: TimerReset },
-  { label: "Estatísticas", href: "/estatisticas", icon: BarChart3 },
 ];
 
 export const teamNav: NavItem[] = [

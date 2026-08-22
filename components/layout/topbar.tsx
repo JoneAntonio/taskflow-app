@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
+import { NotificationBell } from "@/components/layout/notification-bell";
 import type { Profile } from "@/types/database";
 
 export function Topbar({ profile }: { profile: Pick<Profile, "full_name" | "email" | "avatar_url"> }) {
@@ -28,6 +29,7 @@ export function Topbar({ profile }: { profile: Pick<Profile, "full_name" | "emai
       </form>
 
       <div className="ml-auto flex items-center gap-3">
+        <NotificationBell />
         <ThemeToggle />
         <UserMenu profile={profile} />
       </div>

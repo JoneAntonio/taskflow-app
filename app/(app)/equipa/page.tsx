@@ -4,6 +4,7 @@ import { Users, SlidersHorizontal, LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AgentCard } from "@/components/team/agent-card";
 import { AddAgentButton } from "@/components/team/add-agent-button";
+import { MaturityRecommendations } from "@/components/team/maturity-recommendations";
 import { getOperationColor } from "@/lib/operation-colors";
 import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 
@@ -76,6 +77,8 @@ export default async function EquipaPage() {
           <AddAgentButton operations={operationList} />
         </div>
       </div>
+
+      <MaturityRecommendations agents={agentList} />
 
       {agentList.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center">
