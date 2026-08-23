@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles, Users2, Flame } from "lucide-react";
+import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles, Users2, Flame, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTodayISO } from "@/lib/server-date";
 import { getDashboardData } from "@/services/dashboard.queries";
@@ -10,6 +10,7 @@ import { WeeklyProductivityChart } from "@/components/dashboard/weekly-productiv
 import { ActiveProjectsWidget } from "@/components/dashboard/active-projects-widget";
 import { TopPriorityWidget } from "@/components/dashboard/top-priority-widget";
 import { CategoryDistributionWidget } from "@/components/dashboard/category-distribution-widget";
+import { PerformanceCard } from "@/components/dashboard/performance-card";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { Project } from "@/types/database";
@@ -76,6 +77,7 @@ export default async function DashboardPage() {
     distributionCounts.set(label, (distributionCounts.get(label) ?? 0) + 1);
   });
   const distributionEntries = [...distributionCounts.entries()].map(([label, count]) => ({ label, count }));
+  const weekCompletedCount = data.weeklyProductivity.reduce((sum, day) => sum + day.concluidas, 0);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -106,7 +108,7 @@ export default async function DashboardPage() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <StatCard icon={Flame} label="Foco hoje" value={`${(focusMinutesToday / 60).toFixed(1)}h`} accent="accent" />
-        <StatCard icon={Flame} label="Foco esta semana" value={`${(focusMinutesWeek / 60).toFixed(1)}h`} />
+        <StatCard icon={Clock} label="Foco esta semana" value={`${(focusMinutesWeek / 60).toFixed(1)}h`} />
       </div>
 
       <TopPriorityWidget tasks={data.todayTasks} />
@@ -134,9 +136,12 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ActiveProjectsWidget projects={(activeProjects ?? []) as Project[]} />
+      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <CategoryDistributionWidget entries={distributionEntries} />
+        <div className="space-y-4">
+          <ActiveProjectsWidget projects={(activeProjects ?? []) as Project[]} />
+          <PerformanceCard weekCompleted={weekCompletedCount} overdueCount={data.overdueTasks.length} />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
