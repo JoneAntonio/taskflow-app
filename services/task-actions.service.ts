@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { getNextOccurrenceDate } from "@/lib/recurrence";
-import type { Task } from "@/types/database";
+import { STATUS_LABELS } from "@/lib/labels";
+import type { Task, TaskStatus } from "@/types/database";
 
 export const taskActionsService = {
   async toggleImportant(taskId: string, isImportant: boolean): Promise<void> {
@@ -78,5 +79,27 @@ export const taskActionsService = {
     await supabase
       .from("task_activity")
       .insert({ task_id: taskId, user_id: user?.id ?? null, action: "nota", detail: "Editou a nota" });
+  },
+
+  /** Muda o estado de uma tarefa (usado no arrastar-e-largar do quadro Kanban). */
+  async updateStatus(taskId: string, status: TaskStatus): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("tasks")
+      .update({
+        status,
+        completed_at: status === "concluida" ? new Date().toISOString() : null,
+      })
+      .eq("id", taskId);
+    if (error) throw error;
+    await supabase.from("task_activity").insert({
+      task_id: taskId,
+      user_id: user?.id ?? null,
+      action: "estado",
+      detail: `Mudou o estado para ${STATUS_LABELS[status]}`,
+    });
   },
 };

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Play, Pause, RotateCcw, ListTodo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { usePomodoroStore, POMODORO_LABELS, type PomodoroSessionType, type PomodoroPlanSegment } from "@/lib/pomodoro-store";
+import { usePomodoroStore, POMODORO_LABELS, type PomodoroPlanSegment } from "@/lib/pomodoro-store";
 
 export interface PomodoroTaskOption {
   id: string;
@@ -17,16 +17,16 @@ export interface PomodoroTaskOption {
 const LABELS = POMODORO_LABELS;
 
 /**
- * Calcula quantos blocos de foco de 25 min cabem na duração total, segundo
- * a fórmula: sessões = ⌊(tempo total + 5) / 30⌋. A cada 4ª sessão, a pausa
- * é longa (15 min); as restantes são curtas (5 min). O último bloco de foco
- * é ajustado para a soma total bater certo com o tempo indicado.
+ * Único modo de funcionamento: calcula os blocos de foco/pausa a partir da
+ * duração total, segundo a fórmula: sessões = ⌊(tempo total + 5) / 30⌋.
+ * A cada 4ª sessão, a pausa é longa (15 min); as restantes são curtas
+ * (5 min). O último bloco de foco é ajustado para a soma bater certo com o
+ * tempo indicado.
  */
 function buildPomodoroPlan(totalMinutes: number): PomodoroPlanSegment[] {
   const computedSessions = Math.floor((totalMinutes + 5) / 30);
 
   if (computedSessions <= 0) {
-    // Tempo insuficiente para o padrão 25+5 — um único bloco de foco com o tempo todo.
     return [{ type: "foco", minutes: Math.max(1, totalMinutes) }];
   }
 
@@ -63,7 +63,6 @@ function minutesBetween(start: string, end: string): number {
 export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) {
   const store = usePomodoroStore();
   const [selectedTaskId, setSelectedTaskId] = useState<string>(store.selectedTaskId ?? "");
-  const [autoPlanEnabled, setAutoPlanEnabled] = useState(!!store.plan);
   const [totalDuration, setTotalDuration] = useState(60);
   const [notes, setNotes] = useState("");
   const [lockedDuration, setLockedDuration] = useState<number | null>(null);
@@ -73,12 +72,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const sessionType = store.sessionType;
   const segmentIndex = store.segmentIndex;
   const secondsLeft = store.secondsLeft;
-  const customDurations = store.customDurations;
 
-  const newPlan = useMemo(
-    () => (autoPlanEnabled ? buildPomodoroPlan(totalDuration) : null),
-    [autoPlanEnabled, totalDuration]
-  );
+  const newPlan = useMemo(() => buildPomodoroPlan(totalDuration), [totalDuration]);
 
   // Só reconfigura o estado global quando o plano/tarefa realmente mudam, e o temporizador não está a correr
   // (para não interromper uma sessão já em curso ao navegares para esta página).
@@ -90,8 +85,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
     if (planChanged || taskChanged) {
       store.configure({
         plan: newPlan,
-        sessionType: newPlan ? newPlan[0].type : "foco",
-        secondsLeft: newPlan ? newPlan[0].minutes * 60 : customDurations.foco * 60,
+        sessionType: newPlan[0].type,
+        secondsLeft: newPlan[0].minutes * 60,
         selectedTaskId: selectedTaskId || null,
         selectedTaskTitle: selectedTask?.title ?? null,
       });
@@ -107,45 +102,25 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
       // A tarefa já tem uma duração definida: o Pomodoro fica limitado a esse tempo.
       setLockedDuration(task.estimated_duration_minutes);
       setTotalDuration(task.estimated_duration_minutes);
-      setAutoPlanEnabled(true);
       return;
     }
 
-    setLockedDuration(null);
     if (task?.due_time && task?.due_time_end) {
       const diff = minutesBetween(task.due_time, task.due_time_end);
-      if (diff > 0) setTotalDuration(diff);
+      if (diff > 0) {
+        // Duração calculada automaticamente pela diferença entre o fim e o início da tarefa.
+        setLockedDuration(diff);
+        setTotalDuration(diff);
+        return;
+      }
     }
-  }
 
-  function switchSession(type: PomodoroSessionType) {
-    store.pause();
-    store.configure({
-      plan: null,
-      sessionType: type,
-      secondsLeft: customDurations[type] * 60,
-      selectedTaskId: selectedTaskId || null,
-      selectedTaskTitle: tasks.find((t) => t.id === selectedTaskId)?.title ?? null,
-    });
-  }
-
-  function handleDurationChange(type: PomodoroSessionType, minutes: number) {
-    const nextDurations = { ...customDurations, [type]: minutes };
-    store.setCustomDurations(nextDurations);
-    if (!plan && type === sessionType && !isRunning) {
-      store.configure({
-        plan: null,
-        sessionType,
-        secondsLeft: minutes * 60,
-        selectedTaskId: selectedTaskId || null,
-        selectedTaskTitle: tasks.find((t) => t.id === selectedTaskId)?.title ?? null,
-      });
-    }
+    setLockedDuration(null);
   }
 
   const minutes = Math.floor(secondsLeft / 60);
   const seconds = secondsLeft % 60;
-  const currentTotalSeconds = (plan ? plan[segmentIndex]?.minutes ?? customDurations[sessionType] : customDurations[sessionType]) * 60;
+  const currentTotalSeconds = (plan?.[segmentIndex]?.minutes ?? totalDuration) * 60;
   const progress = currentTotalSeconds > 0 ? ((currentTotalSeconds - secondsLeft) / currentTotalSeconds) * 100 : 0;
   const activeTaskTitle = store.selectedTaskTitle;
 
@@ -177,39 +152,25 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
           </div>
         )}
 
-        <label className="flex items-center gap-2 text-xs text-[var(--color-ink-muted)]">
-          <input
-            type="checkbox"
-            checked={autoPlanEnabled}
-            disabled={!!lockedDuration}
-            onChange={(e) => setAutoPlanEnabled(e.target.checked)}
-            className="h-3.5 w-3.5 accent-[var(--color-accent)] disabled:opacity-50"
-          />
-          Plano automático: calcula os blocos de foco e pausa a partir da duração total
-        </label>
-
-        {autoPlanEnabled && (
-          <div className="flex items-center justify-center gap-2">
-            <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
-              Duração total
-              <input
-                type="number"
-                min={5}
-                max={480}
-                value={totalDuration}
-                disabled={!!lockedDuration}
-                onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
-                className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)] disabled:opacity-60"
-              />
-              min
-            </span>
-          </div>
-        )}
+        <div className="flex items-center justify-center gap-2">
+          <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
+            Duração total
+            <input
+              type="number"
+              min={5}
+              max={480}
+              value={totalDuration}
+              disabled={!!lockedDuration}
+              onChange={(e) => setTotalDuration(Math.max(5, Number(e.target.value) || 5))}
+              className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)] disabled:opacity-60"
+            />
+            min
+          </span>
+        </div>
 
         {lockedDuration && (
           <p className="text-center text-[11px] font-medium text-[var(--color-accent)]">
-            🔒 Duração limitada a {lockedDuration} min, definida nesta tarefa. Para mudar, edita a duração estimada
-            da tarefa (ou escolhe &quot;Sem tarefa associada&quot;).
+            🔒 Duração calculada automaticamente ({lockedDuration} min) a partir da tarefa associada.
           </p>
         )}
 
@@ -222,26 +183,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
         )}
       </div>
 
-      {!plan && (
-        <div className="flex gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1">
-          {(Object.keys(LABELS) as PomodoroSessionType[]).map((type) => (
-            <button
-              key={type}
-              onClick={() => switchSession(type)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                sessionType === type
-                  ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-[var(--shadow-sm)]"
-                  : "text-[var(--color-ink-muted)]"
-              }`}
-            >
-              {LABELS[type]}
-            </button>
-          ))}
-        </div>
-      )}
-
       {plan && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {plan.map((seg, index) => (
             <span
               key={index}
@@ -301,25 +244,6 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
           {isRunning ? "Pausar" : "Começar"}
         </Button>
       </div>
-
-      {!plan && (
-        <div className="flex gap-6 text-xs text-[var(--color-ink-muted)]">
-          {(Object.keys(LABELS) as PomodoroSessionType[]).map((type) => (
-            <label key={type} className="flex items-center gap-1.5">
-              {LABELS[type]}
-              <input
-                type="number"
-                min={1}
-                max={90}
-                value={customDurations[type]}
-                onChange={(e) => handleDurationChange(type, Number(e.target.value) || 1)}
-                className="w-12 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-[var(--color-ink)]"
-              />
-              min
-            </label>
-          ))}
-        </div>
-      )}
 
       <p className="text-xs text-[var(--color-ink-muted)]">Sessões de foco concluídas hoje: {store.sessionCount}</p>
 

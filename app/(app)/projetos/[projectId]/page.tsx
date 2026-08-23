@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Folder } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { TaskListItem } from "@/components/tasks/task-list-item";
+import { TaskListSection } from "@/components/tasks/task-list-section";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { ProjectHeaderActions } from "@/components/projects/project-header-actions";
 import { ProjectSmartCard } from "@/components/projects/project-smart-card";
@@ -52,7 +52,6 @@ export default async function ProjectDetailPage({
     .order("created_at", { ascending: false });
 
   const taskList = (tasks ?? []) as Task[];
-  const pending = taskList.filter((t) => t.status !== "concluida" && t.status !== "arquivada");
   const completed = taskList.filter((t) => t.status === "concluida");
 
   return (
@@ -109,33 +108,7 @@ export default async function ProjectDetailPage({
         )}
       </div>
 
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
-          Pendentes ({pending.length})
-        </p>
-        <div className="space-y-2">
-          {pending.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-6 text-center text-sm text-[var(--color-ink-muted)]">
-              Sem tarefas pendentes neste projeto.
-            </p>
-          ) : (
-            pending.map((task) => <TaskListItem key={task.id} task={task} />)
-          )}
-        </div>
-      </div>
-
-      {completed.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
-            Concluídas ({completed.length})
-          </p>
-          <div className="space-y-2">
-            {completed.map((task) => (
-              <TaskListItem key={task.id} task={task} />
-            ))}
-          </div>
-        </div>
-      )}
+      <TaskListSection tasks={taskList} />
 
       <ProjectTimelineChart project={projectData} tasks={taskList} />
     </div>
