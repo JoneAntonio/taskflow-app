@@ -78,7 +78,13 @@ export default async function EquipaPage() {
         </div>
       </div>
 
-      <MaturityRecommendations agents={agentList} />
+      <MaturityRecommendations
+        groups={sortedGroupNames.map((groupName) => ({
+          name: groupName,
+          color: getOperationColor(groupName === "Sem operação atribuída" ? null : groupName, operationList),
+          agents: groups.get(groupName)!,
+        }))}
+      />
 
       {agentList.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center">

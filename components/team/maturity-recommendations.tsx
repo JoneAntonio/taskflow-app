@@ -31,12 +31,12 @@ function buildRecommendations(agents: TeamAgent[]): string[] {
     }
     if (m4.length / total >= 0.4) {
       recommendations.push(
-        `${Math.round((m4.length / total) * 100)}% da tua equipa já está em M4 — isto é sinal de capacidade instalada para escalares a operação (mais volume, ou tarefas mais exigentes) sem perda de qualidade.`
+        `${Math.round((m4.length / total) * 100)}% desta operação já está em M4 — sinal de capacidade instalada para escalar (mais volume, ou tarefas mais exigentes) sem perda de qualidade.`
       );
     }
   } else {
     recommendations.push(
-      "Ainda não tens nenhum agente em M4. Procura, entre os que estão em M3, quem tem pontuações mais altas em Autonomia e Ownership — são os melhores candidatos a desenvolver para M4 nos próximos ciclos."
+      "Ainda sem nenhum agente em M4 nesta operação. Procura, entre os que estão em M3, quem tem pontuações mais altas em Autonomia e Ownership — são os melhores candidatos a desenvolver para M4 nos próximos ciclos."
     );
   }
 
@@ -55,10 +55,20 @@ function buildRecommendations(agents: TeamAgent[]): string[] {
   return recommendations;
 }
 
-export function MaturityRecommendations({ agents }: { agents: TeamAgent[] }) {
-  const recommendations = buildRecommendations(agents);
+export function MaturityRecommendations({
+  groups,
+}: {
+  /** Um grupo por operação — cada operação recebe as suas próprias recomendações. */
+  groups: { name: string; color: string; agents: TeamAgent[] }[];
+}) {
   const [open, setOpen] = useState(false);
-  if (recommendations.length === 0) return null;
+
+  const groupsWithRecommendations = groups
+    .map((group) => ({ ...group, recommendations: buildRecommendations(group.agents) }))
+    .filter((group) => group.recommendations.length > 0);
+
+  const totalCount = groupsWithRecommendations.reduce((sum, g) => sum + g.recommendations.length, 0);
+  if (totalCount === 0) return null;
 
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
@@ -70,21 +80,31 @@ export function MaturityRecommendations({ agents }: { agents: TeamAgent[] }) {
       >
         <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
           <Lightbulb className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-          Recomendações ({recommendations.length})
+          Recomendações ({totalCount})
         </span>
         <ChevronDown
           className={cn("h-4 w-4 text-[var(--color-ink-muted)] transition-transform", open && "rotate-180")}
         />
       </button>
       {open && (
-        <ul className="mt-3 space-y-2.5">
-          {recommendations.map((rec, index) => (
-            <li key={index} className="flex gap-2 text-sm text-[var(--color-ink)]">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-              {rec}
-            </li>
+        <div className="mt-3 space-y-4">
+          {groupsWithRecommendations.map((group) => (
+            <div key={group.name}>
+              <p className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-[var(--color-ink)]">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: group.color }} />
+                {group.name}
+              </p>
+              <ul className="space-y-2">
+                {group.recommendations.map((rec, index) => (
+                  <li key={index} className="flex gap-2 pl-3.5 text-sm text-[var(--color-ink)]">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                    {rec}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
