@@ -65,22 +65,22 @@ export const MATURITY_DESCRIPTIONS: Record<MaturityLevel, { title: string; descr
   M1: {
     title: "Baixa maturidade",
     description: "Pouca competência e pouca experiência; necessita de orientação próxima.",
-    leadershipStyle: "Liderança Autocrática",
+    leadershipStyle: "Liderança Diretiva",
   },
   M2: {
     title: "Maturidade baixa a moderada",
     description: "Começa a desenvolver competências, mas ainda precisa de acompanhamento e motivação.",
-    leadershipStyle: "Liderança Persuasiva",
+    leadershipStyle: "Liderança de Coaching",
   },
   M3: {
     title: "Maturidade moderada a alta",
     description: "Possui competência, mas pode apresentar alguma insegurança ou necessitar de apoio pontual.",
-    leadershipStyle: "Liderança Democrática",
+    leadershipStyle: "Liderança de Apoio",
   },
   M4: {
     title: "Alta maturidade",
     description: "Elevada competência, autonomia e confiança; consegue executar as tarefas praticamente sem supervisão.",
-    leadershipStyle: "Liderança Liberal",
+    leadershipStyle: "Liderança Delegadora",
   },
 };
 
