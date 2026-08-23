@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
+import { computeSmartProgress } from "@/lib/smart-metrics";
 
 export const maxDuration = 60;
 
@@ -98,18 +99,14 @@ export async function GET(request: Request) {
       if (totalDuration <= 0) continue;
       const elapsedRatio = (now - start) / totalDuration;
 
-      let progressRatio: number;
-      if (project.lower_is_better) {
-        progressRatio =
-          project.current_value <= project.target_value
-            ? 1
-            : project.current_value <= 0
-              ? 0
-              : project.target_value / project.current_value;
-      } else {
-        progressRatio =
-          project.target_value === 0 ? (project.current_value > 0 ? 1 : 0) : project.current_value / project.target_value;
-      }
+      const progressPercent = computeSmartProgress(
+        project.current_value,
+        project.target_value,
+        project.actual_value,
+        project.lower_is_better
+      );
+      if (progressPercent === null) continue;
+      const progressRatio = progressPercent / 100;
 
       const behindBy = elapsedRatio - progressRatio;
       if (behindBy < 0.2) continue;

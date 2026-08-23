@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { projectsService, PROJECT_COLORS } from "@/services/projects.service";
+import { validateSmartRange, METRIC_UNIT_OPTIONS } from "@/lib/smart-metrics";
 import { PRIORITY_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { Project, TaskPriority, Team } from "@/types/database";
@@ -40,6 +41,8 @@ export function ProjectDialog({
   const [targetDate, setTargetDate] = useState(project?.target_date ?? "");
   const [currentValue, setCurrentValue] = useState(project?.current_value?.toString() ?? "");
   const [targetValue, setTargetValue] = useState(project?.target_value?.toString() ?? "");
+  const [actualValue, setActualValue] = useState(project?.actual_value?.toString() ?? "");
+  const [metricUnit, setMetricUnit] = useState(project?.metric_unit ?? "");
   const [lowerIsBetter, setLowerIsBetter] = useState(project?.lower_is_better ?? false);
   const [responsible, setResponsible] = useState(project?.responsible ?? "");
   const [smartPriority, setSmartPriority] = useState<TaskPriority>(project?.smart_priority ?? "sem_prioridade");
@@ -59,6 +62,18 @@ export function ProjectDialog({
       setSmartError("Preenche a Meta e o Prazo para guardares este objetivo SMART.");
       return;
     }
+
+    // "Quanto menor, melhor" só faz sentido se o ponto de partida for maior que a meta.
+    const rangeError = validateSmartRange(
+      currentValue.trim() ? Number(currentValue) : null,
+      targetValue.trim() ? Number(targetValue) : null,
+      lowerIsBetter
+    );
+    if (rangeError) {
+      setSmartError(rangeError);
+      return;
+    }
+
     setSmartError(null);
     setIsSubmitting(true);
     try {
@@ -68,6 +83,8 @@ export function ProjectDialog({
         targetDate: targetDate || null,
         currentValue: currentValue.trim() ? Number(currentValue) : null,
         targetValue: targetValue.trim() ? Number(targetValue) : null,
+        actualValue: actualValue.trim() ? Number(actualValue) : null,
+        metricUnit: metricUnit || null,
         lowerIsBetter,
         responsible: responsible.trim() || null,
         smartPriority,
@@ -85,6 +102,8 @@ export function ProjectDialog({
           target_date: smartFields.targetDate,
           current_value: smartFields.currentValue,
           target_value: smartFields.targetValue,
+          actual_value: smartFields.actualValue,
+          metric_unit: smartFields.metricUnit,
           lower_is_better: smartFields.lowerIsBetter,
           responsible: smartFields.responsible,
           smart_priority: smartFields.smartPriority,
@@ -196,36 +215,71 @@ export function ProjectDialog({
             </div>
             <div>
               <Label htmlFor="project-metric">📊 Métrica de sucesso</Label>
-              <Input
-                id="project-metric"
-                value={successMetric}
-                onChange={(e) => setSuccessMetric(e.target.value)}
-                placeholder="Ex: TMA médio ≤ 4 min"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="project-metric"
+                  value={successMetric}
+                  onChange={(e) => setSuccessMetric(e.target.value)}
+                  placeholder="Ex: Tempo médio de atendimento"
+                  className="flex-1"
+                />
+                <select
+                  value={metricUnit}
+                  onChange={(e) => setMetricUnit(e.target.value)}
+                  className="h-10 w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+                >
+                  <option value="">Sem unidade</option>
+                  {METRIC_UNIT_OPTIONS.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="project-current-value">📍 Ponto de partida (opcional)</Label>
-                <Input
-                  id="project-current-value"
-                  type="number"
-                  step="any"
-                  value={currentValue}
-                  onChange={(e) => setCurrentValue(e.target.value)}
-                  placeholder="Ex: 6.2"
-                />
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    id="project-current-value"
+                    type="number"
+                    step="any"
+                    value={currentValue}
+                    onChange={(e) => setCurrentValue(e.target.value)}
+                    placeholder="Ex: 6.2"
+                  />
+                  {metricUnit && <span className="shrink-0 text-xs text-[var(--color-ink-muted)]">{metricUnit}</span>}
+                </div>
               </div>
               <div>
                 <Label htmlFor="project-target-value">🏆 Meta{smartError ? "" : " (opcional)"}</Label>
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    id="project-target-value"
+                    type="number"
+                    step="any"
+                    value={targetValue}
+                    onChange={(e) => setTargetValue(e.target.value)}
+                    placeholder="Ex: 4"
+                    error={smartError && !targetValue.trim() ? "Obrigatório" : undefined}
+                  />
+                  {metricUnit && <span className="shrink-0 text-xs text-[var(--color-ink-muted)]">{metricUnit}</span>}
+                </div>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="project-actual-value">📈 Valor atual (opcional — atualiza sempre que quiseres)</Label>
+              <div className="flex items-center gap-1.5">
                 <Input
-                  id="project-target-value"
+                  id="project-actual-value"
                   type="number"
                   step="any"
-                  value={targetValue}
-                  onChange={(e) => setTargetValue(e.target.value)}
-                  placeholder="Ex: 4"
-                  error={smartError && !targetValue.trim() ? "Obrigatório" : undefined}
+                  value={actualValue}
+                  onChange={(e) => setActualValue(e.target.value)}
+                  placeholder="Se vazio, assume o ponto de partida"
                 />
+                {metricUnit && <span className="shrink-0 text-xs text-[var(--color-ink-muted)]">{metricUnit}</span>}
               </div>
             </div>
             <label className="flex items-center gap-2 text-xs text-[var(--color-ink-muted)]">

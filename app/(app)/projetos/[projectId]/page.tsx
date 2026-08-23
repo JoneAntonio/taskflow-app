@@ -7,6 +7,7 @@ import { TaskListSection } from "@/components/tasks/task-list-section";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { ProjectHeaderActions } from "@/components/projects/project-header-actions";
 import { ProjectSmartCard } from "@/components/projects/project-smart-card";
+import { QuickUpdateValue } from "@/components/projects/quick-update-value";
 import { DeadlineCountdown } from "@/components/projects/deadline-countdown";
 import { ProjectForecastCard } from "@/components/projects/project-forecast-card";
 import { ProjectTimelineChart } from "@/components/projects/project-timeline-chart";
@@ -94,6 +95,8 @@ export default async function ProjectDetailPage({
       </div>
 
       <InlineQuickAdd placeholder="Adicionar tarefa a este projeto" projectId={projectId} />
+
+      <QuickUpdateValue project={projectData} />
 
       <div className={projectData.target_date ? "grid gap-4 sm:grid-cols-[1fr_260px]" : ""}>
         <ProjectSmartCard

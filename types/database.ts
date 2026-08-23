@@ -52,6 +52,8 @@ export interface Project {
   current_value: number | null;
   target_value: number | null;
   lower_is_better: boolean;
+  metric_unit: string | null;
+  actual_value: number | null;
   responsible: string | null;
   smart_priority: TaskPriority;
   action_plan: string | null;

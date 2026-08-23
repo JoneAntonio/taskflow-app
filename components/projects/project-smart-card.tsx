@@ -1,19 +1,7 @@
 import { Target, User, Flag, Wrench } from "lucide-react";
 import { PRIORITY_LABELS, PRIORITY_COLOR_VAR } from "@/lib/labels";
+import { computeSmartProgress } from "@/lib/smart-metrics";
 import type { Project } from "@/types/database";
-
-function calculateProgress(project: Project): number | null {
-  if (project.current_value == null || project.target_value == null) return null;
-  const { current_value: current, target_value: target, lower_is_better: lowerIsBetter } = project;
-
-  if (lowerIsBetter) {
-    if (current <= target) return 100;
-    if (current <= 0) return 0;
-    return Math.max(0, Math.min(100, Math.round((target / current) * 100)));
-  }
-  if (target === 0) return current > 0 ? 100 : 0;
-  return Math.max(0, Math.min(100, Math.round((current / target) * 100)));
-}
 
 export function ProjectSmartCard({
   project,
@@ -25,7 +13,14 @@ export function ProjectSmartCard({
   const hasSmart = project.objective || project.success_metric || project.target_date;
   if (!hasSmart) return null;
 
-  const valueProgress = calculateProgress(project);
+  const valueProgress = computeSmartProgress(
+    project.current_value,
+    project.target_value,
+    project.actual_value,
+    project.lower_is_better
+  );
+  const unit = project.metric_unit ? ` ${project.metric_unit}` : "";
+  const actualDisplay = project.actual_value ?? project.current_value;
   const taskPercentage = taskProgress.total > 0 ? Math.round((taskProgress.completed / taskProgress.total) * 100) : 0;
 
   return (
@@ -77,7 +72,10 @@ export function ProjectSmartCard({
           <div>
             <div className="mb-1 flex items-center justify-between text-xs">
               <span className="text-[var(--color-ink-muted)]">
-                📍 Ponto de partida {project.current_value} → 🏆 Meta {project.target_value}
+                📍 {project.current_value}
+                {unit} → 📈 {actualDisplay}
+                {unit} → 🏆 {project.target_value}
+                {unit}
               </span>
               <span className="font-mono-data font-medium text-[var(--color-ink)]">{valueProgress}%</span>
             </div>

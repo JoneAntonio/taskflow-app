@@ -15,6 +15,8 @@ export const projectsService = {
     currentValue?: number | null;
     targetValue?: number | null;
     lowerIsBetter?: boolean;
+    metricUnit?: string | null;
+    actualValue?: number | null;
     responsible?: string | null;
     smartPriority?: TaskPriority;
     actionPlan?: string | null;
@@ -41,6 +43,8 @@ export const projectsService = {
         current_value: input.currentValue ?? null,
         target_value: input.targetValue ?? null,
         lower_is_better: input.lowerIsBetter ?? false,
+        metric_unit: input.metricUnit ?? null,
+        actual_value: input.actualValue ?? null,
         responsible: input.responsible ?? null,
         smart_priority: input.smartPriority ?? "sem_prioridade",
         action_plan: input.actionPlan ?? null,
@@ -66,6 +70,8 @@ export const projectsService = {
         | "current_value"
         | "target_value"
         | "lower_is_better"
+        | "metric_unit"
+        | "actual_value"
         | "responsible"
         | "smart_priority"
         | "action_plan"
