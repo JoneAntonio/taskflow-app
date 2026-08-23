@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles, Users2 } from "lucide-react";
+import { ListTodo, AlarmClockOff, CalendarClock, CheckCircle2, TimerReset, Sparkles, Users2, Flame } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTodayISO } from "@/lib/server-date";
 import { getDashboardData } from "@/services/dashboard.queries";
+import { getDailyQuote } from "@/lib/daily-quote";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { CompletionRing } from "@/components/dashboard/completion-ring";
 import { WeeklyProductivityChart } from "@/components/dashboard/weekly-productivity-chart";
+import { ActiveProjectsWidget } from "@/components/dashboard/active-projects-widget";
+import { TopPriorityWidget } from "@/components/dashboard/top-priority-widget";
+import { CategoryDistributionWidget } from "@/components/dashboard/category-distribution-widget";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import type { Project } from "@/types/database";
 
 export const metadata: Metadata = { title: "Dashboard — JAFLOW" };
 
@@ -21,25 +26,56 @@ export default async function DashboardPage() {
 
   const today = await getTodayISO();
   const monthStart = `${today.slice(0, 7)}-01`;
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekStartISO = weekStart.toISOString();
 
-  const [data, { data: profile }, { count: completedThisMonth }, { count: pomodoroSessions }, { count: habitsCompletedToday }] =
-    await Promise.all([
-      getDashboardData(user.id),
-      supabase.from("profiles").select("full_name").eq("id", user.id).single(),
-      supabase
-        .from("tasks")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "concluida")
-        .gte("completed_at", `${monthStart}T00:00:00`),
-      supabase
-        .from("pomodoro_sessions")
-        .select("id", { count: "exact", head: true })
-        .eq("session_type", "foco")
-        .not("completed_at", "is", null),
-      supabase.from("habit_logs").select("id", { count: "exact", head: true }).eq("log_date", today),
-    ]);
+  const [
+    data,
+    { data: profile },
+    { count: completedThisMonth },
+    { count: pomodoroSessions },
+    { count: habitsCompletedToday },
+    { data: focusToday },
+    { data: focusWeek },
+    { data: activeProjects },
+    { data: allProjects },
+  ] = await Promise.all([
+    getDashboardData(user.id),
+    supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+    supabase
+      .from("tasks")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "concluida")
+      .gte("completed_at", `${monthStart}T00:00:00`),
+    supabase
+      .from("pomodoro_sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("session_type", "foco")
+      .not("completed_at", "is", null),
+    supabase.from("habit_logs").select("id", { count: "exact", head: true }).eq("log_date", today),
+    supabase
+      .from("pomodoro_sessions")
+      .select("duration_minutes")
+      .eq("session_type", "foco")
+      .gte("completed_at", `${today}T00:00:00`),
+    supabase.from("pomodoro_sessions").select("duration_minutes").eq("session_type", "foco").gte("completed_at", weekStartISO),
+    supabase.from("projects").select("*").not("objective", "is", null).order("target_date", { ascending: true, nullsFirst: false }).limit(5),
+    supabase.from("projects").select("id, name"),
+  ]);
 
   const firstName = profile?.full_name?.trim().split(" ")[0] || "";
+  const focusMinutesToday = (focusToday ?? []).reduce((sum, s) => sum + (s.duration_minutes ?? 0), 0);
+  const focusMinutesWeek = (focusWeek ?? []).reduce((sum, s) => sum + (s.duration_minutes ?? 0), 0);
+
+  const projectNameById = new Map((allProjects ?? []).map((p) => [p.id, p.name]));
+  const distributionCounts = new Map<string, number>();
+  [...data.todayTasks, ...data.upcomingTasks].forEach((task) => {
+    const label = task.project_id ? projectNameById.get(task.project_id) ?? "Projeto removido" : "Sem projeto";
+    distributionCounts.set(label, (distributionCounts.get(label) ?? 0) + 1);
+  });
+  const distributionEntries = [...distributionCounts.entries()].map(([label, count]) => ({ label, count }));
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -47,9 +83,7 @@ export default async function DashboardPage() {
         <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
           {firstName ? `Bem-vindo, ${firstName}` : "Dashboard"}
         </h1>
-        <p className="mt-1 text-sm italic text-[var(--color-ink-muted)]">
-          &quot;Não se gere o que não se mede.&quot;
-        </p>
+        <p className="mt-1 text-sm italic text-[var(--color-ink-muted)]">&quot;{getDailyQuote()}&quot;</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -69,6 +103,13 @@ export default async function DashboardPage() {
         <StatCard icon={TimerReset} label="Sessões Pomodoro" value={pomodoroSessions ?? 0} />
         <StatCard icon={Sparkles} label="Hábitos hoje" value={habitsCompletedToday ?? 0} />
       </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <StatCard icon={Flame} label="Foco hoje" value={`${(focusMinutesToday / 60).toFixed(1)}h`} accent="accent" />
+        <StatCard icon={Flame} label="Foco esta semana" value={`${(focusMinutesWeek / 60).toFixed(1)}h`} />
+      </div>
+
+      <TopPriorityWidget tasks={data.todayTasks} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -91,6 +132,11 @@ export default async function DashboardPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ActiveProjectsWidget projects={(activeProjects ?? []) as Project[]} />
+        <CategoryDistributionWidget entries={distributionEntries} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

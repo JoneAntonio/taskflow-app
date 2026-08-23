@@ -8,7 +8,7 @@ export function WeeklyProductivityChart({
   data: { day: string; concluidas: number; atrasadas: number }[];
 }) {
   return (
-    <div className="h-56 w-full">
+    <div className="h-44 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke="var(--color-border)" />
