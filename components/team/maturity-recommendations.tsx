@@ -1,4 +1,8 @@
-import { Lightbulb } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Lightbulb, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { TeamAgent } from "@/types/team-maturity";
 
 function buildRecommendations(agents: TeamAgent[]): string[] {
@@ -53,22 +57,35 @@ function buildRecommendations(agents: TeamAgent[]): string[] {
 
 export function MaturityRecommendations({ agents }: { agents: TeamAgent[] }) {
   const recommendations = buildRecommendations(agents);
+  const [open, setOpen] = useState(false);
   if (recommendations.length === 0) return null;
 
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-      <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
-        <Lightbulb className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-        Recomendações
-      </p>
-      <ul className="space-y-2.5">
-        {recommendations.map((rec, index) => (
-          <li key={index} className="flex gap-2 text-sm text-[var(--color-ink)]">
-            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-            {rec}
-          </li>
-        ))}
-      </ul>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between"
+        aria-expanded={open}
+      >
+        <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+          <Lightbulb className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+          Recomendações ({recommendations.length})
+        </span>
+        <ChevronDown
+          className={cn("h-4 w-4 text-[var(--color-ink-muted)] transition-transform", open && "rotate-180")}
+        />
+      </button>
+      {open && (
+        <ul className="mt-3 space-y-2.5">
+          {recommendations.map((rec, index) => (
+            <li key={index} className="flex gap-2 text-sm text-[var(--color-ink)]">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+              {rec}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
