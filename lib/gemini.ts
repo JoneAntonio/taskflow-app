@@ -24,7 +24,7 @@ export async function generateWithGemini(prompt: string): Promise<string> {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 1000 },
+          generationConfig: { temperature: 0.4, maxOutputTokens: 2000 },
         }),
       }
     );
@@ -33,7 +33,7 @@ export async function generateWithGemini(prompt: string): Promise<string> {
       const data = await response.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("O Gemini não devolveu texto na resposta.");
-      return text.trim();
+      return trimToCompleteSentence(text.trim());
     }
 
     // 429 (limite atingido) e 503 (sobrecarregado) são temporários — vale a
@@ -51,4 +51,16 @@ export async function generateWithGemini(prompt: string): Promise<string> {
       ? "O Gemini está com muita procura neste momento. Espera um minuto e tenta gerar a análise outra vez."
       : (lastError?.message ?? "Não foi possível gerar a análise.")
   );
+}
+
+/**
+ * Se o texto ficar cortado a meio de uma frase (limite de tokens atingido
+ * antes do modelo terminar), corta no fim da última frase completa em vez
+ * de mostrar algo pela metade, como "...para consolidar a".
+ */
+function trimToCompleteSentence(text: string): string {
+  const lastPunctuation = Math.max(text.lastIndexOf("."), text.lastIndexOf("!"), text.lastIndexOf("?"));
+  // Sem pontuação nenhuma (raro) — devolve tudo, não há onde cortar.
+  if (lastPunctuation === -1) return text;
+  return text.slice(0, lastPunctuation + 1).trim();
 }
