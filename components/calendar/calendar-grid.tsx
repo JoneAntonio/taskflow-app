@@ -99,11 +99,13 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                 {selectedProjected.map((task) => (
                   <div
                     key={`projected-${task.id}`}
-                    className="flex items-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] px-3 py-2 text-sm text-[var(--color-ink-muted)]"
+                    className="flex items-center gap-2 rounded-xl border-2 border-dashed border-[var(--color-accent)]/50 bg-[var(--color-accent)]/5 px-3 py-2 text-sm text-[var(--color-ink)]"
                   >
-                    <Repeat className="h-3.5 w-3.5 shrink-0" />
+                    <Repeat className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]" />
                     <span className="truncate">{task.title}</span>
-                    <span className="ml-auto shrink-0 text-[10px] uppercase tracking-wide">Prevista</span>
+                    <span className="ml-auto shrink-0 rounded-full bg-[var(--color-accent)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-accent-ink)]">
+                      Prevista
+                    </span>
                   </div>
                 ))}
               </div>
@@ -153,10 +155,12 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                 key={cell.date}
                 onClick={() => setSelectedDate(cell.date)}
                 className={cn(
-                  "flex aspect-square flex-col items-center justify-center rounded-xl border text-sm transition-colors",
+                  "relative flex aspect-square flex-col items-center justify-center rounded-xl border text-sm transition-colors",
                   isSelected
                     ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
-                    : "border-transparent hover:bg-[var(--color-surface-alt)]",
+                    : dayProjected.length > 0 && dayTasks.length === 0
+                      ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/5"
+                      : "border-transparent hover:bg-[var(--color-surface-alt)]",
                   isToday && !isSelected && "border-[var(--color-border)]"
                 )}
               >
@@ -167,7 +171,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                   <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-[var(--color-secondary)]" />
                 )}
                 {dayTasks.length === 0 && dayProjected.length > 0 && (
-                  <span className="mt-0.5 h-1.5 w-1.5 rounded-full border border-[var(--color-secondary)]" />
+                  <Repeat className="absolute bottom-1 right-1 h-3 w-3 text-[var(--color-accent)]" strokeWidth={2.5} />
                 )}
               </button>
             );

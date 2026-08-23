@@ -16,12 +16,42 @@ export interface PomodoroTaskOption {
 
 const LABELS = POMODORO_LABELS;
 
-function buildSimplePlan(totalMinutes: number, breakMinutes: number): PomodoroPlanSegment[] {
-  const work = Math.max(1, totalMinutes - breakMinutes);
-  return [
-    { type: "foco", minutes: work },
-    { type: "pausa_curta", minutes: Math.max(1, breakMinutes) },
-  ];
+/**
+ * Calcula quantos blocos de foco de 25 min cabem na duração total, segundo
+ * a fórmula: sessões = ⌊(tempo total + 5) / 30⌋. A cada 4ª sessão, a pausa
+ * é longa (15 min); as restantes são curtas (5 min). O último bloco de foco
+ * é ajustado para a soma total bater certo com o tempo indicado.
+ */
+function buildPomodoroPlan(totalMinutes: number): PomodoroPlanSegment[] {
+  const computedSessions = Math.floor((totalMinutes + 5) / 30);
+
+  if (computedSessions <= 0) {
+    // Tempo insuficiente para o padrão 25+5 — um único bloco de foco com o tempo todo.
+    return [{ type: "foco", minutes: Math.max(1, totalMinutes) }];
+  }
+
+  const segments: PomodoroPlanSegment[] = [];
+  let used = 0;
+  for (let i = 1; i <= computedSessions; i++) {
+    segments.push({ type: "foco", minutes: 25 });
+    used += 25;
+    const isLongBreak = i % 4 === 0;
+    const breakMinutes = isLongBreak ? 15 : 5;
+    segments.push({ type: isLongBreak ? "pausa_longa" : "pausa_curta", minutes: breakMinutes });
+    used += breakMinutes;
+  }
+
+  const leftover = totalMinutes - used;
+  if (leftover !== 0) {
+    for (let i = segments.length - 1; i >= 0; i--) {
+      if (segments[i].type === "foco") {
+        segments[i] = { ...segments[i], minutes: Math.max(1, segments[i].minutes + leftover) };
+        break;
+      }
+    }
+  }
+
+  return segments;
 }
 
 function minutesBetween(start: string, end: string): number {
@@ -35,7 +65,6 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const [selectedTaskId, setSelectedTaskId] = useState<string>(store.selectedTaskId ?? "");
   const [autoPlanEnabled, setAutoPlanEnabled] = useState(!!store.plan);
   const [totalDuration, setTotalDuration] = useState(60);
-  const [breakDuration, setBreakDuration] = useState(10);
   const [notes, setNotes] = useState("");
   const [lockedDuration, setLockedDuration] = useState<number | null>(null);
 
@@ -47,8 +76,8 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const customDurations = store.customDurations;
 
   const newPlan = useMemo(
-    () => (autoPlanEnabled ? buildSimplePlan(totalDuration, breakDuration) : null),
-    [autoPlanEnabled, totalDuration, breakDuration]
+    () => (autoPlanEnabled ? buildPomodoroPlan(totalDuration) : null),
+    [autoPlanEnabled, totalDuration]
   );
 
   // Só reconfigura o estado global quando o plano/tarefa realmente mudam, e o temporizador não está a correr
@@ -118,7 +147,6 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
   const seconds = secondsLeft % 60;
   const currentTotalSeconds = (plan ? plan[segmentIndex]?.minutes ?? customDurations[sessionType] : customDurations[sessionType]) * 60;
   const progress = currentTotalSeconds > 0 ? ((currentTotalSeconds - secondsLeft) / currentTotalSeconds) * 100 : 0;
-  const workMinutes = plan ? plan[0].minutes : null;
   const activeTaskTitle = store.selectedTaskTitle;
 
   return (
@@ -157,11 +185,11 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
             onChange={(e) => setAutoPlanEnabled(e.target.checked)}
             className="h-3.5 w-3.5 accent-[var(--color-accent)] disabled:opacity-50"
           />
-          Plano automático: divide a atividade em trabalho focado + uma pausa no fim
+          Plano automático: calcula os blocos de foco e pausa a partir da duração total
         </label>
 
         {autoPlanEnabled && (
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-2">
             <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
               Duração total
               <input
@@ -175,18 +203,6 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
               />
               min
             </span>
-            <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
-              Pausa
-              <input
-                type="number"
-                min={1}
-                max={totalDuration - 1}
-                value={breakDuration}
-                onChange={(e) => setBreakDuration(Math.min(totalDuration - 1, Math.max(1, Number(e.target.value) || 1)))}
-                className="w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-0.5 text-center text-xs text-[var(--color-ink)]"
-              />
-              min
-            </span>
           </div>
         )}
 
@@ -197,10 +213,11 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
           </p>
         )}
 
-        {plan && workMinutes && (
+        {plan && (
           <p className="text-center text-[11px] text-[var(--color-ink-muted)]">
-            {workMinutes} min de trabalho focado, depois {plan[1].minutes} min de pausa. Ao terminares um bloco,
-            o próximo arranca sozinho — não precisas de voltar a clicar em Começar.
+            {plan.filter((s) => s.type === "foco").length} bloco(s) de foco de 25 min, com pausa curta (5 min) entre
+            cada um e pausa longa (15 min) a cada 4º bloco. Avança sozinho — não precisas de voltar a clicar em
+            Começar.
           </p>
         )}
       </div>
