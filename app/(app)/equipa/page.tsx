@@ -6,6 +6,7 @@ import { AgentCard } from "@/components/team/agent-card";
 import { AddAgentButton } from "@/components/team/add-agent-button";
 import { MaturityRecommendations } from "@/components/team/maturity-recommendations";
 import { MaturityQuadrantMatrix } from "@/components/team/maturity-quadrant-matrix";
+import { AIInsightCard } from "@/components/team/ai-insight-card";
 import { getOperationColor } from "@/lib/operation-colors";
 import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 
@@ -18,13 +19,14 @@ export default async function EquipaPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: agents }, { data: evaluations }, { data: operations }] = await Promise.all([
+  const [{ data: agents }, { data: evaluations }, { data: operations }, { data: aiInsight }] = await Promise.all([
     supabase.from("team_agents").select("*").eq("archived", false).order("name"),
     supabase
       .from("maturity_evaluations")
       .select("agent_id, evaluation_date")
       .order("evaluation_date", { ascending: false }),
     supabase.from("team_operations").select("*").order("name"),
+    supabase.from("ai_insights").select("content, generated_at").eq("scope", "maturidade").maybeSingle(),
   ]);
 
   const lastEvaluationByAgent = new Map<string, string>();
@@ -89,6 +91,8 @@ export default async function EquipaPage() {
           }))}
         />
       </div>
+
+      <AIInsightCard initialContent={aiInsight?.content ?? null} initialGeneratedAt={aiInsight?.generated_at ?? null} />
 
       {agentList.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center">
