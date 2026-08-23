@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateJSONWithGemini } from "@/lib/gemini";
+import { recordAiUsage } from "@/lib/ai-usage";
 
 interface SmartSuggestion {
   objective: string;
@@ -48,6 +49,7 @@ Não inventes números de meta ou ponto de partida — a pessoa preenche isso à
 
   try {
     const suggestion = await generateJSONWithGemini<SmartSuggestion>(prompt);
+    await recordAiUsage("smart");
     return NextResponse.json(suggestion);
   } catch (error) {
     return NextResponse.json(

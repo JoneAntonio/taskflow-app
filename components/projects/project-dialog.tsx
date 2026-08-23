@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
+import { AIUsageIndicator } from "@/components/ai/ai-usage-indicator";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -251,6 +252,9 @@ export function ProjectDialog({
               </Button>
             </div>
             {aiExplanation && <p className="mt-2 text-xs text-[var(--color-ink)]">💡 {aiExplanation}</p>}
+            <div className="mt-2">
+              <AIUsageIndicator scope="smart" />
+            </div>
           </div>
 
           <div className="space-y-3">
