@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,8 +50,37 @@ export function ProjectDialog({
   const [actionPlan, setActionPlan] = useState(project?.action_plan ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [smartError, setSmartError] = useState<string | null>(null);
+  const [aiIdea, setAiIdea] = useState("");
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const parentOptions = availableParents.filter((p) => p.id !== project?.id);
+
+  async function handleAiAssist() {
+    if (!aiIdea.trim()) return;
+    setIsAiLoading(true);
+    setAiExplanation(null);
+    try {
+      const response = await fetch("/api/ai/smart-assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ideaText: aiIdea.trim() }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Falha ao gerar sugestão.");
+
+      setObjective(body.objective ?? "");
+      setSuccessMetric(body.successMetric ?? "");
+      if (body.unit) setMetricUnit(body.unit);
+      if (body.actionPlan) setActionPlan(body.actionPlan);
+      setAiExplanation(body.explanation ?? null);
+      toast.success("Sugestão aplicada — revê e ajusta como quiseres");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível gerar a sugestão.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -203,6 +233,26 @@ export function ProjectDialog({
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
             Método SMART (opcional)
           </p>
+
+          <div className="mb-4 rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 p-3">
+            <Label htmlFor="ai-idea" className="flex items-center gap-1.5 text-[var(--color-accent)]">
+              <Sparkles className="h-3.5 w-3.5" /> Não tens experiência com SMART? Descreve a ideia em poucas palavras
+            </Label>
+            <div className="mt-1.5 flex gap-2">
+              <Input
+                id="ai-idea"
+                value={aiIdea}
+                onChange={(e) => setAiIdea(e.target.value)}
+                placeholder="Ex: quero que a equipa responda mais rápido aos clientes"
+                className="flex-1"
+              />
+              <Button type="button" size="sm" onClick={handleAiAssist} isLoading={isAiLoading} disabled={!aiIdea.trim()}>
+                Sugerir
+              </Button>
+            </div>
+            {aiExplanation && <p className="mt-2 text-xs text-[var(--color-ink)]">💡 {aiExplanation}</p>}
+          </div>
+
           <div className="space-y-3">
             <div>
               <Label htmlFor="project-objective">🎯 Objetivo (o quê e porquê)</Label>

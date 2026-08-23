@@ -1,5 +1,11 @@
 import "server-only";
 
+interface GeminiOptions {
+  /** Pede ao Gemini para responder em JSON puro, sem texto à volta. */
+  json?: boolean;
+  maxOutputTokens?: number;
+}
+
 /**
  * Chama o Gemini (Google AI Studio) para gerar texto. Servidor apenas —
  * nunca deve ser importado em código de cliente (browser).
@@ -7,7 +13,7 @@ import "server-only";
  * Requer a variável de ambiente GEMINI_API_KEY na Vercel (gratuita, sem
  * cartão — gerada em aistudio.google.com).
  */
-export async function generateWithGemini(prompt: string): Promise<string> {
+export async function generateWithGemini(prompt: string, options: GeminiOptions = {}): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("A análise por IA não está configurada (falta GEMINI_API_KEY).");
@@ -24,7 +30,11 @@ export async function generateWithGemini(prompt: string): Promise<string> {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 2000 },
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: options.maxOutputTokens ?? 2000,
+            ...(options.json ? { responseMimeType: "application/json" } : {}),
+          },
         }),
       }
     );
@@ -33,7 +43,7 @@ export async function generateWithGemini(prompt: string): Promise<string> {
       const data = await response.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("O Gemini não devolveu texto na resposta.");
-      return trimToCompleteSentence(text.trim());
+      return options.json ? text.trim() : trimToCompleteSentence(text.trim());
     }
 
     // 429 (limite atingido) e 503 (sobrecarregado) são temporários — vale a
@@ -48,9 +58,19 @@ export async function generateWithGemini(prompt: string): Promise<string> {
 
   throw new Error(
     lastError?.message.includes("503") || lastError?.message.includes("429")
-      ? "O Gemini está com muita procura neste momento. Espera um minuto e tenta gerar a análise outra vez."
-      : (lastError?.message ?? "Não foi possível gerar a análise.")
+      ? "O Gemini está com muita procura neste momento. Espera um minuto e tenta outra vez."
+      : (lastError?.message ?? "Não foi possível gerar a resposta.")
   );
+}
+
+/** Chama o Gemini e devolve já o JSON interpretado, com o tipo pedido. */
+export async function generateJSONWithGemini<T>(prompt: string): Promise<T> {
+  const raw = await generateWithGemini(prompt, { json: true });
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    throw new Error("O Gemini devolveu uma resposta em formato inesperado.");
+  }
 }
 
 /**
