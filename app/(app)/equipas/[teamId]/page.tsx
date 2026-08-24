@@ -24,27 +24,23 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
   const { data: team } = await supabase.from("teams").select("*").eq("id", teamId).single();
   if (!team) notFound();
 
-  const [
-    { data: members, error: membersError },
-    { data: pendingInvites },
-    { data: isAdminResult },
-    { data: teamTasks },
-  ] = await Promise.all([
-    supabase.from("team_memberships").select("*, profile:profiles(*)").eq("team_id", teamId).order("joined_at"),
-    supabase
-      .from("team_invites")
-      .select("*")
-      .eq("team_id", teamId)
-      .eq("status", "pending")
-      .order("created_at", { ascending: false }),
-    supabase.rpc("is_team_admin", { _team_id: teamId }),
-    supabase
-      .from("tasks")
-      .select("*")
-      .eq("team_id", teamId)
-      .order("status")
-      .order("due_date", { ascending: true, nullsFirst: false }),
-  ]);
+  const [{ data: members }, { data: pendingInvites }, { data: isAdminResult }, { data: teamTasks }] =
+    await Promise.all([
+      supabase.from("team_memberships").select("*, profile:profiles(*)").eq("team_id", teamId).order("joined_at"),
+      supabase
+        .from("team_invites")
+        .select("*")
+        .eq("team_id", teamId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false }),
+      supabase.rpc("is_team_admin", { _team_id: teamId }),
+      supabase
+        .from("tasks")
+        .select("*")
+        .eq("team_id", teamId)
+        .order("status")
+        .order("due_date", { ascending: true, nullsFirst: false }),
+    ]);
 
   const isAdmin = !!isAdminResult;
   const memberList = (members ?? []) as unknown as TeamMembership[];
@@ -78,15 +74,6 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
         {(team as Team).description && (
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">{(team as Team).description}</p>
         )}
-      </div>
-
-      <div className="rounded-xl border-2 border-dashed border-[var(--color-danger)] bg-[var(--color-danger)]/5 p-3 text-xs text-[var(--color-ink)]">
-        <p className="font-semibold text-[var(--color-danger)]">🔧 Diagnóstico temporário (vou remover depois)</p>
-        <p>O meu ID de utilizador: {user.id}</p>
-        <p>ID desta equipa (na URL): {teamId}</p>
-        <p>Quantas linhas a query de membros devolveu: {members?.length ?? "null"}</p>
-        <p>Erro da query de membros (se houver): {membersError ? JSON.stringify(membersError) : "nenhum"}</p>
-        <p>Sou admin desta equipa (resultado da função): {String(isAdminResult)}</p>
       </div>
 
       {isAdmin && (
