@@ -32,6 +32,16 @@ export function getNextOccurrenceDate(fromDate: string, recurrence: Recurrence):
     case "anual":
       date.setFullYear(date.getFullYear() + interval);
       break;
+    case "personalizada": {
+      const days = recurrence.by_weekday;
+      if (!days || days.length === 0) return fromDate;
+      // Avança dia a dia (até 7 tentativas) até encontrar o próximo dia da semana escolhido.
+      for (let i = 0; i < 7; i++) {
+        date.setDate(date.getDate() + 1);
+        if (days.includes(date.getDay())) break;
+      }
+      break;
+    }
     default:
       // Frequência desconhecida/não suportada — não avança, evita ciclos.
       return fromDate;

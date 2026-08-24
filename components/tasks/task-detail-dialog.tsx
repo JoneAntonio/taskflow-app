@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Paperclip, Upload, Trash2, Download, X, MessageSquare, Activity } from "lucide-react";
+import { Paperclip, Upload, Trash2, Download, X, MessageSquare, Activity, CalendarClock } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SchedulePopover, type ScheduleValue } from "@/components/tasks/schedule-popover";
 import { attachmentsService } from "@/services/attachments.service";
 import { taskActionsService } from "@/services/task-actions.service";
 import { taskCommentsService } from "@/services/task-comments.service";
+import { tasksService } from "@/services/tasks.service";
 import { getGravatarUrl } from "@/lib/gravatar";
 import type { Task, TaskAttachment, TaskComment, TaskActivity as TaskActivityRow } from "@/types/database";
 
@@ -20,6 +23,10 @@ function formatBytes(bytes: number | null): string {
 }
 
 export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: boolean; onClose: () => void }) {
+  const [title, setTitle] = useState(task.title);
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const scheduleButtonRef = useRef<HTMLButtonElement>(null);
   const [description, setDescription] = useState(task.description ?? "");
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [attachments, setAttachments] = useState<TaskAttachment[]>([]);
@@ -29,6 +36,53 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
   const [isCommenting, setIsCommenting] = useState(false);
   const [activity, setActivity] = useState<TaskActivityRow[]>([]);
   const router = useRouter();
+
+  const scheduleValue: ScheduleValue = {
+    dueDate: task.due_date,
+    dueTime: task.due_time,
+    dueTimeEnd: task.due_time_end,
+    priority: task.priority,
+    recurrence: task.recurrence,
+    reminderMinutesBefore: null,
+    isImportant: task.is_important,
+    location: task.location,
+    estimatedDurationMinutes: task.estimated_duration_minutes,
+    description: task.description,
+  };
+
+  async function handleSaveTitle() {
+    if (!title.trim() || title.trim() === task.title) return;
+    setIsSavingTitle(true);
+    try {
+      await tasksService.updateTask(task.id, { title: title.trim() });
+      toast.success("Título atualizado");
+      router.refresh();
+    } catch {
+      toast.error("Não foi possível atualizar o título.");
+      setTitle(task.title);
+    } finally {
+      setIsSavingTitle(false);
+    }
+  }
+
+  async function handleScheduleChange(next: ScheduleValue) {
+    setScheduleOpen(false);
+    try {
+      await tasksService.updateTask(task.id, {
+        priority: next.priority ?? "sem_prioridade",
+        dueDate: next.dueDate,
+        dueTime: next.dueTime,
+        dueTimeEnd: next.dueTimeEnd,
+        recurrence: next.recurrence,
+        location: next.location,
+        estimatedDurationMinutes: next.estimatedDurationMinutes,
+      });
+      toast.success("Agendamento atualizado");
+      router.refresh();
+    } catch {
+      toast.error("Não foi possível atualizar o agendamento.");
+    }
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -111,8 +165,41 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title={task.title} className="max-w-lg">
+    <Dialog open={open} onClose={onClose} title="Editar tarefa" className="max-w-lg">
       <div className="space-y-5">
+        <div>
+          <div className="flex items-center gap-2">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={handleSaveTitle}
+              disabled={isSavingTitle}
+              className="flex-1 text-base font-medium"
+            />
+            <Button
+              ref={scheduleButtonRef}
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setScheduleOpen(true)}
+              aria-label="Agendamento"
+            >
+              <CalendarClock className="h-4 w-4" />
+            </Button>
+          </div>
+          {scheduleOpen && (
+            <SchedulePopover
+              value={scheduleValue}
+              onChange={handleScheduleChange}
+              onClose={() => setScheduleOpen(false)}
+              anchorRef={scheduleButtonRef}
+            />
+          )}
+          <p className="mt-1 text-[11px] text-[var(--color-ink-muted)]">
+            Clica no ícone de calendário para mudares data, hora, prioridade ou recorrência.
+          </p>
+        </div>
+
         <div>
           <p className="mb-1.5 text-xs font-medium text-[var(--color-ink-muted)]">Nota</p>
           <textarea

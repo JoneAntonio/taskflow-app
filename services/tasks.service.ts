@@ -66,6 +66,37 @@ export const tasksService = {
 
     return task as Task;
   },
+
+  /** Edita os campos principais de uma tarefa já criada. */
+  async updateTask(
+    taskId: string,
+    input: Partial<{
+      title: string;
+      priority: TaskPriority;
+      dueDate: string | null;
+      dueTime: string | null;
+      dueTimeEnd: string | null;
+      recurrence: Recurrence | null;
+      reminderAt: string | null;
+      location: string | null;
+      estimatedDurationMinutes: number | null;
+    }>
+  ): Promise<void> {
+    const supabase = createClient();
+    const updates: Record<string, unknown> = {};
+    if (input.title !== undefined) updates.title = input.title;
+    if (input.priority !== undefined) updates.priority = input.priority;
+    if (input.dueDate !== undefined) updates.due_date = input.dueDate;
+    if (input.dueTime !== undefined) updates.due_time = input.dueTime;
+    if (input.dueTimeEnd !== undefined) updates.due_time_end = input.dueTimeEnd;
+    if (input.recurrence !== undefined) updates.recurrence = input.recurrence;
+    if (input.reminderAt !== undefined) updates.reminder_at = input.reminderAt;
+    if (input.location !== undefined) updates.location = input.location;
+    if (input.estimatedDurationMinutes !== undefined) updates.estimated_duration_minutes = input.estimatedDurationMinutes;
+
+    const { error } = await supabase.from("tasks").update(updates).eq("id", taskId);
+    if (error) throw error;
+  },
 };
 
 async function attachTagsByName(userId: string, taskId: string, tagNames: string[]) {

@@ -28,7 +28,15 @@ const QUICK_DATE_OPTIONS = [
   { label: "Próxima semana", icon: CalendarPlus, getDate: () => addDays(new Date(), 7) },
 ];
 
-const RECURRENCE_OPTIONS: Exclude<RecurrenceFrequency, null>[] = ["diaria", "dias_uteis", "semanal", "mensal", "anual"];
+const RECURRENCE_OPTIONS: Exclude<RecurrenceFrequency, null>[] = [
+  "diaria",
+  "dias_uteis",
+  "semanal",
+  "mensal",
+  "anual",
+  "personalizada",
+];
+const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
 
 /**
  * Mapeamento único entre "nível" e quadrante da Matriz — a MESMA escolha
@@ -353,7 +361,12 @@ export function SchedulePopover({
                 onClick={() =>
                   setLocal((prev) => ({
                     ...prev,
-                    recurrence: { frequency: freq, interval: 1, by_weekday: null, until: null },
+                    recurrence: {
+                      frequency: freq,
+                      interval: 1,
+                      by_weekday: freq === "personalizada" ? [] : null,
+                      until: null,
+                    },
                   }))
                 }
                 className={cn(
@@ -368,6 +381,43 @@ export function SchedulePopover({
               </button>
             );
           })}
+
+          {local.recurrence?.frequency === "personalizada" && (
+            <div className="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 p-2.5">
+              <p className="mb-2 text-xs text-[var(--color-ink-muted)]">Repete só nestes dias:</p>
+              <div className="flex justify-between gap-1">
+                {WEEKDAY_LABELS.map((label, index) => {
+                  const selectedDays = local.recurrence?.by_weekday ?? [];
+                  const isSelected = selectedDays.includes(index);
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() =>
+                        setLocal((prev) => {
+                          if (!prev.recurrence) return prev;
+                          const current = prev.recurrence.by_weekday ?? [];
+                          const next = isSelected ? current.filter((d) => d !== index) : [...current, index].sort();
+                          return { ...prev, recurrence: { ...prev.recurrence, by_weekday: next } };
+                        })
+                      }
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors",
+                        isSelected
+                          ? "bg-[var(--color-accent)] text-[var(--color-accent-ink)]"
+                          : "bg-[var(--color-surface)] text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              {(local.recurrence?.by_weekday ?? []).length === 0 && (
+                <p className="mt-2 text-[11px] text-[var(--color-danger)]">Escolhe pelo menos um dia.</p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
