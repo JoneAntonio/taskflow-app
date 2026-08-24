@@ -26,12 +26,12 @@ export async function GET(request: Request) {
   const supabase = createAdminClient();
   const results = { deletedMessages: 0, weeklyReports: 0, deadlineAlerts: 0 };
 
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const twoMonthsAgo = new Date();
+  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
   const { count: deletedCount } = await supabase
     .from("messages")
     .delete({ count: "exact" })
-    .lt("created_at", sixMonthsAgo.toISOString());
+    .lt("created_at", twoMonthsAgo.toISOString());
   results.deletedMessages = deletedCount ?? 0;
 
   const isMonday = new Date().getDay() === 1;
