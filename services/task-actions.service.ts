@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { getNextOccurrenceDate } from "@/lib/recurrence";
 import { STATUS_LABELS } from "@/lib/labels";
-import type { Task, TaskStatus } from "@/types/database";
+import type { Task, TaskStatus, TaskPriority } from "@/types/database";
 
 export const taskActionsService = {
   async toggleImportant(taskId: string, isImportant: boolean): Promise<void> {
@@ -100,6 +100,26 @@ export const taskActionsService = {
       user_id: user?.id ?? null,
       action: "estado",
       detail: `Mudou o estado para ${STATUS_LABELS[status]}`,
+    });
+  },
+
+  /**
+   * Move uma tarefa para outro quadrante da Matriz de Eisenhower, ajustando
+   * a prioridade e a importância de acordo (arrastar-e-largar).
+   */
+  async moveToQuadrant(taskId: string, important: boolean, urgent: boolean): Promise<void> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const priority: TaskPriority = urgent ? "alta" : "baixa";
+    const { error } = await supabase.from("tasks").update({ priority, is_important: important }).eq("id", taskId);
+    if (error) throw error;
+    await supabase.from("task_activity").insert({
+      task_id: taskId,
+      user_id: user?.id ?? null,
+      action: "quadrante",
+      detail: "Moveu para outro quadrante da Matriz",
     });
   },
 };

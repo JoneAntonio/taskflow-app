@@ -60,9 +60,14 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
 
   return (
     <div
+      draggable={!isCompleted}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/task-id", task.id);
+        e.dataTransfer.effectAllowed = "move";
+      }}
       className={cn(
         "flex items-center gap-2 rounded-lg px-3 py-2 text-sm",
-        isCompleted ? "bg-[var(--color-surface-alt)]" : "bg-[var(--color-surface)]"
+        isCompleted ? "bg-[var(--color-surface-alt)]" : "cursor-grab bg-[var(--color-surface)] active:cursor-grabbing"
       )}
     >
       <button
