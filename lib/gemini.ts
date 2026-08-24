@@ -24,7 +24,7 @@ export async function generateWithGemini(prompt: string, options: GeminiOptions 
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
