@@ -5,10 +5,11 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { AvatarEditor } from "@/components/profile/avatar-editor";
 import { PushNotificationCard } from "@/components/profile/push-notification-card";
 import { AccountTypeSelector } from "@/components/profile/account-type-selector";
+import { PendingAccessRequestsCard } from "@/components/profile/pending-access-requests-card";
 import { LeadershipTeamsCard } from "@/components/profile/leadership-teams-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import type { Team } from "@/types/database";
+import type { Team, AccessRequest } from "@/types/database";
 
 export const metadata: Metadata = { title: "Perfil — JAFLOW" };
 
@@ -21,6 +22,22 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   if (!profile) return null;
+
+  const [{ data: myPendingRequest }, { data: pendingRequests }] = await Promise.all([
+    supabase
+      .from("account_access_requests")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("status", "pending")
+      .maybeSingle(),
+    profile.is_platform_admin
+      ? supabase
+          .from("account_access_requests")
+          .select("*, profile:profiles(full_name, email, account_type)")
+          .eq("status", "pending")
+          .order("requested_at", { ascending: true })
+      : Promise.resolve({ data: [] }),
+  ]);
 
   let leadershipTeams: Team[] = [];
   if (profile.account_type === "supervisor") {
@@ -43,6 +60,10 @@ export default async function PerfilPage() {
         </p>
       </div>
 
+      {profile.is_platform_admin && (
+        <PendingAccessRequestsCard requests={(pendingRequests ?? []) as unknown as AccessRequest[]} />
+      )}
+
       <Card>
         <CardContent className="pt-6">
           <p className="mb-4 text-sm font-medium text-[var(--color-ink)]">Foto de perfil</p>
@@ -54,9 +75,9 @@ export default async function PerfilPage() {
         <CardContent className="pt-6">
           <p className="mb-1 text-sm font-medium text-[var(--color-ink)]">Tipo de conta</p>
           <p className="mb-4 text-xs text-[var(--color-ink-muted)]">
-            Define o que vês na app — muda a qualquer momento.
+            O acesso de Supervisor precisa de aprovação.
           </p>
-          <AccountTypeSelector current={profile.account_type} />
+          <AccountTypeSelector current={profile.account_type} hasPendingRequest={!!myPendingRequest} />
         </CardContent>
       </Card>
 

@@ -150,6 +150,16 @@ export interface TaskActivity {
   author?: Profile;
 }
 
+export interface AccessRequest {
+  id: string;
+  user_id: string;
+  status: "pending" | "approved" | "denied";
+  requested_at: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  profile?: { full_name: string | null; email: string; account_type: AccountType };
+}
+
 export type TeamRole = "admin" | "member";
 
 export interface Team {
