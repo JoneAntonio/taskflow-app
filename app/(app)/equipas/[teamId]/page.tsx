@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { MemberList } from "@/components/teams/member-list";
 import { InviteMemberForm } from "@/components/teams/invite-member-form";
 import { InviteLinkCard } from "@/components/teams/invite-link-card";
 import { TeamTaskCreator } from "@/components/teams/team-task-creator";
 import { TeamChatSection } from "@/components/chat/team-chat-section";
+import { PendingEmailInvitesList } from "@/components/teams/pending-email-invites-list";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-query";
 import type { Team, TeamMembership, TeamInvite, Task } from "@/types/database";
@@ -109,17 +110,7 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
             Convites por aceitar ({inviteList.length})
           </p>
-          <div className="space-y-2">
-            {inviteList.map((invite) => (
-              <div
-                key={invite.id}
-                className="flex items-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] px-3 py-2.5 text-sm text-[var(--color-ink-muted)]"
-              >
-                <Mail className="h-3.5 w-3.5 shrink-0" />
-                {invite.email} · {invite.role === "admin" ? "admin" : "membro"}
-              </div>
-            ))}
-          </div>
+          <PendingEmailInvitesList invites={inviteList} />
         </div>
       )}
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Paperclip, Upload, Trash2, Download, X, MessageSquare, Activity, CalendarClock } from "lucide-react";
+import { Paperclip, Upload, Trash2, Download, X, MessageSquare, Activity, CalendarClock, Lock } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { attachmentsService } from "@/services/attachments.service";
 import { taskActionsService } from "@/services/task-actions.service";
 import { taskCommentsService } from "@/services/task-comments.service";
 import { tasksService } from "@/services/tasks.service";
+import { createClient } from "@/lib/supabase/client";
 import { getGravatarUrl } from "@/lib/gravatar";
 import type { Task, TaskAttachment, TaskComment, TaskActivity as TaskActivityRow } from "@/types/database";
 
@@ -35,7 +36,28 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
   const [newComment, setNewComment] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
   const [activity, setActivity] = useState<TaskActivityRow[]>([]);
+  // Por defeito assume que pode editar — evita "piscar" a mensagem de
+  // bloqueio antes de sabermos mesmo quem está a ver isto.
+  const [canEditSchedule, setCanEditSchedule] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!open) return;
+    const supabase = createClient();
+    (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: myProfile } = await supabase.from("profiles").select("account_type").eq("id", user.id).single();
+      // Só o dono da tarefa (quem a criou) ou uma conta Supervisor podem
+      // editar dia/hora/prioridade. Quem só tem a tarefa atribuída (e é
+      // Agente) só pode concluir, comentar e deixar notas.
+      const isOwner = task.user_id === user.id;
+      const isSupervisor = myProfile?.account_type === "supervisor";
+      setCanEditSchedule(isOwner || isSupervisor);
+    })();
+  }, [open, task.user_id]);
 
   const scheduleValue: ScheduleValue = {
     dueDate: task.due_date,
@@ -173,21 +195,23 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onBlur={handleSaveTitle}
-              disabled={isSavingTitle}
+              disabled={isSavingTitle || !canEditSchedule}
               className="flex-1 text-base font-medium"
             />
-            <Button
-              ref={scheduleButtonRef}
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => setScheduleOpen(true)}
-              aria-label="Agendamento"
-            >
-              <CalendarClock className="h-4 w-4" />
-            </Button>
+            {canEditSchedule && (
+              <Button
+                ref={scheduleButtonRef}
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setScheduleOpen(true)}
+                aria-label="Agendamento"
+              >
+                <CalendarClock className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-          {scheduleOpen && (
+          {scheduleOpen && canEditSchedule && (
             <SchedulePopover
               value={scheduleValue}
               onChange={handleScheduleChange}
@@ -195,9 +219,16 @@ export function TaskDetailDialog({ task, open, onClose }: { task: Task; open: bo
               anchorRef={scheduleButtonRef}
             />
           )}
-          <p className="mt-1 text-[11px] text-[var(--color-ink-muted)]">
-            Clica no ícone de calendário para mudares data, hora, prioridade ou recorrência.
-          </p>
+          {canEditSchedule ? (
+            <p className="mt-1 text-[11px] text-[var(--color-ink-muted)]">
+              Clica no ícone de calendário para mudares data, hora, prioridade ou recorrência.
+            </p>
+          ) : (
+            <p className="mt-1 flex items-center gap-1 text-[11px] text-[var(--color-ink-muted)]">
+              <Lock className="h-3 w-3" /> Só quem criou esta tarefa pode mudar a data, hora ou prioridade. Podes
+              concluir, comentar e deixar notas.
+            </p>
+          )}
         </div>
 
         <div>

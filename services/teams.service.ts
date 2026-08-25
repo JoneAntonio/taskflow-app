@@ -158,6 +158,12 @@ export const teamsService = {
     if (error) throw error;
   },
 
+  async cancelEmailInvite(inviteId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.from("team_invites").update({ status: "revoked" }).eq("id", inviteId);
+    if (error) throw error;
+  },
+
   async getInviteByToken(token: string): Promise<(TeamInvite & { teamName: string }) | null> {
     const supabase = createClient();
     const { data, error } = await supabase

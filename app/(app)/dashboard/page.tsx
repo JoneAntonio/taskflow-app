@@ -173,7 +173,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {isSupervisor && data.teamTasks.length > 0 && (
+      {data.teamTasks.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
