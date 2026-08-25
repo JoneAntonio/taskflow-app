@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
@@ -9,6 +10,7 @@ import { InviteLinkCard } from "@/components/teams/invite-link-card";
 import { TeamTaskCreator } from "@/components/teams/team-task-creator";
 import { TeamChatSection } from "@/components/chat/team-chat-section";
 import { TaskListItem } from "@/components/tasks/task-list-item";
+import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-query";
 import type { Team, TeamMembership, TeamInvite, Task } from "@/types/database";
 
 export const metadata: Metadata = { title: "Equipa — JAFLOW" };
@@ -62,6 +64,9 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <Suspense fallback={null}>
+        <AutoOpenTaskFromQuery />
+      </Suspense>
       <Link
         href="/equipas"
         className="inline-flex items-center gap-1.5 text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"

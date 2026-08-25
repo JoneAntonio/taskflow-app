@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bell, Check } from "lucide-react";
 import { notificationsService } from "@/services/notifications.service";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function poll() {
@@ -58,13 +60,21 @@ export function NotificationBell() {
   }
 
   async function handleMarkOne(notification: Notification) {
-    if (notification.read) return;
-    try {
-      await notificationsService.markRead(notification.id);
-      setNotifications((prev) => prev.map((n) => (n.id === notification.id ? { ...n, read: true } : n)));
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch {
-      // silencioso
+    if (!notification.read) {
+      try {
+        await notificationsService.markRead(notification.id);
+        setNotifications((prev) => prev.map((n) => (n.id === notification.id ? { ...n, read: true } : n)));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      } catch {
+        // silencioso
+      }
+    }
+
+    setOpen(false);
+    if (notification.related_task_id) {
+      router.push(`/tarefa/${notification.related_task_id}`);
+    } else if (notification.team_id) {
+      router.push(`/equipas/${notification.team_id}`);
     }
   }
 

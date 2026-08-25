@@ -120,5 +120,16 @@ async function notifyChatMentions(input: { teamId: string; body: string; authorI
       body: input.body.slice(0, 140),
       team_id: input.teamId,
     });
+
+    fetch("/api/notifications/mention-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        targetUserId: match.user_id,
+        teamId: input.teamId,
+        snippet: input.body.slice(0, 200),
+        path: `/equipas/${input.teamId}`,
+      }),
+    }).catch(() => {});
   }
 }

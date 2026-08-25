@@ -263,6 +263,7 @@ export interface Notification {
   body: string | null;
   read: boolean;
   related_task_id: string | null;
+  team_id: string | null;
   created_at: string;
 }
 

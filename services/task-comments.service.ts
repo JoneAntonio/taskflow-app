@@ -81,5 +81,16 @@ async function notifyMentions(input: { taskId: string; teamId: string; body: str
       body: input.body.slice(0, 140),
       related_task_id: input.taskId,
     });
+
+    fetch("/api/notifications/mention-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        targetUserId: match.user_id,
+        teamId: input.teamId,
+        snippet: input.body.slice(0, 200),
+        path: `/tarefa/${input.taskId}`,
+      }),
+    }).catch(() => {});
   }
 }

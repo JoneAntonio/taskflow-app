@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getTodayISO } from "@/lib/server-date";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
+import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-query";
 import { HojeView } from "@/components/tasks/hoje-view";
 import type { Task } from "@/types/database";
 
@@ -35,6 +37,9 @@ export default async function HojePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <Suspense fallback={null}>
+        <AutoOpenTaskFromQuery />
+      </Suspense>
       <div>
         <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Hoje</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">

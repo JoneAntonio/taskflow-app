@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Folder } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { TaskListSection } from "@/components/tasks/task-list-section";
+import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-query";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { ProjectHeaderActions } from "@/components/projects/project-header-actions";
 import { ProjectSmartCard } from "@/components/projects/project-smart-card";
@@ -57,6 +59,9 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <Suspense fallback={null}>
+        <AutoOpenTaskFromQuery />
+      </Suspense>
       <Link
         href="/projetos"
         className="inline-flex items-center gap-1.5 text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
