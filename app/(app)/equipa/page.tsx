@@ -4,7 +4,6 @@ import { Users, SlidersHorizontal, LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AgentCard } from "@/components/team/agent-card";
 import { AddAgentButton } from "@/components/team/add-agent-button";
-import { MaturityRecommendations } from "@/components/team/maturity-recommendations";
 import { MaturityQuadrantMatrix } from "@/components/team/maturity-quadrant-matrix";
 import { AIInsightCard } from "@/components/team/ai-insight-card";
 import { getOperationColor } from "@/lib/operation-colors";
@@ -83,16 +82,8 @@ export default async function EquipaPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <MaturityQuadrantMatrix agents={agentList} />
-        <MaturityRecommendations
-          groups={sortedGroupNames.map((groupName) => ({
-            name: groupName,
-            color: getOperationColor(groupName === "Sem operação atribuída" ? null : groupName, operationList),
-            agents: groups.get(groupName)!,
-          }))}
-        />
+        <AIInsightCard initialContent={aiInsight?.content ?? null} initialGeneratedAt={aiInsight?.generated_at ?? null} />
       </div>
-
-      <AIInsightCard initialContent={aiInsight?.content ?? null} initialGeneratedAt={aiInsight?.generated_at ?? null} />
 
       {agentList.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center">
