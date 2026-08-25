@@ -8,7 +8,7 @@ import { escapeHtml } from "@/lib/escape-html";
  * Avisa todos os admins de plataforma quando alguém pede acesso de
  * Supervisor — por email e por notificação dentro da app.
  */
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -31,7 +31,7 @@ export async function POST() {
   }
 
   const requesterName = escapeHtml(requesterProfile?.full_name || requesterProfile?.email || "Alguém");
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
 
   for (const platformAdmin of platformAdmins) {
     await admin.from("notifications").insert({

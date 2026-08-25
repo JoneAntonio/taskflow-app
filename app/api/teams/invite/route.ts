@@ -30,6 +30,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não tens permissão para convidar para esta equipa." }, { status: 403 });
   }
 
+  const { data: requesterProfile } = await supabase.from("profiles").select("account_type").eq("id", user.id).single();
+  if (requesterProfile?.account_type !== "supervisor") {
+    return NextResponse.json({ error: "Só contas Supervisor podem convidar membros." }, { status: 403 });
+  }
+
   const normalizedEmail = email.toLowerCase().trim();
   const admin = createAdminClient();
 

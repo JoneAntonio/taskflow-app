@@ -14,9 +14,12 @@ import type { TeamMembership } from "@/types/database";
 export function TeamTaskCreator({
   teamId,
   membersWithLoad,
+  canAssign = true,
 }: {
   teamId: string;
   membersWithLoad: { membership: TeamMembership; activeTaskCount: number }[];
+  /** Contas "agente" podem criar tarefas, mas nunca atribuir a outra pessoa. */
+  canAssign?: boolean;
 }) {
   const [title, setTitle] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
@@ -60,19 +63,21 @@ export function TeamTaskCreator({
           placeholder="Nova tarefa da equipa..."
           className="flex-1"
         />
-        <select
-          value={assignedTo}
-          onChange={(e) => setAssignedTo(e.target.value)}
-          className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)]"
-        >
-          <option value="">Sem responsável</option>
-          {membersWithLoad.map(({ membership, activeTaskCount }) => (
-            <option key={membership.user_id} value={membership.user_id}>
-              {membership.profile?.full_name || membership.profile?.email} ({activeTaskCount}{" "}
-              {activeTaskCount === 1 ? "tarefa" : "tarefas"})
-            </option>
-          ))}
-        </select>
+        {canAssign && (
+          <select
+            value={assignedTo}
+            onChange={(e) => setAssignedTo(e.target.value)}
+            className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)]"
+          >
+            <option value="">Sem responsável</option>
+            {membersWithLoad.map(({ membership, activeTaskCount }) => (
+              <option key={membership.user_id} value={membership.user_id}>
+                {membership.profile?.full_name || membership.profile?.email} ({activeTaskCount}{" "}
+                {activeTaskCount === 1 ? "tarefa" : "tarefas"})
+              </option>
+            ))}
+          </select>
+        )}
         <div className="flex items-center gap-1.5">
           <Label htmlFor="team-task-deadline" className="sr-only">
             Prazo

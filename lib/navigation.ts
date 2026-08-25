@@ -45,7 +45,7 @@ export const focusNav: NavItem[] = [
 ];
 
 export const teamNav: NavItem[] = [
-  { label: "Equipas", href: "/equipas", icon: Users2, supervisorOnly: true },
+  { label: "Equipas", href: "/equipas", icon: Users2 },
   { label: "Maturidade da Equipa", href: "/equipa", icon: Users, supervisorOnly: true },
 ];
 

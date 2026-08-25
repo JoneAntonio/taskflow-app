@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { requireSupervisor } from "@/lib/require-supervisor";
 import { MemberList } from "@/components/teams/member-list";
 import { InviteMemberForm } from "@/components/teams/invite-member-form";
 import { InviteLinkCard } from "@/components/teams/invite-link-card";
@@ -17,7 +16,6 @@ import type { Team, TeamMembership, TeamInvite, Task } from "@/types/database";
 export const metadata: Metadata = { title: "Equipa — JAFLOW" };
 
 export default async function EquipaDetailPage({ params }: { params: Promise<{ teamId: string }> }) {
-  await requireSupervisor();
   const { teamId } = await params;
   const supabase = await createClient();
   const {
@@ -28,7 +26,7 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
   const { data: team } = await supabase.from("teams").select("*").eq("id", teamId).single();
   if (!team) notFound();
 
-  const [{ data: members }, { data: pendingInvites }, { data: isAdminResult }, { data: teamTasks }] =
+  const [{ data: members }, { data: pendingInvites }, { data: isAdminResult }, { data: teamTasks }, { data: profile }] =
     await Promise.all([
       supabase.from("team_memberships").select("*, profile:profiles(*)").eq("team_id", teamId).order("joined_at"),
       supabase
@@ -44,9 +42,15 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
         .eq("team_id", teamId)
         .order("status")
         .order("due_date", { ascending: true, nullsFirst: false }),
+      supabase.from("profiles").select("account_type").eq("id", user.id).single(),
     ]);
 
   const isAdmin = !!isAdminResult;
+  // Independentemente do papel na equipa, contas "agente" nunca podem
+  // convidar nem atribuir tarefas a outros — só podem ver, ser atribuídas, e
+  // conversar no chat.
+  const isSupervisor = profile?.account_type === "supervisor";
+  const canManageTeam = isAdmin && isSupervisor;
   const memberList = (members ?? []) as unknown as TeamMembership[];
   const inviteList = (pendingInvites ?? []) as TeamInvite[];
   const taskList = (teamTasks ?? []) as Task[];
@@ -83,7 +87,7 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
         )}
       </div>
 
-      {isAdmin && (
+      {canManageTeam && (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
             <p className="mb-3 text-sm font-medium text-[var(--color-ink)]">Convidar por email</p>
@@ -97,10 +101,10 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
           Membros ({memberList.length})
         </p>
-        <MemberList members={memberList} isAdmin={isAdmin} currentUserId={user.id} />
+        <MemberList members={memberList} isAdmin={canManageTeam} currentUserId={user.id} />
       </div>
 
-      {isAdmin && inviteList.length > 0 && (
+      {canManageTeam && inviteList.length > 0 && (
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
             Convites por aceitar ({inviteList.length})
@@ -124,7 +128,7 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
           Tarefas da equipa ({taskList.length})
         </p>
         <div className="space-y-3">
-          <TeamTaskCreator teamId={teamId} membersWithLoad={membersWithLoad} />
+          <TeamTaskCreator teamId={teamId} membersWithLoad={membersWithLoad} canAssign={isSupervisor} />
           {taskList.length === 0 ? (
             <p className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-8 text-center text-sm text-[var(--color-ink-muted)]">
               Ainda sem tarefas nesta equipa.
