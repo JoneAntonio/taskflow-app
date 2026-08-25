@@ -34,9 +34,9 @@
 }
 
 .dark {
-  --color-bg: #14151b;
-  --color-surface: #1b1d25;
-  --color-surface-alt: #23252f;
+  --color-bg: #121212;
+  --color-surface: #1e1e24;
+  --color-surface-alt: #26262e;
   --color-border: #2c2f3a;
   --color-ink: #f1f1ee;
   --color-ink-muted: #9498a3;

@@ -90,16 +90,19 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       .eq("user_id", userId)
       .eq("status", "concluida")
       .gte("completed_at", `${today}T00:00:00`),
+    // Inclui tanto tarefas criadas por ti como tarefas atribuídas a ti numa
+    // equipa (assigned_to) — sem isto, uma tarefa de equipa concluída por
+    // um agente não aparecia no gráfico, só no número total do mês.
     supabase
       .from("tasks")
       .select("completed_at")
-      .eq("user_id", userId)
+      .or(`user_id.eq.${userId},assigned_to.eq.${userId}`)
       .eq("status", "concluida")
       .gte("completed_at", `${weekStart}T00:00:00`),
     supabase
       .from("tasks")
       .select("due_date")
-      .eq("user_id", userId)
+      .or(`user_id.eq.${userId},assigned_to.eq.${userId}`)
       .in("status", ["pendente", "em_progresso"])
       .lt("due_date", today)
       .gte("due_date", weekStart),
