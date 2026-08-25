@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Conversation, Message } from "@/types/database";
+import type { Conversation, Message, Profile } from "@/types/database";
 
 export const chatService = {
   async getOrCreateTeamConversation(teamId: string): Promise<Conversation> {
@@ -54,7 +54,7 @@ export const chatService = {
     return (data ?? []) as unknown as Message[];
   },
 
-  async sendMessage(conversationId: string, body: string): Promise<void> {
+  async sendMessage(conversationId: string, body: string, teamId?: string | null): Promise<void> {
     const supabase = createClient();
     const {
       data: { user },
@@ -65,6 +65,23 @@ export const chatService = {
       .from("messages")
       .insert({ conversation_id: conversationId, sender_id: user.id, body });
     if (error) throw error;
+
+    if (teamId) {
+      try {
+        await notifyChatMentions({ teamId, body, authorId: user.id });
+      } catch {
+        // Uma falha a notificar não deve impedir a mensagem de ficar enviada.
+      }
+    }
+  },
+
+  async listTeamMembersForMentions(teamId: string): Promise<{ user_id: string; profile: Profile }[]> {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("team_memberships")
+      .select("user_id, profile:profiles(*)")
+      .eq("team_id", teamId);
+    return (data ?? []) as unknown as { user_id: string; profile: Profile }[];
   },
 
   subscribeToMessages(conversationId: string, onMessage: (message: Message) => void) {
@@ -83,3 +100,25 @@ export const chatService = {
     };
   },
 };
+
+async function notifyChatMentions(input: { teamId: string; body: string; authorId: string }) {
+  const mentionMatches = [...input.body.matchAll(/@([\p{L}\p{N}._-]+(?:\s[\p{L}\p{N}._-]+)?)/gu)].map((m) => m[1]);
+  if (mentionMatches.length === 0) return;
+
+  const supabase = createClient();
+  const members = await chatService.listTeamMembersForMentions(input.teamId);
+
+  for (const mention of mentionMatches) {
+    const normalized = mention.trim().toLowerCase();
+    const match = members.find((m) => m.profile?.full_name?.toLowerCase().startsWith(normalized));
+    if (!match || match.user_id === input.authorId) continue;
+
+    await supabase.from("notifications").insert({
+      user_id: match.user_id,
+      type: "mencao",
+      title: "Foste mencionado no chat da equipa",
+      body: input.body.slice(0, 140),
+      team_id: input.teamId,
+    });
+  }
+}

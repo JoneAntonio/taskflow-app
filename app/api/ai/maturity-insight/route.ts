@@ -50,40 +50,57 @@ export async function POST() {
     historyByAgent.set(evalRow.agent_id, list);
   });
 
-  const agentSummaries = agents
-    .map((agent) => {
-      const history = historyByAgent.get(agent.id) ?? [];
-      if (history.length === 0) {
-        return `- ${agent.name} (${agent.operation ?? "sem operação"}): sem avaliações ainda.`;
-      }
+  interface AgentRow {
+    id: string;
+    name: string;
+    operation: string | null;
+    current_maturity: string | null;
+  }
 
-      const progression = [...history].reverse().map((h) => h.confirmed_maturity).join(" → ");
-      const latest = history[0];
-      const scoresText = latest.scores?.map((s) => `${s.name}: ${s.score}/5`).join(", ");
-      const historyLines = history
-        .map((h) => `    · ${h.evaluation_date} (${h.confirmed_maturity}): ${h.scores?.map((s) => `${s.name}=${s.score}`).join(", ")}`)
-        .join("\n");
-
-      return `- ${agent.name} (${agent.operation ?? "sem operação"}), nível atual: ${agent.current_maturity}. Progressão: ${progression}.
+  const agentSummary = (agent: AgentRow) => {
+    const history = historyByAgent.get(agent.id) ?? [];
+    if (history.length === 0) {
+      return `- ${agent.name}: sem avaliações ainda.`;
+    }
+    const progression = [...history].reverse().map((h) => h.confirmed_maturity).join(" → ");
+    const latest = history[0];
+    const scoresText = latest.scores?.map((s) => `${s.name}: ${s.score}/5`).join(", ");
+    const historyLines = history
+      .map((h) => `    · ${h.evaluation_date} (${h.confirmed_maturity}): ${h.scores?.map((s) => `${s.name}=${s.score}`).join(", ")}`)
+      .join("\n");
+    return `- ${agent.name}, nível atual: ${agent.current_maturity ?? "n/d"}. Progressão: ${progression}.
   Última avaliação (${latest.evaluation_date}): ${scoresText}. Ponto forte: ${latest.strength ?? "n/d"}. A melhorar: ${latest.improvement_point ?? "n/d"}.
   Histórico (mais recente primeiro):
 ${historyLines}`;
-    })
+  };
+
+  // Agrupa por operação — cada equipa/operação é um grupo à parte, para a IA
+  // nunca comparar ou misturar agentes de operações diferentes como se
+  // fossem a mesma equipa.
+  const groups = new Map<string, AgentRow[]>();
+  (agents as AgentRow[]).forEach((agent) => {
+    const key = agent.operation?.trim() || "Sem operação atribuída";
+    const list = groups.get(key) ?? [];
+    list.push(agent);
+    groups.set(key, list);
+  });
+
+  const groupedText = [...groups.entries()]
+    .map(([operation, groupAgents]) => `### Operação: ${operation}\n${groupAgents.map(agentSummary).join("\n\n")}`)
     .join("\n\n");
 
   const prompt = `És um consultor de gestão de equipas especialista no modelo de liderança situacional de Hersey-Blanchard (M1-M4).
 
-Analisa os seguintes agentes de uma equipa, incluindo o histórico completo de avaliações de cada um (não só a mais recente):
+Analisa os agentes abaixo, JÁ ORGANIZADOS POR OPERAÇÃO (cada "### Operação: X" é uma equipa distinta e independente). Inclui o histórico completo de avaliações de cada um (não só a mais recente).
 
-${agentSummaries}
+${groupedText}
 
-Escreve uma análise curta e prática, em português de Portugal, com no máximo 6 frases no total, organizadas em 2-4 pontos com marcadores (•). Foca-te em:
-1. Que agente(s) estão mais perto de subir de nível, e em que critério específico devem focar-se.
-2. Tendências reais ao longo do tempo — alguém a melhorar consistentemente, ou estagnado há várias avaliações no mesmo nível/pontuação.
-3. Algum padrão preocupante que valha a pena assinalar.
-4. Uma sugestão concreta de ação para esta semana.
+Escreve uma análise curta e prática, em português de Portugal, organizada por operação (usa o nome de cada operação como um pequeno cabeçalho antes dos pontos dessa operação). Para cada operação, no máximo 3 frases com marcadores (•), focando-te em:
+1. Que agente(s) dessa operação estão mais perto de subir de nível, e em que critério específico.
+2. Tendências reais ao longo do tempo, ou um padrão preocupante nessa operação.
+3. Uma sugestão concreta de ação para essa operação esta semana.
 
-Não repitas os dados que já te dei de forma genérica — sê específico e acionável, e usa o histórico para dares contexto real (ex: "subiu 2 pontos desde a última avaliação"). Não uses formatação markdown como títulos ou negrito, só os marcadores (•).`;
+IMPORTANTE: nunca compares ou misturas agentes de operações diferentes como se fossem a mesma equipa — cada operação é independente. Não repitas os dados de forma genérica — sê específico. Não uses markdown como títulos com # ou negrito, só o nome da operação seguido de dois pontos, e marcadores (•) para os pontos.`;
 
   try {
     const content = await generateWithGemini(prompt);
