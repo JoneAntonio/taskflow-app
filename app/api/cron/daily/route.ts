@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/escape-html";
 import { computeSmartProgress } from "@/lib/smart-metrics";
 
 export const maxDuration = 60;
@@ -63,11 +64,12 @@ export async function GET(request: Request) {
       const rows = projects
         .map(
           (p) =>
-            `<li><strong>${p.name}</strong> — ${p.objective ?? ""}${
+            `<li><strong>${escapeHtml(p.name)}</strong> — ${escapeHtml(p.objective ?? "")}${
               p.target_date ? ` (prazo: ${new Date(p.target_date).toLocaleDateString("pt-PT")})` : ""
             }</li>`
         )
         .join("");
+      const safeTeamName = escapeHtml(team.name);
       for (const admin of adminList) {
         if (!admin.profile?.email) continue;
         try {
@@ -75,7 +77,7 @@ export async function GET(request: Request) {
             to: admin.profile.email,
             subject: `JAFLOW — Objetivos SMART da equipa ${team.name} esta semana`,
             html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
-              <h2 style="color:#14151b;">Objetivos SMART — ${team.name}</h2>
+              <h2 style="color:#14151b;">Objetivos SMART — ${safeTeamName}</h2>
               <p style="color:#3a3a3a;font-size:14px;">Estes são os objetivos que podem precisar de uma atualização de estado esta semana:</p>
               <ul style="color:#3a3a3a;font-size:14px;line-height:1.6;">${rows}</ul>
             </div>`,
@@ -112,6 +114,7 @@ export async function GET(request: Request) {
       if (behindBy < 0.2) continue;
 
       const title = `⚠️ "${project.name}" está atrasado`;
+      const safeTitle = `⚠️ "${escapeHtml(project.name)}" está atrasado`;
       const body = `Já passou ${Math.round(elapsedRatio * 100)}% do prazo, mas o progresso está em ${Math.round(progressRatio * 100)}%.`;
 
       for (const admin of adminList) {
@@ -126,7 +129,7 @@ export async function GET(request: Request) {
           try {
             await sendEmail({
               to: admin.profile.email,
-              subject: title,
+              subject: safeTitle,
               html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;"><p style="color:#3a3a3a;font-size:14px;">${body}</p></div>`,
             });
           } catch {

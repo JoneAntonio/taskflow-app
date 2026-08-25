@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/escape-html";
 
 export async function POST(request: Request) {
   let body: { subject?: string; message?: string; to?: string };
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2 style="color: #14151b;">JAFLOW</h2>
-          <p style="color: #3a3a3a; font-size: 15px; line-height: 1.6;">${body.message ?? ""}</p>
+          <p style="color: #3a3a3a; font-size: 15px; line-height: 1.6;">${escapeHtml(body.message ?? "")}</p>
         </div>
       `,
     });
