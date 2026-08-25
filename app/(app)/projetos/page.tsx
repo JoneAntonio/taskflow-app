@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FolderKanban } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { ProjectCard } from "@/components/projects/project-card";
 import { NewProjectButton } from "@/components/projects/new-project-button";
 import type { Project, Team } from "@/types/database";
@@ -8,6 +9,7 @@ import type { Project, Team } from "@/types/database";
 export const metadata: Metadata = { title: "Método SMART — JAFLOW" };
 
 export default async function ProjetosPage() {
+  await requireSupervisor();
   const supabase = await createClient();
   const {
     data: { user },

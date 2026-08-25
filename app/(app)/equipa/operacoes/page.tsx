@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { OperationsManager } from "@/components/team/operations-manager";
 import { OperationStatsCard } from "@/components/team/operation-stats-card";
 import { getOperationColor } from "@/lib/operation-colors";
@@ -10,6 +11,7 @@ import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 export const metadata: Metadata = { title: "Operações — JAFLOW" };
 
 export default async function OperacoesPage() {
+  await requireSupervisor();
   const supabase = await createClient();
   const {
     data: { user },

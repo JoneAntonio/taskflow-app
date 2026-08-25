@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { MaturityBadge } from "@/components/team/maturity-badge";
 import { MaturityTrack } from "@/components/team/maturity-track";
 import { CriteriaBar } from "@/components/team/criteria-bar";
@@ -21,6 +22,7 @@ export default async function AgentDetailPage({
   params: Promise<{ agentId: string }>;
 }) {
   const { agentId } = await params;
+  await requireSupervisor();
   const supabase = await createClient();
   const {
     data: { user },

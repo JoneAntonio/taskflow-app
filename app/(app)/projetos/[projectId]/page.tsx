@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Folder } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { TaskListSection } from "@/components/tasks/task-list-section";
 import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-query";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
@@ -23,6 +24,7 @@ export default async function ProjectDetailPage({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
+  await requireSupervisor();
   const supabase = await createClient();
   const {
     data: { user },

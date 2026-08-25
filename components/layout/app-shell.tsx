@@ -16,7 +16,7 @@ export function AppShell({
   projects,
   children,
 }: {
-  profile: Pick<Profile, "full_name" | "email" | "avatar_url">;
+  profile: Pick<Profile, "full_name" | "email" | "avatar_url" | "account_type">;
   projects: Project[];
   children: ReactNode;
 }) {
@@ -24,7 +24,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen bg-[var(--color-bg)]">
-      <Sidebar onQuickAdd={() => setQuickAddOpen(true)} projects={projects} />
+      <Sidebar onQuickAdd={() => setQuickAddOpen(true)} projects={projects} accountType={profile.account_type} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar profile={profile} />

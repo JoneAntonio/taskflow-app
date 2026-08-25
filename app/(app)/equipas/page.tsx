@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Users2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { NewTeamButton } from "@/components/teams/new-team-button";
 import type { Team } from "@/types/database";
 
 export const metadata: Metadata = { title: "Equipas — JAFLOW" };
 
 export default async function EquipasPage() {
+  await requireSupervisor();
   const supabase = await createClient();
   const {
     data: { user },

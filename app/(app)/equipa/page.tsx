@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Users, SlidersHorizontal, LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { AgentCard } from "@/components/team/agent-card";
 import { AddAgentButton } from "@/components/team/add-agent-button";
 import { MaturityQuadrantMatrix } from "@/components/team/maturity-quadrant-matrix";
@@ -12,6 +13,7 @@ import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 export const metadata: Metadata = { title: "Maturidade da Equipa — JAFLOW" };
 
 export default async function EquipaPage() {
+  await requireSupervisor();
   const supabase = await createClient();
   const {
     data: { user },

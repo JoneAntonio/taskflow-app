@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireSupervisor } from "@/lib/require-supervisor";
 import { MemberList } from "@/components/teams/member-list";
 import { InviteMemberForm } from "@/components/teams/invite-member-form";
 import { InviteLinkCard } from "@/components/teams/invite-link-card";
@@ -16,6 +17,7 @@ import type { Team, TeamMembership, TeamInvite, Task } from "@/types/database";
 export const metadata: Metadata = { title: "Equipa — JAFLOW" };
 
 export default async function EquipaDetailPage({ params }: { params: Promise<{ teamId: string }> }) {
+  await requireSupervisor();
   const { teamId } = await params;
   const supabase = await createClient();
   const {

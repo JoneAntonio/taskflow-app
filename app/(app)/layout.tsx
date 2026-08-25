@@ -22,6 +22,7 @@ export default async function AppGroupLayout({ children }: { children: React.Rea
         full_name: profile?.full_name ?? null,
         email: profile?.email ?? user.email ?? "",
         avatar_url: profile?.avatar_url ?? null,
+        account_type: profile?.account_type ?? "supervisor",
       }}
       projects={projects ?? []}
     >

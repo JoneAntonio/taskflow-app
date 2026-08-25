@@ -44,7 +44,7 @@ export default async function DashboardPage() {
     { data: allProjects },
   ] = await Promise.all([
     getDashboardData(user.id),
-    supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+    supabase.from("profiles").select("full_name, account_type").eq("id", user.id).single(),
     supabase
       .from("tasks")
       .select("id", { count: "exact", head: true })
@@ -67,6 +67,7 @@ export default async function DashboardPage() {
   ]);
 
   const firstName = profile?.full_name?.trim().split(" ")[0] || "";
+  const isSupervisor = (profile?.account_type ?? "supervisor") === "supervisor";
   const focusMinutesToday = (focusToday ?? []).reduce((sum, s) => sum + (s.duration_minutes ?? 0), 0);
   const focusMinutesWeek = (focusWeek ?? []).reduce((sum, s) => sum + (s.duration_minutes ?? 0), 0);
 
@@ -137,9 +138,9 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <CategoryDistributionWidget entries={distributionEntries} />
+        {isSupervisor && <CategoryDistributionWidget entries={distributionEntries} />}
         <div className="space-y-4">
-          <ActiveProjectsWidget projects={(activeProjects ?? []) as Project[]} />
+          {isSupervisor && <ActiveProjectsWidget projects={(activeProjects ?? []) as Project[]} />}
           <PerformanceCard weekCompleted={weekCompletedCount} overdueCount={data.overdueTasks.length} />
         </div>
       </div>
@@ -172,7 +173,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {data.teamTasks.length > 0 && (
+      {isSupervisor && data.teamTasks.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

@@ -21,6 +21,8 @@ export interface NavItem {
   icon: LucideIcon;
   /** Aparece também na navegação inferior no telemóvel */
   showOnMobile?: boolean;
+  /** Só visível para contas do tipo "supervisor" — perfis "agente" não veem. */
+  supervisorOnly?: boolean;
 }
 
 export const primaryNav: NavItem[] = [
@@ -32,7 +34,7 @@ export const primaryNav: NavItem[] = [
 ];
 
 export const organizeNav: NavItem[] = [
-  { label: "Método SMART", href: "/projetos", icon: Target },
+  { label: "Método SMART", href: "/projetos", icon: Target, supervisorOnly: true },
   { label: "Etiquetas", href: "/etiquetas", icon: Tag },
 ];
 
@@ -43,8 +45,8 @@ export const focusNav: NavItem[] = [
 ];
 
 export const teamNav: NavItem[] = [
-  { label: "Equipas", href: "/equipas", icon: Users2 },
-  { label: "Maturidade da Equipa", href: "/equipa", icon: Users },
+  { label: "Equipas", href: "/equipas", icon: Users2, supervisorOnly: true },
+  { label: "Maturidade da Equipa", href: "/equipa", icon: Users, supervisorOnly: true },
 ];
 
 export const mobileNav: NavItem[] = [

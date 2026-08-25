@@ -5,17 +5,22 @@ import { usePathname } from "next/navigation";
 import { Waypoints, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { primaryNav, organizeNav, focusNav, teamNav } from "@/lib/navigation";
-import type { Project } from "@/types/database";
+import type { AccountType, Project } from "@/types/database";
 
 function NavGroup({
   title,
   items,
   pathname,
+  accountType,
 }: {
   title?: string;
-  items: { label: string; href: string; icon: React.ElementType }[];
+  items: { label: string; href: string; icon: React.ElementType; supervisorOnly?: boolean }[];
   pathname: string;
+  accountType: AccountType;
 }) {
+  const visibleItems = items.filter((item) => !item.supervisorOnly || accountType === "supervisor");
+  if (visibleItems.length === 0) return null;
+
   return (
     <div className="space-y-0.5">
       {title && (
@@ -23,7 +28,7 @@ function NavGroup({
           {title}
         </p>
       )}
-      {items.map((item) => {
+      {visibleItems.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
         return (
@@ -54,9 +59,11 @@ function NavGroup({
 export function Sidebar({
   onQuickAdd,
   projects = [],
+  accountType,
 }: {
   onQuickAdd?: () => void;
   projects?: Project[];
+  accountType: AccountType;
 }) {
   const pathname = usePathname();
 
@@ -81,12 +88,12 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-4">
-        <NavGroup items={primaryNav} pathname={pathname} />
-        <NavGroup title="Organizar" items={organizeNav} pathname={pathname} />
-        <NavGroup title="Foco" items={focusNav} pathname={pathname} />
-        <NavGroup title="Equipa" items={teamNav} pathname={pathname} />
+        <NavGroup items={primaryNav} pathname={pathname} accountType={accountType} />
+        <NavGroup title="Organizar" items={organizeNav} pathname={pathname} accountType={accountType} />
+        <NavGroup title="Foco" items={focusNav} pathname={pathname} accountType={accountType} />
+        <NavGroup title="Equipa" items={teamNav} pathname={pathname} accountType={accountType} />
 
-        {projects.length > 0 && (
+        {accountType === "supervisor" && projects.length > 0 && (
           <div className="space-y-0.5">
             <p className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
               Projetos

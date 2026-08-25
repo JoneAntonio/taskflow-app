@@ -19,6 +19,8 @@ export type RecurrenceFrequency =
 
 export type ThemePreference = "light" | "dark" | "system";
 
+export type AccountType = "agente" | "supervisor";
+
 export interface Profile {
   id: string;
   full_name: string | null;
@@ -28,6 +30,7 @@ export interface Profile {
   timezone: string;
   notifications_enabled: boolean;
   is_platform_admin: boolean;
+  account_type: AccountType;
   created_at: string;
   updated_at: string;
 }
