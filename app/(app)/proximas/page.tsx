@@ -30,7 +30,7 @@ export default async function ProximasPage() {
   const [{ data: tasks }, { data: projects }] = await Promise.all([
     supabase
       .from("tasks")
-      .select("*")
+      .select("*, task_tags(tag:tags(*))")
       .gte("due_date", toISODate(tomorrow))
       .lte("due_date", toISODate(endOfNextMonth))
       .in("status", ["pendente", "em_progresso"])
@@ -38,7 +38,10 @@ export default async function ProximasPage() {
     supabase.from("projects").select("*"),
   ]);
 
-  const all = (tasks ?? []) as Task[];
+  const all = (tasks ?? []).map((row) => {
+    const { task_tags, ...task } = row as Task & { task_tags: { tag: { id: string; name: string } }[] };
+    return { ...task, tags: task_tags?.map((tt) => tt.tag) ?? [] };
+  }) as Task[];
   const dateGroups = [
     { label: "Amanhã", tasks: all.filter((t) => t.due_date === toISODate(tomorrow)) },
     {

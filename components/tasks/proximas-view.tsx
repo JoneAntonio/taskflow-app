@@ -1,12 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { CalendarRange, FolderKanban, FileText } from "lucide-react";
+import { useMemo, useState } from "react";
+import { FileText, ListFilter } from "lucide-react";
 import { TaskListItem } from "@/components/tasks/task-list-item";
 import { cn } from "@/lib/utils";
 import type { Task, Project } from "@/types/database";
 
-type ViewMode = "data" | "projeto";
+type GroupByOption = "dueDate" | "priority" | "category" | "project" | "none";
+
+const GROUP_LABELS: Record<GroupByOption, string> = {
+  dueDate: "Por data de vencimento",
+  priority: "Por prioridade",
+  category: "Por categoria/etiqueta",
+  project: "Por projeto",
+  none: "Sem agrupamento",
+};
+
+const PRIORITY_GROUP_ORDER = ["Alta prioridade", "Média prioridade", "Baixa prioridade"];
+
+function priorityGroupLabel(priority: Task["priority"]): string {
+  if (priority === "urgente" || priority === "alta") return "Alta prioridade";
+  if (priority === "media") return "Média prioridade";
+  return "Baixa prioridade";
+}
 
 export function ProximasView({
   allTasks,
@@ -17,49 +33,80 @@ export function ProximasView({
   dateGroups: { label: string; tasks: Task[] }[];
   projects: Project[];
 }) {
-  const [view, setView] = useState<ViewMode>("data");
+  const [groupBy, setGroupBy] = useState<GroupByOption>("dueDate");
   const [showNotes, setShowNotes] = useState(false);
 
-  const projectNameById = new Map(projects.map((p) => [p.id, p.name]));
-  const projectGroups = new Map<string, Task[]>();
-  allTasks.forEach((task) => {
-    const key = task.project_id ? projectNameById.get(task.project_id) ?? "Projeto removido" : "Sem projeto";
-    const list = projectGroups.get(key) ?? [];
-    list.push(task);
-    projectGroups.set(key, list);
-  });
-  const sortedProjectGroupNames = [...projectGroups.keys()].sort((a, b) => a.localeCompare(b, "pt"));
+  const groups = useMemo(() => {
+    if (groupBy === "dueDate") return dateGroups;
 
-  const groups =
-    view === "data" ? dateGroups : sortedProjectGroupNames.map((name) => ({ label: name, tasks: projectGroups.get(name)! }));
+    if (groupBy === "none") {
+      return [{ label: "Todas", tasks: allTasks }];
+    }
+
+    if (groupBy === "priority") {
+      const map = new Map<string, Task[]>();
+      allTasks.forEach((task) => {
+        const label = priorityGroupLabel(task.priority);
+        const list = map.get(label) ?? [];
+        list.push(task);
+        map.set(label, list);
+      });
+      return PRIORITY_GROUP_ORDER.filter((label) => map.has(label)).map((label) => ({
+        label,
+        tasks: map.get(label)!,
+      }));
+    }
+
+    if (groupBy === "category") {
+      const map = new Map<string, Task[]>();
+      allTasks.forEach((task) => {
+        const tags = task.tags ?? [];
+        if (tags.length === 0) {
+          const list = map.get("Sem etiqueta") ?? [];
+          list.push(task);
+          map.set("Sem etiqueta", list);
+          return;
+        }
+        tags.forEach((tag) => {
+          const list = map.get(tag.name) ?? [];
+          list.push(task);
+          map.set(tag.name, list);
+        });
+      });
+      const names = [...map.keys()].sort((a, b) => a.localeCompare(b, "pt"));
+      return names.map((name) => ({ label: name, tasks: map.get(name)! }));
+    }
+
+    // project
+    const projectNameById = new Map(projects.map((p) => [p.id, p.name]));
+    const map = new Map<string, Task[]>();
+    allTasks.forEach((task) => {
+      const key = task.project_id ? (projectNameById.get(task.project_id) ?? "Projeto removido") : "Sem projeto";
+      const list = map.get(key) ?? [];
+      list.push(task);
+      map.set(key, list);
+    });
+    const names = [...map.keys()].sort((a, b) => a.localeCompare(b, "pt"));
+    return names.map((name) => ({ label: name, tasks: map.get(name)! }));
+  }, [groupBy, allTasks, dateGroups, projects]);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1">
-          <button
-            onClick={() => setView("data")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-              view === "data"
-                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-[var(--shadow-sm)]"
-                : "text-[var(--color-ink-muted)]"
-            )}
+        <label className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+          <ListFilter className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-muted)]" />
+          <select
+            value={groupBy}
+            onChange={(e) => setGroupBy(e.target.value as GroupByOption)}
+            className="bg-transparent text-sm text-[var(--color-ink)] outline-none"
           >
-            <CalendarRange className="h-3.5 w-3.5" /> Por data
-          </button>
-          <button
-            onClick={() => setView("projeto")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-              view === "projeto"
-                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-[var(--shadow-sm)]"
-                : "text-[var(--color-ink-muted)]"
-            )}
-          >
-            <FolderKanban className="h-3.5 w-3.5" /> Por projeto
-          </button>
-        </div>
+            {(Object.keys(GROUP_LABELS) as GroupByOption[]).map((option) => (
+              <option key={option} value={option}>
+                {GROUP_LABELS[option]}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <button
           onClick={() => setShowNotes((prev) => !prev)}
@@ -88,7 +135,7 @@ export function ProximasView({
                 </p>
                 <div className="space-y-2">
                   {group.tasks.map((task) => (
-                    <div key={task.id}>
+                    <div key={`${group.label}-${task.id}`}>
                       <TaskListItem task={task} />
                       {showNotes && task.description && (
                         <p className="ml-7 mt-1 rounded-lg bg-[var(--color-surface-alt)] px-3 py-2 text-xs text-[var(--color-ink-muted)]">

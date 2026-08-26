@@ -64,17 +64,17 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
   const selectedProjected = selectedDate ? projectedByDate.get(selectedDate) ?? [] : [];
 
   return (
-    <div className="flex flex-col-reverse gap-4 md:flex-row md:items-start">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:items-start">
       {/* Painel de detalhe do dia — à esquerda em ecrãs largos */}
-      <div className="w-full shrink-0 md:sticky md:top-20 md:w-64">
+      <div className="min-w-0 overflow-hidden md:sticky md:top-20 md:col-span-4">
         {!selectedDate ? (
           <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] px-4 py-10 text-center">
             <CalendarDays className="h-6 w-6 text-[var(--color-ink-muted)]" />
             <p className="text-sm text-[var(--color-ink-muted)]">Clica num dia para veres os detalhes aqui.</p>
           </div>
         ) : (
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <p className="font-display text-sm font-semibold capitalize text-[var(--color-ink)]">
+          <div className="min-w-0 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+            <p className="truncate font-display text-sm font-semibold capitalize text-[var(--color-ink)]">
               {new Date(selectedDate + "T00:00:00").toLocaleDateString("pt-PT", {
                 weekday: "long",
                 day: "numeric",
@@ -84,14 +84,14 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
             {selectedTasks.length === 0 && selectedProjected.length === 0 ? (
               <p className="mt-3 text-sm text-[var(--color-ink-muted)]">Sem tarefas neste dia.</p>
             ) : (
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 min-w-0 space-y-2">
                 {selectedTasks.map((task) => (
-                  <div key={task.id}>
+                  <div key={task.id} className="min-w-0">
                     <TaskListItem task={task} compact />
                     {task.location && (
-                      <p className="ml-8 mt-0.5 flex items-center gap-1.5 text-xs text-[var(--color-ink-muted)]">
+                      <p className="ml-8 mt-0.5 flex min-w-0 items-center gap-1.5 truncate text-xs text-[var(--color-ink-muted)]">
                         <MapPin className="h-3 w-3 shrink-0" />
-                        {task.location}
+                        <span className="truncate">{task.location}</span>
                       </p>
                     )}
                   </div>
@@ -99,10 +99,10 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                 {selectedProjected.map((task) => (
                   <div
                     key={`projected-${task.id}`}
-                    className="flex items-center gap-2 rounded-xl border-2 border-dashed border-[var(--color-accent)]/50 bg-[var(--color-accent)]/5 px-3 py-2 text-sm text-[var(--color-ink)]"
+                    className="flex min-w-0 items-center gap-2 rounded-xl border-2 border-dashed border-[var(--color-accent)]/50 bg-[var(--color-accent)]/5 px-3 py-2 text-sm text-[var(--color-ink)]"
                   >
                     <Repeat className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]" />
-                    <span className="truncate">{task.title}</span>
+                    <span className="min-w-0 flex-1 truncate">{task.title}</span>
                     <span className="ml-auto shrink-0 rounded-full bg-[var(--color-accent)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-accent-ink)]">
                       Prevista
                     </span>
@@ -115,7 +115,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
       </div>
 
       {/* Grelha do calendário */}
-      <div className="min-w-0 flex-1 space-y-4">
+      <div className="min-w-0 space-y-4 md:col-span-8">
         <div className="flex items-center justify-between">
           <p className="font-display text-lg font-semibold capitalize text-[var(--color-ink)]">{monthLabel}</p>
           <div className="flex gap-1">
@@ -140,7 +140,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
 
         <div className="grid grid-cols-7 gap-1.5">
           {WEEKDAY_LABELS.map((label) => (
-            <div key={label} className="pb-1 text-center text-xs font-medium text-[var(--color-ink-muted)]">
+            <div key={label} className="truncate pb-1 text-center text-xs font-medium text-[var(--color-ink-muted)]">
               {label}
             </div>
           ))}
@@ -155,7 +155,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
                 key={cell.date}
                 onClick={() => setSelectedDate(cell.date)}
                 className={cn(
-                  "relative flex aspect-square flex-col items-center justify-center rounded-xl border text-sm transition-colors",
+                  "relative flex aspect-square min-w-0 flex-col items-center justify-center overflow-hidden rounded-xl border text-sm transition-colors",
                   isSelected
                     ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
                     : dayProjected.length > 0 && dayTasks.length === 0
