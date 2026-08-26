@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inbox as InboxIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
-import { TaskListItem } from "@/components/tasks/task-list-item";
+import { TaskListWithModes } from "@/components/tasks/task-list-with-modes";
+import type { Task } from "@/types/database";
 
 export const metadata: Metadata = { title: "Inbox — JAFLOW" };
 
@@ -32,19 +32,10 @@ export default async function InboxPage() {
 
       <InlineQuickAdd placeholder="Preparar relatório mensal" />
 
-      <div className="space-y-2">
-        {!tasks || tasks.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center">
-            <InboxIcon className="h-8 w-8 text-[var(--color-ink-muted)]" />
-            <p className="text-sm font-medium text-[var(--color-ink)]">A tua Inbox está vazia</p>
-            <p className="text-sm text-[var(--color-ink-muted)]">
-              Escreve acima para adicionares a tua primeira tarefa.
-            </p>
-          </div>
-        ) : (
-          tasks.map((task) => <TaskListItem key={task.id} task={task} />)
-        )}
-      </div>
+      <TaskListWithModes
+        tasks={(tasks ?? []) as Task[]}
+        emptyMessage="A tua Inbox está vazia. Escreve acima para adicionares a tua primeira tarefa."
+      />
     </div>
   );
 }

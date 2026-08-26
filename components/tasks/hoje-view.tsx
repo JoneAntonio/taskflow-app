@@ -4,6 +4,10 @@ import { useState } from "react";
 import { List, CalendarClock } from "lucide-react";
 import { AgendaTimeline } from "@/components/pomodoro/agenda-timeline";
 import { TaskListItem } from "@/components/tasks/task-list-item";
+import { TaskDetailedRow } from "@/components/tasks/task-detailed-row";
+import { KanbanBoard } from "@/components/tasks/kanban-board";
+import { TaskDisplayModeSwitcher } from "@/components/tasks/task-display-mode-switcher";
+import { useTaskDisplayMode, type TaskDisplayMode } from "@/lib/use-task-display-mode";
 import { cn } from "@/lib/utils";
 import type { Task } from "@/types/database";
 
@@ -24,11 +28,12 @@ function groupByPeriod(tasks: Task[]) {
 
 export function HojeView({ todayTasks, overdueTasks }: { todayTasks: Task[]; overdueTasks: Task[] }) {
   const [view, setView] = useState<"lista" | "agenda">("lista");
+  const [displayMode, setDisplayMode] = useTaskDisplayMode();
   const groups = groupByPeriod(todayTasks);
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-end gap-2">
         <div className="flex gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-1">
           <button
             onClick={() => setView("lista")}
@@ -53,17 +58,20 @@ export function HojeView({ todayTasks, overdueTasks }: { todayTasks: Task[]; ove
             <CalendarClock className="h-3.5 w-3.5" /> Agenda
           </button>
         </div>
+        {view === "lista" && <TaskDisplayModeSwitcher value={displayMode} onChange={setDisplayMode} />}
       </div>
 
       {view === "agenda" ? (
         <AgendaTimeline tasks={todayTasks} />
+      ) : displayMode === "grelha" ? (
+        <KanbanBoard tasks={[...overdueTasks, ...todayTasks]} />
       ) : (
         <>
-          {overdueTasks.length > 0 && <TaskGroup title="Atrasadas" tasks={overdueTasks} tone="danger" />}
-          <TaskGroup title="Sem hora definida" tasks={groups.semHora} />
-          <TaskGroup title="Manhã" tasks={groups.manha} />
-          <TaskGroup title="Tarde" tasks={groups.tarde} />
-          <TaskGroup title="Noite" tasks={groups.noite} />
+          {overdueTasks.length > 0 && <TaskGroup title="Atrasadas" tasks={overdueTasks} tone="danger" mode={displayMode} />}
+          <TaskGroup title="Sem hora definida" tasks={groups.semHora} mode={displayMode} />
+          <TaskGroup title="Manhã" tasks={groups.manha} mode={displayMode} />
+          <TaskGroup title="Tarde" tasks={groups.tarde} mode={displayMode} />
+          <TaskGroup title="Noite" tasks={groups.noite} mode={displayMode} />
 
           {todayTasks.length === 0 && overdueTasks.length === 0 && (
             <p className="rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center text-sm text-[var(--color-ink-muted)]">
@@ -76,7 +84,17 @@ export function HojeView({ todayTasks, overdueTasks }: { todayTasks: Task[]; ove
   );
 }
 
-function TaskGroup({ title, tasks, tone }: { title: string; tasks: Task[]; tone?: "danger" }) {
+function TaskGroup({
+  title,
+  tasks,
+  tone,
+  mode,
+}: {
+  title: string;
+  tasks: Task[];
+  tone?: "danger";
+  mode: TaskDisplayMode;
+}) {
   if (tasks.length === 0) return null;
   return (
     <div>
@@ -87,9 +105,9 @@ function TaskGroup({ title, tasks, tone }: { title: string; tasks: Task[]; tone?
         {title}
       </p>
       <div className="space-y-2">
-        {tasks.map((task) => (
-          <TaskListItem key={task.id} task={task} />
-        ))}
+        {tasks.map((task) =>
+          mode === "detalhada" ? <TaskDetailedRow key={task.id} task={task} /> : <TaskListItem key={task.id} task={task} />
+        )}
       </div>
     </div>
   );
