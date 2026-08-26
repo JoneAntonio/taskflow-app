@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import { FileText, ListFilter } from "lucide-react";
 import { TaskListItem } from "@/components/tasks/task-list-item";
+import { TaskDetailedRow } from "@/components/tasks/task-detailed-row";
+import { KanbanBoard } from "@/components/tasks/kanban-board";
+import { TaskDisplayModeSwitcher } from "@/components/tasks/task-display-mode-switcher";
+import { useTaskDisplayMode } from "@/lib/use-task-display-mode";
 import { cn } from "@/lib/utils";
 import type { Task, Project } from "@/types/database";
 
@@ -35,6 +39,7 @@ export function ProximasView({
 }) {
   const [groupBy, setGroupBy] = useState<GroupByOption>("dueDate");
   const [showNotes, setShowNotes] = useState(false);
+  const [displayMode, setDisplayMode] = useTaskDisplayMode();
 
   const groups = useMemo(() => {
     if (groupBy === "dueDate") return dateGroups;
@@ -119,12 +124,16 @@ export function ProximasView({
         >
           <FileText className="h-3.5 w-3.5" /> Mostrar notas
         </button>
+
+        <TaskDisplayModeSwitcher value={displayMode} onChange={setDisplayMode} />
       </div>
 
       {allTasks.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-[var(--color-border)] px-6 py-16 text-center text-sm text-[var(--color-ink-muted)]">
           Sem tarefas agendadas nos próximos tempos.
         </p>
+      ) : displayMode === "grelha" ? (
+        <KanbanBoard tasks={allTasks} />
       ) : (
         groups.map(
           (group) =>
@@ -136,8 +145,8 @@ export function ProximasView({
                 <div className="space-y-2">
                   {group.tasks.map((task) => (
                     <div key={`${group.label}-${task.id}`}>
-                      <TaskListItem task={task} />
-                      {showNotes && task.description && (
+                      {displayMode === "detalhada" ? <TaskDetailedRow task={task} /> : <TaskListItem task={task} />}
+                      {showNotes && displayMode !== "detalhada" && task.description && (
                         <p className="ml-7 mt-1 rounded-lg bg-[var(--color-surface-alt)] px-3 py-2 text-xs text-[var(--color-ink-muted)]">
                           {task.description}
                         </p>
