@@ -93,11 +93,11 @@ export function parseQuickTask(input: string, referenceDate = new Date()): Parse
   const recurrenceRules: { regex: RegExp; build: (m: RegExpMatchArray) => Recurrence }[] = [
     {
       regex: /\btodos\s+os\s+dias\s+úteis\b|\bdias\s+úteis\b/giu,
-      build: () => ({ frequency: "dias_uteis", interval: 1, by_weekday: null, until: null }),
+      build: () => ({ frequency: "dias_uteis", interval: 1, by_weekday: null, by_monthday: null, until: null }),
     },
     {
       regex: /\btodos\s+os\s+dias\b|\bdiariamente\b/giu,
-      build: () => ({ frequency: "diaria", interval: 1, by_weekday: null, until: null }),
+      build: () => ({ frequency: "diaria", interval: 1, by_weekday: null, by_monthday: null, until: null }),
     },
     {
       regex: /\btod[ao]s?\s+(?:as\s+)?(domingo|segunda|terça|terca|quarta|quinta|sexta|sábado|sabado)s?(?:-feiras?)?\b/giu,
@@ -105,20 +105,21 @@ export function parseQuickTask(input: string, referenceDate = new Date()): Parse
         frequency: "semanal",
         interval: 1,
         by_weekday: [WEEKDAY_INDEX[m[1].toLowerCase()]],
+        by_monthday: null,
         until: null,
       }),
     },
     {
       regex: /\btodas\s+as\s+semanas\b|\bsemanalmente\b/giu,
-      build: () => ({ frequency: "semanal", interval: 1, by_weekday: null, until: null }),
+      build: () => ({ frequency: "semanal", interval: 1, by_weekday: null, by_monthday: null, until: null }),
     },
     {
       regex: /\btodos\s+os\s+meses\b|\bmensalmente\b/giu,
-      build: () => ({ frequency: "mensal", interval: 1, by_weekday: null, until: null }),
+      build: () => ({ frequency: "mensal", interval: 1, by_weekday: null, by_monthday: null, until: null }),
     },
     {
       regex: /\btodos\s+os\s+anos\b|\banualmente\b/giu,
-      build: () => ({ frequency: "anual", interval: 1, by_weekday: null, until: null }),
+      build: () => ({ frequency: "anual", interval: 1, by_weekday: null, by_monthday: null, until: null }),
     },
   ];
   for (const rule of recurrenceRules) {

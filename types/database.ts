@@ -89,6 +89,7 @@ export interface Recurrence {
   frequency: RecurrenceFrequency;
   interval: number; // ex: a cada 2 semanas
   by_weekday: number[] | null; // 0=domingo ... 6=sábado
+  by_monthday: number[] | null; // dias específicos do mês, ex: [1, 15]
   until: string | null; // data limite opcional
 }
 

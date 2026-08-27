@@ -23,12 +23,36 @@ export function getNextOccurrenceDate(fromDate: string, recurrence: Recurrence):
       }
       break;
     }
-    case "semanal":
+    case "semanal": {
+      const weekdays = recurrence.by_weekday;
+      if (weekdays && weekdays.length > 0) {
+        // Com dias específicos escolhidos, avança dia a dia até ao próximo
+        // dia da semana marcado — permite "toda a segunda e quinta", por
+        // exemplo, em vez de só um único dia fixo.
+        for (let i = 0; i < 7; i++) {
+          date.setDate(date.getDate() + 1);
+          if (weekdays.includes(date.getDay())) break;
+        }
+        break;
+      }
       date.setDate(date.getDate() + 7 * interval);
       break;
-    case "mensal":
+    }
+    case "mensal": {
+      const monthdays = recurrence.by_monthday;
+      if (monthdays && monthdays.length > 0) {
+        // Avança dia a dia (até 35 tentativas, cobre um mês inteiro) até
+        // encontrar o próximo dia do mês escolhido — permite "dia 1 e 15",
+        // por exemplo, em vez de só um único dia fixo.
+        for (let i = 0; i < 35; i++) {
+          date.setDate(date.getDate() + 1);
+          if (monthdays.includes(date.getDate())) break;
+        }
+        break;
+      }
       date.setMonth(date.getMonth() + interval);
       break;
+    }
     case "anual":
       date.setFullYear(date.getFullYear() + interval);
       break;

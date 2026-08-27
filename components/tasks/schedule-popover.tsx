@@ -364,7 +364,8 @@ export function SchedulePopover({
                     recurrence: {
                       frequency: freq,
                       interval: 1,
-                      by_weekday: freq === "personalizada" ? [] : null,
+                      by_weekday: freq === "personalizada" || freq === "semanal" ? [] : null,
+                      by_monthday: freq === "mensal" ? [] : null,
                       until: null,
                     },
                   }))
@@ -382,9 +383,13 @@ export function SchedulePopover({
             );
           })}
 
-          {local.recurrence?.frequency === "personalizada" && (
+          {(local.recurrence?.frequency === "personalizada" || local.recurrence?.frequency === "semanal") && (
             <div className="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 p-2.5">
-              <p className="mb-2 text-xs text-[var(--color-ink-muted)]">Repete só nestes dias:</p>
+              <p className="mb-2 text-xs text-[var(--color-ink-muted)]">
+                {local.recurrence.frequency === "semanal"
+                  ? "Repete nestes dias da semana (opcional — sem nenhum escolhido, repete só no mesmo dia todas as semanas):"
+                  : "Repete só nestes dias:"}
+              </p>
               <div className="flex justify-between gap-1">
                 {WEEKDAY_LABELS.map((label, index) => {
                   const selectedDays = local.recurrence?.by_weekday ?? [];
@@ -413,9 +418,46 @@ export function SchedulePopover({
                   );
                 })}
               </div>
-              {(local.recurrence?.by_weekday ?? []).length === 0 && (
+              {local.recurrence.frequency === "personalizada" && (local.recurrence?.by_weekday ?? []).length === 0 && (
                 <p className="mt-2 text-[11px] text-[var(--color-danger)]">Escolhe pelo menos um dia.</p>
               )}
+            </div>
+          )}
+
+          {local.recurrence?.frequency === "mensal" && (
+            <div className="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 p-2.5">
+              <p className="mb-2 text-xs text-[var(--color-ink-muted)]">
+                Repete nestes dias do mês (opcional — ex: dia 1 e dia 15). Sem nenhum escolhido, repete no mesmo dia
+                todos os meses:
+              </p>
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
+                  const selectedDays = local.recurrence?.by_monthday ?? [];
+                  const isSelected = selectedDays.includes(day);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() =>
+                        setLocal((prev) => {
+                          if (!prev.recurrence) return prev;
+                          const current = prev.recurrence.by_monthday ?? [];
+                          const next = isSelected ? current.filter((d) => d !== day) : [...current, day].sort((a, b) => a - b);
+                          return { ...prev, recurrence: { ...prev.recurrence, by_monthday: next } };
+                        })
+                      }
+                      className={cn(
+                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold transition-colors",
+                        isSelected
+                          ? "bg-[var(--color-accent)] text-[var(--color-accent-ink)]"
+                          : "bg-[var(--color-surface)] text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]"
+                      )}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
