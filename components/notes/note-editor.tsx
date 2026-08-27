@@ -69,7 +69,7 @@ export function NoteEditor({ note, onBack, onDeleted }: { note: Note; onBack: ()
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-w-0 flex-col">
       <div className="mb-3 flex items-center gap-2">
         <button
           onClick={onBack}
@@ -82,7 +82,7 @@ export function NoteEditor({ note, onBack, onDeleted }: { note: Note; onBack: ()
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Título da nota"
-          className="flex-1 bg-transparent font-display text-lg font-semibold text-[var(--color-ink)] outline-none"
+          className="min-w-0 flex-1 bg-transparent font-display text-lg font-semibold text-[var(--color-ink)] outline-none"
         />
         <button
           onClick={handleDelete}
@@ -109,7 +109,8 @@ export function NoteEditor({ note, onBack, onDeleted }: { note: Note; onBack: ()
 
       {preview ? (
         <div
-          className="flex-1 overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-ink)]"
+          className="min-w-0 flex-1 overflow-y-auto break-words rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-ink)]"
+          style={{ overflowWrap: "anywhere" }}
           dangerouslySetInnerHTML={{
             __html: renderNoteMarkdown(content) || "<p class='text-[var(--color-ink-muted)]'>Nota vazia.</p>",
           }}
@@ -120,7 +121,8 @@ export function NoteEditor({ note, onBack, onDeleted }: { note: Note; onBack: ()
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Escreve aqui... usa **negrito**, ## títulos, e - listas."
-          className="flex-1 resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+          className="w-full min-w-0 flex-1 resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+          style={{ overflowWrap: "anywhere" }}
         />
       )}
     </div>

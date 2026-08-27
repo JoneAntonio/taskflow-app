@@ -59,9 +59,9 @@ export function NotesView({ notebooks, notes }: { notebooks: Notebook[]; notes: 
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[220px_280px_1fr] lg:items-start">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[220px_280px_1fr] lg:items-start">
       {/* Cadernos */}
-      <div className="space-y-1">
+      <div className="min-w-0 space-y-1">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">Cadernos</p>
         <button
           onClick={() => {
@@ -124,7 +124,7 @@ export function NotesView({ notebooks, notes }: { notebooks: Notebook[]; notes: 
       </div>
 
       {/* Lista de notas */}
-      <div className="space-y-2">
+      <div className="min-w-0 space-y-2">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
             Notas · {visibleNotes.length}
@@ -164,7 +164,7 @@ export function NotesView({ notebooks, notes }: { notebooks: Notebook[]; notes: 
       </div>
 
       {/* Editor */}
-      <div className="min-h-[400px] rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 lg:sticky lg:top-20">
+      <div className="min-h-[400px] min-w-0 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 lg:sticky lg:top-20">
         {selectedNote ? (
           <NoteEditor
             note={selectedNote}
