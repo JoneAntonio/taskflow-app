@@ -161,6 +161,25 @@ export interface AccessRequest {
   profile?: { full_name: string | null; email: string; account_type: AccountType };
 }
 
+export interface Notebook {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string;
+  position: number;
+  created_at: string;
+}
+
+export interface Note {
+  id: string;
+  user_id: string;
+  notebook_id: string | null;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export type TeamRole = "admin" | "member";
 
 export interface Team {
