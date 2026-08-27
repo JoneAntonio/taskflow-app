@@ -3,16 +3,18 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { playAlarmSound } from "@/lib/alarm-sound";
 
 const CHECK_INTERVAL_MS = 30_000;
 const LOOKBACK_MS = 90_000; // margem para não perder lembretes entre verificações
 
 /**
  * Enquanto a app estiver aberta num separador, verifica a cada 30s se alguma
- * tarefa tem um lembrete (reminder_at) a vencer, e avisa por toast + pela
- * Notification API do browser (se autorizada). Não substitui notificações
- * push reais (que exigiriam um worker/servidor de fundo), mas cobre o caso
- * de a app estar aberta.
+ * tarefa tem um lembrete (reminder_at) a vencer, e avisa por toast + som de
+ * alarme + pela Notification API do browser (se autorizada — esta já
+ * costuma tocar o som de notificação do próprio sistema operativo). Não
+ * substitui notificações push reais (que exigiriam um worker/servidor de
+ * fundo), mas cobre o caso de a app estar aberta.
  */
 export function ReminderWatcher() {
   const notifiedIds = useRef<Set<string>>(new Set());
@@ -50,6 +52,7 @@ export function ReminderWatcher() {
         notifiedIds.current.add(task.id);
 
         toast(`🔔 ${task.title}`, { description: "Está prestes a começar." });
+        playAlarmSound();
 
         if ("Notification" in window && Notification.permission === "granted") {
           new Notification("JAFLOW — lembrete", { body: task.title });

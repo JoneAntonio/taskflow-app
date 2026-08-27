@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Topbar } from "@/components/layout/topbar";
@@ -9,6 +9,7 @@ import { ReminderWatcher } from "@/components/notifications/reminder-watcher";
 import { PomodoroMiniWidget } from "@/components/pomodoro/pomodoro-mini-widget";
 import { InstallAppPrompt } from "@/components/providers/install-app-prompt";
 import { PendingInvitesBanner } from "@/components/teams/pending-invites-banner";
+import { unlockAlarmAudio } from "@/lib/alarm-sound";
 import type { Profile, Project } from "@/types/database";
 
 export function AppShell({
@@ -21,6 +22,17 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+
+  useEffect(() => {
+    // Destranca o som do alarme no primeiro clique em qualquer sítio da app
+    // — os browsers não deixam tocar som sem uma interação prévia do utilizador.
+    function handleFirstInteraction() {
+      unlockAlarmAudio();
+      window.removeEventListener("click", handleFirstInteraction);
+    }
+    window.addEventListener("click", handleFirstInteraction);
+    return () => window.removeEventListener("click", handleFirstInteraction);
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-[var(--color-bg)]">
