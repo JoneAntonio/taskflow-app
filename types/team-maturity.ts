@@ -9,9 +9,21 @@ export interface TeamAgent {
   operation: string | null;
   avatar_url: string | null;
   current_maturity: MaturityLevel | null;
+  phone: string | null;
+  birthday: string | null;
+  start_date: string | null;
+  skills: string[];
   archived: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface AgentNote {
+  id: string;
+  agent_id: string;
+  user_id: string;
+  note: string;
+  created_at: string;
 }
 
 export interface MaturityCriterion {

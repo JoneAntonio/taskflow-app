@@ -10,9 +10,12 @@ import { CriteriaBar } from "@/components/team/criteria-bar";
 import { NewEvaluationButton } from "@/components/team/new-evaluation-button";
 import { EvolutionChart } from "@/components/team/evolution-chart";
 import { EvaluationHistoryList } from "@/components/team/evaluation-history-list";
+import { AgentProfileCard } from "@/components/team/agent-profile-card";
+import { AgentNotesHistory } from "@/components/team/agent-notes-history";
+import { Agent1on1PrepCard } from "@/components/team/agent-1on1-prep-card";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DEFAULT_CRITERIA, MATURITY_DESCRIPTIONS } from "@/types/team-maturity";
-import type { MaturityCriterion, MaturityEvaluation, TeamAgent } from "@/types/team-maturity";
+import type { MaturityCriterion, MaturityEvaluation, TeamAgent, AgentNote } from "@/types/team-maturity";
 
 export const metadata: Metadata = { title: "Agente — Maturidade da Equipa — JAFLOW" };
 
@@ -53,8 +56,15 @@ export default async function AgentDetailPage({
     .eq("agent_id", agentId)
     .order("evaluation_date", { ascending: true });
 
+  const { data: notes } = await supabase
+    .from("agent_notes")
+    .select("*")
+    .eq("agent_id", agentId)
+    .order("created_at", { ascending: false });
+
   const agentData = agent as TeamAgent;
   const evaluationList = (evaluations ?? []) as MaturityEvaluation[];
+  const noteList = (notes ?? []) as AgentNote[];
   const latestEvaluation = evaluationList[evaluationList.length - 1] ?? null;
 
   return (
@@ -75,6 +85,10 @@ export default async function AgentDetailPage({
         </div>
         <NewEvaluationButton agentId={agentId} criteria={(criteria ?? []) as MaturityCriterion[]} />
       </div>
+
+      <AgentProfileCard agent={agentData} />
+
+      <Agent1on1PrepCard agentId={agentId} />
 
       <Card className="p-5">
         <div className="flex items-center justify-between">
@@ -126,10 +140,19 @@ export default async function AgentDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Histórico</CardTitle>
+          <CardTitle>Histórico de avaliações</CardTitle>
         </CardHeader>
         <CardContent>
           <EvaluationHistoryList evaluations={evaluationList} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Notas e conversas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AgentNotesHistory agentId={agentId} notes={noteList} />
         </CardContent>
       </Card>
     </div>
