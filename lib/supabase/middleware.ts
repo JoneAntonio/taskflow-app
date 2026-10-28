@@ -7,6 +7,12 @@ const PUBLIC_PATHS = [
   "/recuperar-password",
   "/nova-password",
   "/auth/callback",
+  // Ficheiros da app instalável: o browser pede-os sem cookies de sessão.
+  "/manifest.json",
+  "/sw.js",
+  "/icons/",
+  // O cron da Vercel não tem sessão; a rota valida o CRON_SECRET.
+  "/api/cron/",
 ];
 
 /**
