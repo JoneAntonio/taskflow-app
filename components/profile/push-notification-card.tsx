@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { Bell, BellOff, Send, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -90,20 +90,24 @@ function ScheduledAlertsSettings() {
   );
 }
 
+const noopSubscribe = () => () => {};
+
 export function PushNotificationCard() {
-  const [supported] = useState(() => pushService.isSupported());
+  // O suporte só se sabe no browser: no servidor assume-se "suportado" e o
+  // React confirma depois de hidratar, sem diferença entre servidor e cliente.
+  const supported = useSyncExternalStore(noopSubscribe, () => pushService.isSupported(), () => true);
   const [subscribed, setSubscribed] = useState(false);
-  const [isLoading, setIsLoading] = useState(() => pushService.isSupported());
+  const [checking, setChecking] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
+  const isLoading = supported && checking;
 
   useEffect(() => {
-    if (supported) {
-      pushService
-        .isSubscribed()
-        .then(setSubscribed)
-        .finally(() => setIsLoading(false));
-    }
-  }, [supported]);
+    if (!pushService.isSupported()) return;
+    pushService
+      .isSubscribed()
+      .then(setSubscribed)
+      .finally(() => setChecking(false));
+  }, []);
 
   async function handleToggle() {
     setIsBusy(true);
