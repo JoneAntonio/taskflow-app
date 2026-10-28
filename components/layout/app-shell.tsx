@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Topbar } from "@/components/layout/topbar";
+import { NexusBackdrop } from "@/components/layout/nexus-backdrop";
 import { QuickAddDialog } from "@/components/tasks/quick-add-dialog";
 import { ReminderWatcher } from "@/components/notifications/reminder-watcher";
 import { PomodoroMiniWidget } from "@/components/pomodoro/pomodoro-mini-widget";
@@ -60,6 +61,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen">
+      <NexusBackdrop />
       <Sidebar onQuickAdd={() => setQuickAddOpen(true)} projects={projects} accountType={profile.account_type} />
 
       <div className="flex min-w-0 flex-1 flex-col">
