@@ -34,13 +34,37 @@ export function AppShell({
     return () => window.removeEventListener("click", handleFirstInteraction);
   }, []);
 
+  useEffect(() => {
+    // Atalhos de teclado: ⌘K / Ctrl+K ou "/" focam a pesquisa, "N" abre nova tarefa.
+    function handleKey(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const typing =
+        !!target && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        document.getElementById("nx-global-search")?.focus();
+        return;
+      }
+      if (typing || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key === "/") {
+        event.preventDefault();
+        document.getElementById("nx-global-search")?.focus();
+      } else if (event.key.toLowerCase() === "n") {
+        event.preventDefault();
+        setQuickAddOpen(true);
+      }
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
   return (
-    <div className="flex min-h-screen bg-[var(--color-bg)]">
+    <div className="flex min-h-screen">
       <Sidebar onQuickAdd={() => setQuickAddOpen(true)} projects={projects} accountType={profile.account_type} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar profile={profile} />
-        <main className="flex-1 px-4 pb-24 pt-5 sm:px-6 lg:pb-8">
+        <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-10">
           <PendingInvitesBanner />
           {children}
         </main>

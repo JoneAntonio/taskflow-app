@@ -135,7 +135,7 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
 
       <div className="w-full max-w-xs space-y-2">
         {tasks.length > 0 && (
-          <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+          <div className="flex items-center gap-2 nx-panel rounded-xl border border-[var(--color-border)] px-3 py-2">
             <ListTodo className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
             <select
               value={selectedTaskId}
@@ -256,7 +256,7 @@ export function PomodoroTimer({ tasks = [] }: { tasks?: PomodoroTaskOption[] }) 
           onChange={(e) => setNotes(e.target.value)}
           placeholder="O que tens em mente? Regista as tuas ideias enquanto trabalhas..."
           rows={3}
-          className="w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] outline-none focus:border-[var(--color-accent)]"
+          className="w-full resize-none nx-panel rounded-xl border border-[var(--color-border)] p-3 text-sm text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] outline-none focus:border-[var(--color-accent)]"
         />
       </div>
     </div>

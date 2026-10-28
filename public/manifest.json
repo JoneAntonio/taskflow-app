@@ -1,13 +1,13 @@
 {
-  "name": "JAFLOW — organiza o teu fluxo",
-  "short_name": "JAFLOW",
-  "description": "Tarefas, projetos, hábitos, foco e maturidade de equipa num único lugar.",
+  "name": "JAFLOW Nexus",
+  "short_name": "Nexus",
+  "description": "Centro de comando para tarefas, projetos, hábitos, foco e equipa — com alertas à hora certa.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#14151b",
-  "theme_color": "#f2a93b",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
   "icons": [
     {
       "src": "/icons/icon-192.png",

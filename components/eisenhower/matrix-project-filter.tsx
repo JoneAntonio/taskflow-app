@@ -39,7 +39,7 @@ export function MatrixProjectFilter({
     <div className="space-y-4">
       {projects.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+          <div className="flex items-center gap-2 nx-panel rounded-xl border border-[var(--color-border)] px-3 py-2">
             <FolderKanban className="h-4 w-4 shrink-0 text-[var(--color-ink-muted)]" />
             <select
               value={projectId}

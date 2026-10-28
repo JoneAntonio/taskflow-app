@@ -81,12 +81,40 @@ export default async function DashboardPage() {
   const weekCompletedCount = data.weeklyProductivity.reduce((sum, day) => sum + day.concluidas, 0);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
-          {firstName ? `Bem-vindo, ${firstName}` : "Dashboard"}
-        </h1>
-        <p className="mt-1 text-sm italic text-[var(--color-ink-muted)]">&quot;{getDailyQuote()}&quot;</p>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="flex items-center gap-2 font-mono-data text-[11px] text-[var(--color-accent)]">
+            <span className="nx-live-dot" />
+            painel · {new Date(`${today}T12:00:00`).toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+          <h1 className="mt-2 font-display text-[30px] font-semibold leading-tight text-[var(--color-ink)] sm:text-[36px]">
+            {firstName ? (
+              <>
+                Olá, <span className="nx-gradient-text">{firstName}</span>.
+              </>
+            ) : (
+              "Dashboard"
+            )}
+          </h1>
+          <p className="mt-1.5 max-w-xl text-sm text-[var(--color-ink-muted)]">{getDailyQuote()}</p>
+        </div>
+        <div className="nx-panel flex items-center gap-5 rounded-xl border border-[var(--color-border)] px-4 py-2.5">
+          <div>
+            <p className="font-mono-data text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">hoje</p>
+            <p className="font-mono-data text-lg text-[var(--color-ink)]">{data.todayTasks.length}</p>
+          </div>
+          <span className="h-8 w-px bg-[var(--color-border)]" />
+          <div>
+            <p className="font-mono-data text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">atrasadas</p>
+            <p className="font-mono-data text-lg" style={{ color: data.overdueTasks.length ? "var(--color-danger)" : "var(--color-ink)" }}>{data.overdueTasks.length}</p>
+          </div>
+          <span className="h-8 w-px bg-[var(--color-border)]" />
+          <div>
+            <p className="font-mono-data text-[10px] uppercase tracking-wider text-[var(--color-ink-muted)]">conclusão</p>
+            <p className="font-mono-data text-lg text-[var(--color-accent)]">{data.completionRate}%</p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

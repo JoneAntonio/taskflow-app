@@ -57,7 +57,7 @@ export function MemberList({
         return (
           <div
             key={membership.id}
-            className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5"
+            className="flex items-center gap-3 nx-panel rounded-xl border border-[var(--color-border)] px-3 py-2.5"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={avatarUrl} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />

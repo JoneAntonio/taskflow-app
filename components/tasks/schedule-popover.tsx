@@ -144,7 +144,7 @@ export function SchedulePopover({
   return createPortal(
     <div
       ref={popoverRef}
-      className="fixed z-[60] w-80 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)]"
+      className="fixed z-[60] w-80 overflow-y-auto nx-panel rounded-2xl border border-[var(--color-border)] p-4 shadow-[var(--shadow-lg)]"
       style={{ top: position.top, left: position.left, maxHeight: position.maxHeight }}
     >
       <div className="mb-3 flex gap-1 rounded-full bg-[var(--color-surface-alt)] p-1">

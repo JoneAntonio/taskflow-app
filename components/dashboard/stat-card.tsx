@@ -24,14 +24,17 @@ export function StatCard({
     <Card className="p-4">
       <div className="flex items-center gap-3">
         <div
-          className={cn("flex h-9 w-9 items-center justify-center rounded-xl")}
-          style={{ backgroundColor: "var(--color-surface-alt)" }}
+          className={cn("hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] min-[420px]:flex sm:flex")}
+          style={{
+            background: `color-mix(in oklab, ${accentColor} 12%, var(--color-surface-alt))`,
+            boxShadow: accent === "default" ? undefined : `0 0 18px -6px ${accentColor}`,
+          }}
         >
           <Icon className="h-4.5 w-4.5" style={{ color: accentColor }} />
         </div>
         <div className="min-w-0">
-          <p className="font-display text-xl font-semibold text-[var(--color-ink)]">{value}</p>
-          <p className="truncate text-xs text-[var(--color-ink-muted)]">{label}</p>
+          <p className="font-mono-data text-[22px] font-medium leading-tight text-[var(--color-ink)]">{value}</p>
+          <p className="line-clamp-2 text-xs leading-tight text-[var(--color-ink-muted)]">{label}</p>
         </div>
       </div>
     </Card>

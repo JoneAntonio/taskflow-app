@@ -43,7 +43,7 @@ export default async function PesquisaPage({
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Pesquisa</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Pesquisa</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           {query ? `Resultados para "${query}"` : "Usa a barra de pesquisa no topo para procurar."}
         </p>

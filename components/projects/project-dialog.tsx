@@ -179,7 +179,7 @@ export function ProjectDialog({
               id="project-parent"
               value={parentId}
               onChange={(e) => setParentId(e.target.value)}
-              className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+              className="h-10 w-full nx-panel rounded-xl border border-[var(--color-border)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
             >
               <option value="">Nenhum (projeto de topo)</option>
               {parentOptions.map((p) => (
@@ -197,7 +197,7 @@ export function ProjectDialog({
               id="project-team"
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
-              className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+              className="h-10 w-full nx-panel rounded-xl border border-[var(--color-border)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
             >
               <option value="">Nenhuma (projeto pessoal)</option>
               {availableTeams.map((t) => (
@@ -280,7 +280,7 @@ export function ProjectDialog({
                 <select
                   value={metricUnit}
                   onChange={(e) => setMetricUnit(e.target.value)}
-                  className="h-10 w-28 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+                  className="h-10 w-28 nx-panel rounded-xl border border-[var(--color-border)] px-2 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
                 >
                   <option value="">Sem unidade</option>
                   {METRIC_UNIT_OPTIONS.map((u) => (
@@ -371,7 +371,7 @@ export function ProjectDialog({
                   id="project-priority"
                   value={smartPriority}
                   onChange={(e) => setSmartPriority(e.target.value as TaskPriority)}
-                  className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+                  className="h-10 w-full nx-panel rounded-xl border border-[var(--color-border)] px-3 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
                 >
                   {PRIORITY_OPTIONS.map((p) => (
                     <option key={p} value={p}>
@@ -389,7 +389,7 @@ export function ProjectDialog({
                 value={actionPlan}
                 onChange={(e) => setActionPlan(e.target.value)}
                 placeholder="Os passos principais para lá chegares..."
-                className="w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+                className="w-full resize-none nx-panel rounded-xl border border-[var(--color-border)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
               />
             </div>
           </div>

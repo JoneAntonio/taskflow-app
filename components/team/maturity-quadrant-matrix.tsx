@@ -18,7 +18,7 @@ export function MaturityQuadrantMatrix({ agents }: { agents: TeamAgent[] }) {
   }));
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
         <LayoutGrid className="h-3.5 w-3.5" /> Distribuição por quadrante
       </p>

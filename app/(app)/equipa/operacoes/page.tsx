@@ -45,7 +45,7 @@ export default async function OperacoesPage() {
       </Link>
 
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Operações</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Operações</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           Personaliza a cor de cada operação/equipa que supervisionas, e acompanha a distribuição de maturidade em
           cada uma.

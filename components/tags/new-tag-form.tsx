@@ -32,7 +32,7 @@ export function NewTagForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-3 nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <Input
         value={name}
         onChange={(e) => setName(e.target.value)}

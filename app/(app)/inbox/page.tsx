@@ -24,7 +24,7 @@ export default async function InboxPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-5">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Inbox</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Inbox</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           Captura tudo rapidamente. Organiza mais tarde.
         </p>

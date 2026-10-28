@@ -55,7 +55,7 @@ export default async function EquipaPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
+          <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">
             Maturidade da Equipa
           </h1>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">

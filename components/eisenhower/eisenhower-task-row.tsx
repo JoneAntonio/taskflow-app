@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDueLabel } from "@/lib/format-due";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Star, Check, Trash2, Repeat } from "lucide-react";
@@ -93,9 +94,7 @@ export function EisenhowerTaskRow({ task }: { task: Task }) {
       </span>
       {(task.due_date || task.due_time) && !isCompleted && (
         <span className="hidden shrink-0 items-center gap-1 text-xs text-[var(--color-ink-muted)] sm:flex">
-          {task.due_date && new Date(task.due_date + "T00:00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })}
-          {task.due_time ? ` · ${task.due_time}` : ""}
-          {task.due_time_end ? `–${task.due_time_end}` : ""}
+          <span className="font-mono-data">{formatDueLabel(task.due_date, task.due_time, task.due_time_end)}</span>
           {task.recurrence && <Repeat className="h-3 w-3" />}
         </span>
       )}

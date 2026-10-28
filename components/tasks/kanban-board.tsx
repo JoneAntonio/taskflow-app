@@ -84,7 +84,7 @@ export function KanbanBoard({ tasks }: { tasks: Task[] }) {
                     e.dataTransfer.effectAllowed = "move";
                   }}
                   className={cn(
-                    "flex cursor-grab items-start gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm text-[var(--color-ink)] shadow-[var(--shadow-sm)] active:cursor-grabbing",
+                    "flex cursor-grab items-start gap-2 nx-panel rounded-xl border border-[var(--color-border)] p-3 text-sm text-[var(--color-ink)] shadow-[var(--shadow-sm)] active:cursor-grabbing",
                     isMoving && "opacity-70"
                   )}
                 >

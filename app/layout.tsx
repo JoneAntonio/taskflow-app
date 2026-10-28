@@ -1,38 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
 import { TimezoneSync } from "@/components/providers/timezone-sync";
 import { ServiceWorkerRegister } from "@/components/providers/service-worker-register";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
-
 export const metadata: Metadata = {
-  title: "JAFLOW — organiza o teu fluxo",
+  title: "JAFLOW Nexus — o teu centro de comando",
   description:
     "JAFLOW é a aplicação de produtividade que junta tarefas, projetos, hábitos e foco num único lugar.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "JAFLOW",
+    title: "Nexus",
   },
   icons: {
     icon: [
@@ -44,7 +27,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f2a93b",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#05070d" },
+    { media: "(prefers-color-scheme: light)", color: "#f3f5f9" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -52,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="pt-PT"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable} h-full`}
+      className={`${GeistSans.variable} ${GeistMono.variable} h-full`}
     >
       <body className="min-h-full antialiased">
         <ThemeProvider>

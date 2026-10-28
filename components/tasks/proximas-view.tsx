@@ -98,7 +98,7 @@ export function ProximasView({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+        <label className="flex items-center gap-2 nx-panel rounded-xl border border-[var(--color-border)] px-3 py-2">
           <ListFilter className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-muted)]" />
           <select
             value={groupBy}

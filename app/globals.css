@@ -1,61 +1,74 @@
 @import "tailwindcss";
 
 /*
-  TaskFlow — Sistema de tokens visuais
-  Paleta: "grafite + chama âmbar" — fundo neutro sóbrio, tinta quase-preta,
-  um único acento quente (âmbar) reservado para foco/ação, e um azul-aço
-  frio para hierarquia secundária (prioridade média, links, estados info).
-  Objetivo: sensação de estúdio de produtividade, não de app genérico.
+  JAFLOW Nexus — sistema visual
+  Escuro por omissão: fundo de espaço profundo, superfícies de vidro fumado
+  com uma linha de luz no topo, e dois acentos com papéis fixos:
+  ciano-iónico (ação, foco, progresso) e violeta-plasma (hierarquia
+  secundária). Números e dados em monoespaçada — a app lê-se como um painel
+  de instrumentos, não como um caderno.
 */
 
 :root {
-  --color-bg: #f7f7f4;
+  --color-bg: #f3f5f9;
   --color-surface: #ffffff;
-  --color-surface-alt: #efefe9;
-  --color-border: #e3e2da;
-  --color-ink: #1a1c22;
-  --color-ink-muted: #6b6f7b;
-  --color-accent: #f2a93b;
-  --color-accent-ink: #1a1c22;
-  --color-secondary: #3f6fa8;
-  --color-danger: #e2504c;
-  --color-success: #3f9e6d;
-  --color-warning: #f2a93b;
+  --color-surface-alt: #eef1f6;
+  --color-border: #dfe4ee;
+  --color-ink: #0a0f1c;
+  --color-ink-muted: #5a667d;
+  --color-accent: #0091d5;
+  --color-accent-ink: #ffffff;
+  --color-secondary: #6b5cff;
+  --color-danger: #e11d48;
+  --color-success: #0f9f6e;
+  --color-warning: #d97706;
 
-  --color-priority-none: #b9bcc4;
-  --color-priority-baixa: #7d93a8;
-  --color-priority-media: #3f6fa8;
-  --color-priority-alta: #f2a93b;
-  --color-priority-urgente: #e2504c;
+  --color-priority-none: #b4bccb;
+  --color-priority-baixa: #6b7fa8;
+  --color-priority-media: #6b5cff;
+  --color-priority-alta: #d97706;
+  --color-priority-urgente: #e11d48;
 
-  --shadow-sm: 0 1px 2px rgba(26, 28, 34, 0.04);
-  --shadow-md: 0 4px 16px rgba(26, 28, 34, 0.08);
-  --shadow-lg: 0 12px 32px rgba(26, 28, 34, 0.12);
+  --glow: 0 0 0 1px rgba(0, 145, 213, 0.18), 0 8px 24px -10px rgba(0, 145, 213, 0.45);
+  --hairline: linear-gradient(90deg, transparent, rgba(0, 145, 213, 0.35), rgba(107, 92, 255, 0.35), transparent);
+  --grid-line: rgba(10, 15, 28, 0.045);
+  --aurora-a: rgba(0, 145, 213, 0.10);
+  --aurora-b: rgba(107, 92, 255, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(10, 15, 28, 0.05), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  --shadow-md: 0 8px 24px -8px rgba(10, 15, 28, 0.14);
+  --shadow-lg: 0 24px 48px -16px rgba(10, 15, 28, 0.22);
 }
 
 .dark {
-  --color-bg: #121212;
-  --color-surface: #1e1e24;
-  --color-surface-alt: #26262e;
-  --color-border: #2c2f3a;
-  --color-ink: #f1f1ee;
-  --color-ink-muted: #9498a3;
-  --color-accent: #f5b656;
-  --color-accent-ink: #14151b;
-  --color-secondary: #6f9bd1;
-  --color-danger: #ea6f6b;
-  --color-success: #55b686;
-  --color-warning: #f5b656;
+  --color-bg: #05070d;
+  --color-surface: #0b101b;
+  --color-surface-alt: #121a2a;
+  --color-border: #1b2436;
+  --color-ink: #e6edf7;
+  --color-ink-muted: #7d8aa3;
+  --color-accent: #3dd9ff;
+  --color-accent-ink: #021018;
+  --color-secondary: #8b7cff;
+  --color-danger: #ff4d6d;
+  --color-success: #2ee6a6;
+  --color-warning: #ffb547;
 
-  --color-priority-none: #565a66;
-  --color-priority-baixa: #8fa4b8;
-  --color-priority-media: #6f9bd1;
-  --color-priority-alta: #f5b656;
-  --color-priority-urgente: #ea6f6b;
+  --color-priority-none: #3a4560;
+  --color-priority-baixa: #6b7fa8;
+  --color-priority-media: #8b7cff;
+  --color-priority-alta: #ffb547;
+  --color-priority-urgente: #ff4d6d;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.4);
+  --glow: 0 0 0 1px rgba(61, 217, 255, 0.28), 0 10px 30px -10px rgba(61, 217, 255, 0.55);
+  --hairline: linear-gradient(90deg, transparent, rgba(61, 217, 255, 0.45), rgba(139, 124, 255, 0.45), transparent);
+  --grid-line: rgba(125, 160, 255, 0.045);
+  --aurora-a: rgba(61, 217, 255, 0.10);
+  --aurora-b: rgba(139, 124, 255, 0.10);
+
+  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 32px -12px rgba(0, 0, 0, 0.7);
+  --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 32px 64px -20px rgba(0, 0, 0, 0.85);
 }
 
 @theme inline {
@@ -72,9 +85,16 @@
   --color-success: var(--color-success);
   --color-warning: var(--color-warning);
 
-  --font-display: var(--font-space-grotesk);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-geist-sans);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Raios mais contidos: precisão em vez de "bolhas" */
+  --radius-md: 0.4rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.875rem;
+  --radius-3xl: 1.125rem;
 }
 
 * {
@@ -93,15 +113,134 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
+}
+
+/* Campo de fundo: grelha técnica a desvanecer + aurora de dois tons */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+body::before {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 30%, transparent 80%);
+}
+body::after {
+  background:
+    radial-gradient(600px 380px at 12% -6%, var(--aurora-a), transparent 70%),
+    radial-gradient(520px 360px at 92% 4%, var(--aurora-b), transparent 70%);
 }
 
 .font-display {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.025em;
+}
+h1.font-display,
+h2.font-display {
+  letter-spacing: -0.035em;
 }
 
 .font-mono-data {
   font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@layer components {
+/* Painel de vidro com linha de luz no topo — usado em cartões e barras */
+.nx-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 38%),
+    var(--color-surface);
+}
+.nx-panel::before {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 0;
+  height: 1px;
+  background: var(--hairline);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.nx-glass {
+  background: color-mix(in oklab, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+.nx-hairline-b {
+  position: relative;
+}
+.nx-hairline-b::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--hairline);
+  opacity: 0.7;
+}
+.nx-gradient-text {
+  background: linear-gradient(100deg, var(--color-accent), var(--color-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.nx-live-dot {
+  position: relative;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+}
+.nx-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid var(--color-success);
+  opacity: 0;
+  animation: nx-ping 2.4s ease-out infinite;
+}
+@keyframes nx-ping {
+  0% { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.nx-kbd {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-ink-muted);
+}
+
+}
+
+@layer utilities {
+  /* Rótulos pequenos em maiúsculas → leitura de painel de instrumentos */
+  .uppercase.tracking-wider,
+  .uppercase.tracking-wide,
+  .uppercase.tracking-widest {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -116,7 +255,11 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 35%, transparent);
 }
 
 ::-webkit-scrollbar {
@@ -126,6 +269,8 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 ::-webkit-scrollbar-track {
   background: transparent;

@@ -32,7 +32,7 @@ export function ProjectTimelineChart({ project, tasks }: { project: Project; tas
   });
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
         Linha temporal do objetivo
       </p>

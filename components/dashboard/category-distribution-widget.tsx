@@ -1,6 +1,6 @@
 import { PieChart } from "lucide-react";
 
-const BAR_COLORS = ["#F2A93B", "#3F6FA8", "#3F9E6D", "#8B5CF6", "#E2504C", "#0EA5A5"];
+const BAR_COLORS = ["#3DD9FF", "#8B7CFF", "#2EE6A6", "#FFB547", "#FF4D6D", "#5B8DEF"];
 
 export function CategoryDistributionWidget({ entries }: { entries: { label: string; count: number }[] }) {
   if (entries.length === 0) return null;
@@ -10,7 +10,7 @@ export function CategoryDistributionWidget({ entries }: { entries: { label: stri
   const sorted = [...entries].sort((a, b) => b.count - a.count).slice(0, 6);
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
         <PieChart className="h-3.5 w-3.5" /> Onde o tempo está a ser gasto
       </p>

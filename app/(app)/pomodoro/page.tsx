@@ -34,7 +34,7 @@ export default async function PomodoroPage() {
     <div className="mx-auto grid max-w-4xl gap-6 lg:grid-cols-[1fr_280px]">
       <div className="space-y-6">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Pomodoro</h1>
+          <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Pomodoro</h1>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
             Trabalho focado + pausa, calculados a partir da duração da tua atividade.
           </p>

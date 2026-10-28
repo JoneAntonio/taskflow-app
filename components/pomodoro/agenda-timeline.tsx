@@ -37,7 +37,7 @@ export function AgendaTimeline({ tasks }: { tasks: Task[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-3">
       <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
         Agenda de hoje
       </p>

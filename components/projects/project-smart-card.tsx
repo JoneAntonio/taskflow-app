@@ -24,7 +24,7 @@ export function ProjectSmartCard({
   const taskPercentage = taskProgress.total > 0 ? Math.round((taskProgress.completed / taskProgress.total) * 100) : 0;
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
         🎯 Objetivo SMART
       </p>

@@ -41,7 +41,7 @@ export default async function HojePage() {
         <AutoOpenTaskFromQuery />
       </Suspense>
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Hoje</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Hoje</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           {new Date().toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" })}
         </p>

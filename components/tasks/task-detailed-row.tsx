@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDueLabel } from "@/lib/format-due";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -43,7 +44,7 @@ export function TaskDetailedRow({ task }: { task: Task }) {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-colors hover:border-[var(--color-accent)]/60">
+    <div className="nx-panel rounded-xl border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-accent)]/60">
       <div className="flex items-start gap-3">
         <button
           onClick={handleToggleComplete}
@@ -82,11 +83,7 @@ export function TaskDetailedRow({ task }: { task: Task }) {
 
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[var(--color-ink-muted)]">
             {(task.due_date || task.due_time) && (
-              <span>
-                {task.due_date}
-                {task.due_time ? ` · ${task.due_time}` : ""}
-                {task.due_time_end ? `–${task.due_time_end}` : ""}
-              </span>
+              <span className="font-mono-data">{formatDueLabel(task.due_date, task.due_time, task.due_time_end)}</span>
             )}
             <span
               className="rounded-full px-2 py-0.5 text-[11px] font-medium"

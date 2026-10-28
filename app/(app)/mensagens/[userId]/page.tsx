@@ -26,7 +26,7 @@ export default async function MensagensPage({ params }: { params: Promise<{ user
       >
         <ArrowLeft className="h-4 w-4" /> Equipas
       </Link>
-      <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
+      <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">
         {otherProfile.full_name || otherProfile.email}
       </h1>
       <DmChatSection otherUserId={userId} currentUserId={user.id} />

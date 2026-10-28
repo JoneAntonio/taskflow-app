@@ -33,7 +33,7 @@ export function MiniCalendar({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-sm font-medium capitalize text-[var(--color-ink)]">{monthLabel}</p>
+        <p className="text-sm font-medium first-letter:uppercase text-[var(--color-ink)]">{monthLabel}</p>
         <div className="flex gap-1">
           <button
             type="button"

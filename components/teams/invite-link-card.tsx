@@ -52,7 +52,7 @@ export function InviteLinkCard({ teamId }: { teamId: string }) {
   if (invite === undefined) return null;
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <p className="text-sm font-medium text-[var(--color-ink)]">Convite por link</p>
       <p className="mb-3 text-xs text-[var(--color-ink-muted)]">
         Qualquer pessoa com este link pode entrar na equipa, mesmo sem receber um email.

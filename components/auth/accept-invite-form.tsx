@@ -145,7 +145,7 @@ export function AcceptInviteForm() {
   return (
     <div className="space-y-3">
       {invites.map((invite) => (
-        <div key={invite.id} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <div key={invite.id} className="nx-panel rounded-xl border border-[var(--color-border)] p-4">
           <p className="text-sm text-[var(--color-ink)]">
             Foste convidado como <span className="font-semibold">{invite.role === "admin" ? "admin" : "membro"}</span>{" "}
             de uma equipa.

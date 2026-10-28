@@ -60,7 +60,7 @@ export default async function MatrizPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Matriz de Eisenhower</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Matriz de Eisenhower</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           A urgência vem da prioridade e da data; marca a estrela ⭐ numa tarefa para a definires como importante.
           Filtra por projeto para veres só o que é preciso fazer para um objetivo específico.

@@ -18,7 +18,7 @@ export function OperationStatsCard({
   });
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <div className="flex items-center gap-2">
         <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: color }} />
         <p className="truncate text-sm font-medium text-[var(--color-ink)]">{name}</p>

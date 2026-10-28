@@ -47,7 +47,7 @@ function ChecklistRow({ task }: { task: Task }) {
     <button
       onClick={handleToggle}
       disabled={isPending}
-      className="flex w-full items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3 text-left transition-colors hover:border-[var(--color-accent)]/60"
+      className="flex w-full items-center gap-3 nx-panel rounded-xl border border-[var(--color-border)] px-3 py-3 text-left transition-colors hover:border-[var(--color-accent)]/60"
     >
       <span
         className={cn(

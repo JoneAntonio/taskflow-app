@@ -67,7 +67,7 @@ export function TeamTaskCreator({
           <select
             value={assignedTo}
             onChange={(e) => setAssignedTo(e.target.value)}
-            className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)]"
+            className="h-10 nx-panel rounded-xl border border-[var(--color-border)] px-3 text-sm text-[var(--color-ink)]"
           >
             <option value="">Sem responsável</option>
             {membersWithLoad.map(({ membership, activeTaskCount }) => (

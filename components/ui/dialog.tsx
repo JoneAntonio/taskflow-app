@@ -42,7 +42,7 @@ export function Dialog({ open, onClose, title, description, children, className 
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-[10vh] sm:items-center sm:pt-4">
       <div
         aria-hidden
-        className="fixed inset-0 bg-black/40 backdrop-blur-[2px]"
+        className="fixed inset-0 bg-[#02040a]/60 backdrop-blur-md"
         onClick={onClose}
       />
       <div
@@ -50,7 +50,7 @@ export function Dialog({ open, onClose, title, description, children, className 
         aria-modal="true"
         aria-labelledby="dialog-title"
         className={cn(
-          "relative w-full max-w-lg rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-lg)]",
+          "nx-panel relative w-full max-w-lg rounded-2xl border border-[var(--color-border)] p-6 shadow-[var(--shadow-lg)]",
           className
         )}
       >

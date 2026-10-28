@@ -24,7 +24,7 @@ export function DeadlineCountdown({ targetDate }: { targetDate: string }) {
   const isOverdue = daysLeft < 0;
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <div className="mb-3 text-center">
         <p
           className="font-display text-3xl font-semibold"
@@ -34,7 +34,7 @@ export function DeadlineCountdown({ targetDate }: { targetDate: string }) {
         </p>
         <p className="text-xs text-[var(--color-ink-muted)]">{isOverdue ? "desde o prazo" : "até ao prazo do projeto"}</p>
       </div>
-      <p className="mb-2 text-center text-xs font-medium capitalize text-[var(--color-ink)]">{monthLabel}</p>
+      <p className="mb-2 text-center text-xs font-medium first-letter:uppercase text-[var(--color-ink)]">{monthLabel}</p>
       <div className="grid grid-cols-7 gap-1">
         {WEEKDAY_LABELS.map((label, i) => (
           <div key={i} className="text-center text-[10px] text-[var(--color-ink-muted)]">

@@ -49,7 +49,7 @@ export default async function CriteriosPage() {
       </Link>
 
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Critérios de avaliação</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Critérios de avaliação</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           Adiciona, ajusta ou remove os critérios usados para avaliar a maturidade dos teus agentes.
         </p>

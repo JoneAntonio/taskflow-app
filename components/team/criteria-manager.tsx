@@ -79,7 +79,7 @@ export function CriteriaManager({ initialCriteria }: { initialCriteria: Maturity
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-5">
       <div className="mb-1 flex items-center justify-between">
         <p className="text-sm font-medium text-[var(--color-ink)]">Critérios de avaliação</p>
         <span

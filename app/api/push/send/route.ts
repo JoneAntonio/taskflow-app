@@ -75,5 +75,26 @@ export async function POST(request: Request) {
     })
   );
 
+  // Também entrega nos dispositivos registados nesta versão (Nexus), cujas
+  // subscrições usam a chave do serviço agendado no Supabase.
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/faisca-push`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+      body: JSON.stringify({
+        action: "relay",
+        userId: targetUserId,
+        title: body.title ?? "JAFLOW",
+        body: body.body ?? "",
+        url: body.url ?? "/dashboard",
+      }),
+    });
+  } catch {
+    // não bloqueia o envio principal
+  }
+
   return NextResponse.json({ success: true });
 }

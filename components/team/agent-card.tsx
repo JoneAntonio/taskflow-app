@@ -94,7 +94,7 @@ export function AgentCard({
       {menuOpen && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-3 top-10 z-20 w-40 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]"
+          className="absolute right-3 top-10 z-20 w-40 nx-panel rounded-xl border border-[var(--color-border)] p-1 shadow-[var(--shadow-md)]"
         >
           <button
             onClick={(e) => {

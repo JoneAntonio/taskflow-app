@@ -37,7 +37,7 @@ export default async function PerfilPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Perfil</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Perfil</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           Gere os teus dados pessoais e preferências.
         </p>

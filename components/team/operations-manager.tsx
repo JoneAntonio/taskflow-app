@@ -64,7 +64,7 @@ export function OperationsManager({ initialOperations }: { initialOperations: Te
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-5">
       <p className="mb-1 text-sm font-medium text-[var(--color-ink)]">Operações</p>
       <p className="mb-4 text-xs text-[var(--color-ink-muted)]">
         A cor escolhida aqui aparece em todos os agentes dessa operação.

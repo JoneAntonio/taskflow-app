@@ -26,7 +26,7 @@ export function AcceptLinkInviteButton({ invite, teamName }: { invite: TeamInvit
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center">
+    <div className="flex flex-col items-center gap-4 nx-panel rounded-2xl border border-[var(--color-border)] p-8 text-center">
       <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-accent)]/15">
         <Users2 className="h-7 w-7 text-[var(--color-accent)]" />
       </span>

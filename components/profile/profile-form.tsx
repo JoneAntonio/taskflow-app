@@ -82,7 +82,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <select
           id="timezone"
           {...register("timezone")}
-          className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
+          className="h-10 w-full nx-panel rounded-xl border border-[var(--color-border)] px-3.5 text-sm text-[var(--color-ink)] focus:border-[var(--color-accent)]"
         >
           {TIMEZONES.map((tz) => (
             <option key={tz} value={tz}>

@@ -21,7 +21,7 @@ export function HabitPreviewCalendar({ selectedDays, color }: { selectedDays: nu
 
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-      <p className="mb-2 text-center text-xs font-medium capitalize text-[var(--color-ink)]">{monthLabel}</p>
+      <p className="mb-2 text-center text-xs font-medium first-letter:uppercase text-[var(--color-ink)]">{monthLabel}</p>
       <div className="grid grid-cols-7 gap-1">
         {WEEKDAY_LABELS.map((label, i) => (
           <div key={i} className="text-center text-[10px] text-[var(--color-ink-muted)]">

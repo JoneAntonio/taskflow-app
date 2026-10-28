@@ -25,7 +25,7 @@ export default async function EquipasPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Equipas</h1>
+          <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Equipas</h1>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
             {isSupervisor
               ? "Cria uma equipa e convida pessoas reais para colaborarem contigo."
@@ -49,7 +49,7 @@ export default async function EquipasPage() {
             <Link
               key={team.id}
               href={`/equipas/${team.id}`}
-              className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-colors hover:border-[var(--color-accent)]/60"
+              className="nx-panel rounded-2xl border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-accent)]/60"
             >
               <p className="text-sm font-medium text-[var(--color-ink)]">{team.name}</p>
               {team.description && <p className="mt-1 text-xs text-[var(--color-ink-muted)]">{team.description}</p>}

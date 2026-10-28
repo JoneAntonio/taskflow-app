@@ -104,7 +104,7 @@ export function MaturityRecommendations({
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}

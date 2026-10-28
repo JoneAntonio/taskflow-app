@@ -44,7 +44,7 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
       <select
         value={role}
         onChange={(e) => setRole(e.target.value as TeamRole)}
-        className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)]"
+        className="h-10 nx-panel rounded-xl border border-[var(--color-border)] px-3 text-sm text-[var(--color-ink)]"
       >
         <option value="member">Membro</option>
         <option value="admin">Admin</option>

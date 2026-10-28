@@ -82,7 +82,7 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
       </Link>
 
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">{(team as Team).name}</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">{(team as Team).name}</h1>
         {(team as Team).description && (
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">{(team as Team).description}</p>
         )}
@@ -90,7 +90,7 @@ export default async function EquipaDetailPage({ params }: { params: Promise<{ t
 
       {canManageTeam && (
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
             <p className="mb-3 text-sm font-medium text-[var(--color-ink)]">Convidar por email</p>
             <InviteMemberForm teamId={teamId} />
           </div>

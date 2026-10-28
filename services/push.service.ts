@@ -8,6 +8,10 @@ function urlBase64ToUint8Array(base64String: string): BufferSource {
   return array.buffer as ArrayBuffer;
 }
 
+const NEXUS_VAPID_PUBLIC_KEY =
+  "BLw0NS86-_T-DrSg-epe002z1L4WoGIApIUIHT_6lPHJx1HGIcr-0hLqJJ_dzXiDPJMMFrt1LQ8BOObO482RaJM";
+const SUBSCRIPTIONS_TABLE = "faisca_push_subscriptions";
+
 export const pushService = {
   isSupported(): boolean {
     return typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window;
@@ -26,8 +30,8 @@ export const pushService = {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") throw new Error("Permissão de notificações recusada.");
 
-    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-    if (!publicKey) throw new Error("Notificações push ainda não estão configuradas nesta app.");
+    // Chave do serviço de notificações agendadas (Supabase, a cada minuto).
+    const publicKey = NEXUS_VAPID_PUBLIC_KEY;
 
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
@@ -42,12 +46,13 @@ export const pushService = {
     if (!user) throw new Error("Utilizador não autenticado.");
 
     const json = subscription.toJSON();
-    const { error } = await supabase.from("push_subscriptions").upsert(
+    const { error } = await supabase.from(SUBSCRIPTIONS_TABLE).upsert(
       {
         user_id: user.id,
         endpoint: subscription.endpoint,
         p256dh: json.keys?.p256dh ?? "",
         auth: json.keys?.auth ?? "",
+        user_agent: navigator.userAgent.slice(0, 200),
       },
       { onConflict: "endpoint" }
     );
@@ -60,24 +65,15 @@ export const pushService = {
     const subscription = await registration.pushManager.getSubscription();
     if (subscription) {
       const supabase = createClient();
-      await supabase.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
+      await supabase.from(SUBSCRIPTIONS_TABLE).delete().eq("endpoint", subscription.endpoint);
       await subscription.unsubscribe();
     }
   },
 
   async sendTest(): Promise<void> {
-    const response = await fetch("/api/push/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: "JAFLOW",
-        body: "As notificações push estão a funcionar! 🎉",
-        url: "/dashboard",
-      }),
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(body.error ?? "Não foi possível enviar a notificação de teste.");
-    }
+    const supabase = createClient();
+    const { data, error } = await supabase.functions.invoke("faisca-push", { body: { action: "test" } });
+    if (error) throw new Error("Não foi possível enviar a notificação de teste.");
+    if (!data?.sent) throw new Error("Nenhum dispositivo ativo recebeu o teste. Volta a ativar as notificações.");
   },
 };

@@ -34,7 +34,7 @@ export function QuickUpdateValue({ project }: { project: Project }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+      className="flex items-center gap-2 nx-panel rounded-2xl border border-[var(--color-border)] p-3"
     >
       <TrendingUp className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
       <span className="shrink-0 text-xs text-[var(--color-ink-muted)]">Atualizar valor atual</span>

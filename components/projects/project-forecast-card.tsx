@@ -59,7 +59,7 @@ export function ProjectForecastCard({ project, tasks }: { project: Project; task
   const Icon = config.icon;
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <div className="nx-panel rounded-2xl border border-[var(--color-border)] p-4">
       <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
         <TrendingUp className="h-3.5 w-3.5" /> Previsão
       </p>

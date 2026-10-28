@@ -20,7 +20,7 @@ export default async function NotasPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Notas</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Notas</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
           Organiza as tuas notas em cadernos, com títulos, negrito e listas.
         </p>

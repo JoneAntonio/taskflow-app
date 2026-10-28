@@ -109,7 +109,7 @@ export function NoteEditor({ note, onBack, onDeleted }: { note: Note; onBack: ()
 
       {preview ? (
         <div
-          className="min-w-0 flex-1 overflow-y-auto break-words rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-ink)]"
+          className="min-w-0 flex-1 overflow-y-auto break-words nx-panel rounded-xl border border-[var(--color-border)] p-4 text-sm text-[var(--color-ink)]"
           style={{ overflowWrap: "anywhere" }}
           dangerouslySetInnerHTML={{
             __html: renderNoteMarkdown(content) || "<p class='text-[var(--color-ink-muted)]'>Nota vazia.</p>",
@@ -121,7 +121,7 @@ export function NoteEditor({ note, onBack, onDeleted }: { note: Note; onBack: ()
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Escreve aqui... usa **negrito**, ## títulos, e - listas."
-          className="w-full min-w-0 flex-1 resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+          className="w-full min-w-0 flex-1 resize-none nx-panel rounded-xl border border-[var(--color-border)] p-4 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
           style={{ overflowWrap: "anywhere" }}
         />
       )}

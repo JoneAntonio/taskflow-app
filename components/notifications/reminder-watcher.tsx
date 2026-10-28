@@ -55,16 +55,11 @@ export function ReminderWatcher() {
         playAlarmSound();
 
         if ("Notification" in window && Notification.permission === "granted") {
-          new Notification("JAFLOW — lembrete", { body: task.title });
+          new Notification("Lembrete", { body: task.title });
         }
 
-        // Notificação push real — chega mesmo que este separador seja fechado
-        // a seguir, desde que o dispositivo tenha as push notifications ativas.
-        fetch("/api/push/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: "JAFLOW — lembrete", body: task.title, url: "/hoje" }),
-        }).catch(() => {});
+        // A notificação push (com a app fechada) é enviada pelo serviço
+        // agendado no Supabase a cada minuto — aqui só o aviso local.
 
         await supabase.from("notifications").insert({
           user_id: user.id,

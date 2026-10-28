@@ -13,11 +13,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--color-accent)] text-[var(--color-accent-ink)] hover:brightness-95 shadow-[var(--shadow-sm)]",
+    "bg-[linear-gradient(120deg,var(--color-accent),color-mix(in_oklab,var(--color-accent)_55%,var(--color-secondary)))] text-[var(--color-accent-ink)] font-semibold shadow-[var(--glow)] hover:brightness-110 active:scale-[0.98]",
   secondary:
     "bg-[var(--color-surface-alt)] text-[var(--color-ink)] hover:bg-[var(--color-border)]",
   outline:
-    "border border-[var(--color-border)] bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-alt)]",
+    "border border-[var(--color-border)] bg-[var(--color-surface)]/40 text-[var(--color-ink)] hover:border-[color-mix(in_oklab,var(--color-accent)_45%,var(--color-border))] hover:bg-[var(--color-surface-alt)]",
   ghost: "bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-alt)]",
   danger: "bg-[var(--color-danger)] text-white hover:brightness-95",
 };
@@ -36,7 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          "inline-flex items-center font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+          "inline-flex items-center whitespace-nowrap font-medium transition-[background,box-shadow,border-color,filter,transform] duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
           variantStyles[variant],
           sizeStyles[size],
           className

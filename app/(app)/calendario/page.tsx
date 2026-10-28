@@ -21,7 +21,7 @@ export default async function CalendarioPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">Calendário</h1>
+        <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">Calendário</h1>
         <p className="mt-1 text-sm text-[var(--color-ink-muted)]">Clica num dia para veres as tarefas agendadas.</p>
       </div>
       <CalendarGrid tasks={(tasks ?? []) as Task[]} />

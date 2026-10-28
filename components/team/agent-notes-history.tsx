@@ -44,7 +44,7 @@ export function AgentNotesHistory({ agentId, notes }: { agentId: string; notes: 
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Regista uma nota de 1-para-1, feedback dado, ou algo importante..."
           rows={2}
-          className="flex-1 resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+          className="flex-1 resize-none nx-panel rounded-xl border border-[var(--color-border)] p-3 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
         />
         <button
           type="submit"
@@ -64,7 +64,7 @@ export function AgentNotesHistory({ agentId, notes }: { agentId: string; notes: 
           {notes.map((note) => (
             <div
               key={note.id}
-              className="group flex items-start gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+              className="group flex items-start gap-2 nx-panel rounded-xl border border-[var(--color-border)] p-3"
             >
               <div className="min-w-0 flex-1">
                 <p className="whitespace-pre-wrap text-sm text-[var(--color-ink)]">{note.note}</p>

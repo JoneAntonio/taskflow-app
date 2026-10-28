@@ -43,7 +43,7 @@ export function UserMenu({ profile }: { profile: Pick<Profile, "full_name" | "em
       </button>
 
       {open && (
-        <div className="absolute right-0 z-30 mt-2 w-52 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 shadow-[var(--shadow-md)]">
+        <div className="absolute right-0 z-30 mt-2 w-52 nx-panel rounded-xl border border-[var(--color-border)] p-1.5 shadow-[var(--shadow-md)]">
           <div className="px-2.5 py-2">
             <p className="truncate text-sm font-medium text-[var(--color-ink)]">
               {profile.full_name || "Sem nome"}

@@ -106,7 +106,7 @@ export function ChatPanel({
   }
 
   return (
-    <div className="flex h-[420px] flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+    <div className="flex h-[420px] flex-col nx-panel rounded-2xl border border-[var(--color-border)]">
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {isLoading ? (
           <p className="text-center text-sm text-[var(--color-ink-muted)]">A carregar conversa...</p>
@@ -146,7 +146,7 @@ export function ChatPanel({
 
       <form onSubmit={handleSend} className="relative border-t border-[var(--color-border)] p-3">
         {mentionSuggestions.length > 0 && (
-          <div className="absolute bottom-full left-3 right-3 mb-1 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-lg)]">
+          <div className="absolute bottom-full left-3 right-3 mb-1 overflow-hidden nx-panel rounded-xl border border-[var(--color-border)] shadow-[var(--shadow-lg)]">
             {mentionSuggestions.map((member) => (
               <button
                 key={member.user_id}
@@ -172,7 +172,7 @@ export function ChatPanel({
             onChange={(e) => handleValueChange(e.target.value)}
             placeholder={mentionableMembers.length > 0 ? "Escreve uma mensagem... use @Nome para mencionar" : "Escreve uma mensagem..."}
             disabled={isSending}
-            className="h-10 flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+            className="h-10 flex-1 nx-panel rounded-xl border border-[var(--color-border)] px-3 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
           />
           <button
             type="submit"

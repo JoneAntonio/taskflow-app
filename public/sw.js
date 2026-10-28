@@ -25,10 +25,13 @@ self.addEventListener("push", (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || "JAFLOW", {
+    self.registration.showNotification(payload.title || "JAFLOW Nexus", {
       body: payload.body || "",
       icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
+      badge: "/icons/badge-96.png",
+      tag: payload.tag || undefined,
+      renotify: !!payload.tag,
+      vibrate: [40, 30, 80],
       data: { url: payload.url || "/dashboard" },
     })
   );

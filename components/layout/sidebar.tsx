@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Waypoints, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { primaryNav, organizeNav, focusNav, teamNav } from "@/lib/navigation";
+import { NexusMark } from "@/components/layout/nexus-mark";
+import { SystemStatus } from "@/components/layout/system-status";
 import type { AccountType, Project } from "@/types/database";
 
 function NavGroup({
@@ -24,7 +26,8 @@ function NavGroup({
   return (
     <div className="space-y-0.5">
       {title && (
-        <p className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
+        <p className="flex items-center gap-2 px-3 pb-1.5 pt-5 font-mono-data text-[10.5px] text-[var(--color-ink-muted)]">
+          <span className="h-px w-3 bg-[var(--color-border)]" />
           {title}
         </p>
       )}
@@ -36,16 +39,22 @@ function NavGroup({
             key={item.href}
             href={item.href}
             className={cn(
-              "group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+              "group relative flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13.5px] font-medium transition-colors",
               isActive
-                ? "bg-[var(--color-surface-alt)] text-[var(--color-ink)]"
-                : "text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-ink)]"
+                ? "bg-[linear-gradient(90deg,color-mix(in_oklab,var(--color-accent)_14%,transparent),transparent_85%)] text-[var(--color-ink)]"
+                : "text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-alt)]/70 hover:text-[var(--color-ink)]"
             )}
           >
+            {isActive && (
+              <span
+                aria-hidden
+                className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-full bg-[var(--color-accent)] shadow-[0_0_10px_var(--color-accent)]"
+              />
+            )}
             <Icon
               className={cn(
-                "h-4 w-4 shrink-0",
-                isActive ? "text-[var(--color-accent)]" : "text-[var(--color-ink-muted)]"
+                "h-4 w-4 shrink-0 transition-colors",
+                isActive ? "text-[var(--color-accent)]" : "text-[var(--color-ink-muted)] group-hover:text-[var(--color-ink)]"
               )}
             />
             {item.label}
@@ -68,45 +77,51 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:flex">
-      {/* Marca + linha de fluxo (elemento assinatura) */}
-      <div className="relative flex items-center gap-2 px-5 pb-4 pt-6">
-        <Waypoints className="h-5 w-5 text-[var(--color-accent)]" />
-        <span className="font-display text-base font-semibold text-[var(--color-ink)]">
-          JAFLOW
-        </span>
+    <aside className="nx-glass sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-[var(--color-border)] lg:flex">
+      <div className="flex items-center gap-2.5 px-5 pb-5 pt-6">
+        <NexusMark className="h-7 w-7" />
+        <div className="leading-none">
+          <span className="font-display text-[15px] font-semibold tracking-tight text-[var(--color-ink)]">JAFLOW</span>
+          <span className="ml-1.5 rounded border border-[var(--color-border)] px-1 py-px font-mono-data text-[9.5px] text-[var(--color-accent)]">
+            nexus
+          </span>
+        </div>
       </div>
 
       <div className="px-3">
         <button
           onClick={onQuickAdd}
-          className="flex w-full items-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] px-3 py-2 text-sm font-medium text-[var(--color-ink-muted)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-ink)]"
+          className="group flex w-full items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)]/60 px-3 py-2 text-[13px] font-medium text-[var(--color-ink)] transition-[border-color,box-shadow] hover:border-[color-mix(in_oklab,var(--color-accent)_50%,var(--color-border))] hover:shadow-[var(--glow)]"
         >
-          <Plus className="h-4 w-4" />
-          Adicionar tarefa
+          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[var(--color-accent)] text-[var(--color-accent-ink)]">
+            <Plus className="h-3.5 w-3.5" strokeWidth={2.6} />
+          </span>
+          Nova tarefa
+          <span className="nx-kbd ml-auto">N</span>
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 pb-4">
+      <nav className="flex-1 overflow-y-auto px-3 pb-4 pt-1">
         <NavGroup items={primaryNav} pathname={pathname} accountType={accountType} />
-        <NavGroup title="Organizar" items={organizeNav} pathname={pathname} accountType={accountType} />
-        <NavGroup title="Foco" items={focusNav} pathname={pathname} accountType={accountType} />
-        <NavGroup title="Equipa" items={teamNav} pathname={pathname} accountType={accountType} />
+        <NavGroup title="organizar" items={organizeNav} pathname={pathname} accountType={accountType} />
+        <NavGroup title="foco" items={focusNav} pathname={pathname} accountType={accountType} />
+        <NavGroup title="equipa" items={teamNav} pathname={pathname} accountType={accountType} />
 
         {accountType === "supervisor" && projects.length > 0 && (
           <div className="space-y-0.5">
-            <p className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-muted)]">
-              Projetos
+            <p className="flex items-center gap-2 px-3 pb-1.5 pt-5 font-mono-data text-[10.5px] text-[var(--color-ink-muted)]">
+              <span className="h-px w-3 bg-[var(--color-border)]" />
+              projetos
             </p>
             {projects.slice(0, 6).map((project) => (
               <Link
                 key={project.id}
                 href={`/projetos/${project.id}`}
-                className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-[var(--color-ink-muted)] transition-colors hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-ink)]"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13.5px] font-medium text-[var(--color-ink-muted)] transition-colors hover:bg-[var(--color-surface-alt)]/70 hover:text-[var(--color-ink)]"
               >
                 <span
-                  className="h-2 w-2 shrink-0 rounded-full"
-                  style={{ backgroundColor: project.color }}
+                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: project.color, boxShadow: `0 0 8px ${project.color}` }}
                 />
                 <span className="truncate">{project.name}</span>
               </Link>
@@ -115,15 +130,7 @@ export function Sidebar({
         )}
       </nav>
 
-      {/* Linha de fluxo vertical — assinatura visual do JAFLOW */}
-      <div
-        aria-hidden
-        className="mx-5 mb-5 h-1 rounded-full"
-        style={{
-          background:
-            "linear-gradient(90deg, var(--color-accent) 0%, var(--color-secondary) 100%)",
-        }}
-      />
+      <SystemStatus />
     </aside>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDueLabel } from "@/lib/format-due";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -73,7 +74,7 @@ export function TaskListItem({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] transition-colors hover:border-[var(--color-accent)]/60",
+        "flex items-center gap-3 nx-panel rounded-xl border border-[var(--color-border)] transition-colors hover:border-[var(--color-accent)]/60",
         compact ? "px-3 py-2" : "px-4 py-3"
       )}
     >
@@ -109,10 +110,8 @@ export function TaskListItem({
           </p>
         </button>
         {!compact && (task.due_date || task.due_time) && (
-          <p className="text-xs text-[var(--color-ink-muted)]">
-            {task.due_date}
-            {task.due_time ? ` · ${task.due_time}` : ""}
-            {task.due_time_end ? `–${task.due_time_end}` : ""}
+          <p className="font-mono-data text-[11.5px] text-[var(--color-ink-muted)]">
+            {formatDueLabel(task.due_date, task.due_time, task.due_time_end)}
           </p>
         )}
       </div>

@@ -80,7 +80,7 @@ export default async function ProjectDetailPage({
             <Folder className="h-5 w-5" style={{ color: projectData.color }} />
           </span>
           <div>
-            <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">{projectData.name}</h1>
+            <h1 className="font-display text-[26px] sm:text-[30px] font-semibold leading-tight text-[var(--color-ink)]">{projectData.name}</h1>
             {parentProject && (
               <Link
                 href={`/projetos/${parentProject.id}`}

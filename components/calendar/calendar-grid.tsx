@@ -73,8 +73,8 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
             <p className="text-sm text-[var(--color-ink-muted)]">Clica num dia para veres os detalhes aqui.</p>
           </div>
         ) : (
-          <div className="min-w-0 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <p className="truncate font-display text-sm font-semibold capitalize text-[var(--color-ink)]">
+          <div className="min-w-0 overflow-hidden nx-panel rounded-2xl border border-[var(--color-border)] p-4">
+            <p className="truncate font-display text-sm font-semibold first-letter:uppercase text-[var(--color-ink)]">
               {new Date(selectedDate + "T00:00:00").toLocaleDateString("pt-PT", {
                 weekday: "long",
                 day: "numeric",
@@ -117,7 +117,7 @@ export function CalendarGrid({ tasks }: { tasks: Task[] }) {
       {/* Grelha do calendário */}
       <div className="min-w-0 space-y-4 md:col-span-8">
         <div className="flex items-center justify-between">
-          <p className="font-display text-lg font-semibold capitalize text-[var(--color-ink)]">{monthLabel}</p>
+          <p className="font-display text-lg font-semibold first-letter:uppercase text-[var(--color-ink)]">{monthLabel}</p>
           <div className="flex gap-1">
             <Button
               variant="outline"
