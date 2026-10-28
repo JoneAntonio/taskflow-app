@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
-export const metadata: Metadata = { title: "Nova palavra-passe — JAFLOW" };
+export const metadata: Metadata = { title: "Nova palavra-passe — I.D.I.O.T.A." };
 
 export default function ResetPasswordPage() {
   return (

@@ -55,12 +55,12 @@ export async function POST(request: Request) {
   try {
     await sendEmail({
       to: profile.email,
-      subject: `${safeSenderName} mencionou-te no JAFLOW`,
+      subject: `${safeSenderName} mencionou-te no I.D.I.O.T.A.`,
       html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
         <h2 style="color:#14151b;">Foste mencionado</h2>
         <p style="color:#3a3a3a;font-size:14px;">${safeSenderName} escreveu:</p>
         <p style="color:#3a3a3a;font-size:14px;background:#f7f7f4;border-radius:8px;padding:12px;">${safeSnippet}</p>
-        <a href="${link}" style="display:inline-block;margin-top:12px;background:#f2a93b;color:#14151b;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;">Ver no JAFLOW</a>
+        <a href="${link}" style="display:inline-block;margin-top:12px;background:#f2a93b;color:#14151b;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;">Ver no I.D.I.O.T.A.</a>
       </div>`,
     });
     return NextResponse.json({ success: true });

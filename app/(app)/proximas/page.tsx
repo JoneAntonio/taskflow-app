@@ -4,7 +4,7 @@ import { getTodayISO } from "@/lib/server-date";
 import { ProximasView } from "@/components/tasks/proximas-view";
 import type { Task, Project } from "@/types/database";
 
-export const metadata: Metadata = { title: "Próximas — JAFLOW" };
+export const metadata: Metadata = { title: "Próximas — I.D.I.O.T.A." };
 
 function toISODate(date: Date) {
   return date.toISOString().slice(0, 10);

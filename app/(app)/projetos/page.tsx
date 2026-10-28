@@ -6,7 +6,7 @@ import { ProjectCard } from "@/components/projects/project-card";
 import { NewProjectButton } from "@/components/projects/new-project-button";
 import type { Project, Team } from "@/types/database";
 
-export const metadata: Metadata = { title: "Método SMART — JAFLOW" };
+export const metadata: Metadata = { title: "Método SMART — I.D.I.O.T.A." };
 
 export default async function ProjetosPage() {
   await requireSupervisor();

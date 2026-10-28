@@ -6,7 +6,7 @@ import { NewTagForm } from "@/components/tags/new-tag-form";
 import { TagCard } from "@/components/tags/tag-card";
 import type { Tag } from "@/types/database";
 
-export const metadata: Metadata = { title: "Etiquetas — JAFLOW" };
+export const metadata: Metadata = { title: "Etiquetas — I.D.I.O.T.A." };
 
 export default async function EtiquetasPage() {
   const supabase = await createClient();

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Folder, Tag as TagIcon } from "lucide-react";
 import type { Task, Project, Tag } from "@/types/database";
 
-export const metadata: Metadata = { title: "Pesquisa — JAFLOW" };
+export const metadata: Metadata = { title: "Pesquisa — I.D.I.O.T.A." };
 
 export default async function PesquisaPage({
   searchParams,

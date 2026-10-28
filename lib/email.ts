@@ -11,7 +11,7 @@ import { Resend } from "resend";
  * - RESEND_FROM_EMAIL: o endereço que aparece como remetente — para
  *   conseguires enviar a QUALQUER destinatário (não só a ti), precisas de
  *   verificar um domínio teu na Resend e usar um email desse domínio aqui
- *   (ex: "JAFLOW <notificacoes@oteudominio.com>"). Sem domínio verificado,
+ *   (ex: "I.D.I.O.T.A. <notificacoes@oteudominio.com>"). Sem domínio verificado,
  *   a Resend só entrega ao teu próprio email de signup (modo de teste).
  */
 export async function sendEmail(input: { to: string; subject: string; html: string }): Promise<void> {

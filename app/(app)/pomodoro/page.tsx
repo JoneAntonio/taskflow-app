@@ -5,7 +5,7 @@ import { PomodoroTimer } from "@/components/pomodoro/pomodoro-timer";
 import { AgendaTimeline } from "@/components/pomodoro/agenda-timeline";
 import type { Task } from "@/types/database";
 
-export const metadata: Metadata = { title: "Pomodoro — JAFLOW" };
+export const metadata: Metadata = { title: "Pomodoro — I.D.I.O.T.A." };
 
 export default async function PomodoroPage() {
   const supabase = await createClient();

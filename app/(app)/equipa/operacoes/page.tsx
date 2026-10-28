@@ -8,7 +8,7 @@ import { OperationStatsCard } from "@/components/team/operation-stats-card";
 import { getOperationColor } from "@/lib/operation-colors";
 import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 
-export const metadata: Metadata = { title: "Operações — JAFLOW" };
+export const metadata: Metadata = { title: "Operações — I.D.I.O.T.A." };
 
 export default async function OperacoesPage() {
   await requireSupervisor();

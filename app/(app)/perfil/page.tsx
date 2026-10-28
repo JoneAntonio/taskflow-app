@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import type { Team } from "@/types/database";
 
-export const metadata: Metadata = { title: "Perfil — JAFLOW" };
+export const metadata: Metadata = { title: "Perfil — I.D.I.O.T.A." };
 
 export default async function PerfilPage() {
   const supabase = await createClient();

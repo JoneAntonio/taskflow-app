@@ -4,7 +4,7 @@ import { InlineQuickAdd } from "@/components/tasks/inline-quick-add";
 import { TaskListWithModes } from "@/components/tasks/task-list-with-modes";
 import type { Task } from "@/types/database";
 
-export const metadata: Metadata = { title: "Inbox — JAFLOW" };
+export const metadata: Metadata = { title: "Inbox — I.D.I.O.T.A." };
 
 export default async function InboxPage() {
   const supabase = await createClient();

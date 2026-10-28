@@ -14,7 +14,7 @@ import { TaskListItem } from "@/components/tasks/task-list-item";
 import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-query";
 import type { Team, TeamMembership, TeamInvite, Task } from "@/types/database";
 
-export const metadata: Metadata = { title: "Equipa — JAFLOW" };
+export const metadata: Metadata = { title: "Equipa — I.D.I.O.T.A." };
 
 export default async function EquipaDetailPage({ params }: { params: Promise<{ teamId: string }> }) {
   const { teamId } = await params;

@@ -8,14 +8,14 @@ import { ServiceWorkerRegister } from "@/components/providers/service-worker-reg
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "JAFLOW Nexus — o teu centro de comando",
+  title: "I.D.I.O.T.A. — Inteligência Digital Integrada para Organização, Trabalho e Aprendizagem",
   description:
-    "JAFLOW é a aplicação de produtividade que junta tarefas, projetos, hábitos e foco num único lugar.",
+    "Inteligência Digital Integrada para Organização, Trabalho e Aprendizagem — tarefas, projetos, hábitos, foco e equipa num único lugar.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Nexus",
+    title: "I.D.I.O.T.A.",
   },
   icons: {
     icon: [

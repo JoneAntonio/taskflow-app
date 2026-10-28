@@ -16,7 +16,7 @@ import { ProjectForecastCard } from "@/components/projects/project-forecast-card
 import { ProjectTimelineChart } from "@/components/projects/project-timeline-chart";
 import type { Project, Task, Team } from "@/types/database";
 
-export const metadata: Metadata = { title: "Método SMART — JAFLOW" };
+export const metadata: Metadata = { title: "Método SMART — I.D.I.O.T.A." };
 
 export default async function ProjectDetailPage({
   params,

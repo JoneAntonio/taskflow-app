@@ -4,7 +4,7 @@ import { getTodayISO } from "@/lib/server-date";
 import { MatrixProjectFilter } from "@/components/eisenhower/matrix-project-filter";
 import type { Task, Project } from "@/types/database";
 
-export const metadata: Metadata = { title: "Matriz de Eisenhower — JAFLOW" };
+export const metadata: Metadata = { title: "Matriz de Eisenhower — I.D.I.O.T.A." };
 
 /**
  * Urgência é derivada da prioridade e da data: consideramos urgente uma

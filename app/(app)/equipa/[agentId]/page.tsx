@@ -17,7 +17,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DEFAULT_CRITERIA, MATURITY_DESCRIPTIONS } from "@/types/team-maturity";
 import type { MaturityCriterion, MaturityEvaluation, TeamAgent, AgentNote } from "@/types/team-maturity";
 
-export const metadata: Metadata = { title: "Agente — Maturidade da Equipa — JAFLOW" };
+export const metadata: Metadata = { title: "Agente — Maturidade da Equipa — I.D.I.O.T.A." };
 
 export default async function AgentDetailPage({
   params,

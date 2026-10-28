@@ -7,7 +7,7 @@ import { WeeklyProductivityChart } from "@/components/dashboard/weekly-productiv
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { CheckCircle2, TimerReset, Sparkles, TrendingUp } from "lucide-react";
 
-export const metadata: Metadata = { title: "Estatísticas — JAFLOW" };
+export const metadata: Metadata = { title: "Estatísticas — I.D.I.O.T.A." };
 
 export default async function EstatisticasPage() {
   const supabase = await createClient();

@@ -104,7 +104,7 @@ export function AcceptInviteForm() {
     return (
       <form onSubmit={handleSubmit(onSubmitPassword)} className="space-y-4" noValidate>
         <p className="text-sm text-[var(--color-ink-muted)]">
-          Foste convidado para uma equipa no JAFLOW. Define uma palavra-passe para criares a tua conta.
+          Foste convidado para uma equipa no I.D.I.O.T.A.. Define uma palavra-passe para criares a tua conta.
         </p>
         <div>
           <Label htmlFor="password">Palavra-passe</Label>

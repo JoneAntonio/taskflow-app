@@ -7,7 +7,7 @@ import { CriteriaManager } from "@/components/team/criteria-manager";
 import { DEFAULT_CRITERIA } from "@/types/team-maturity";
 import type { MaturityCriterion } from "@/types/team-maturity";
 
-export const metadata: Metadata = { title: "Critérios de avaliação — JAFLOW" };
+export const metadata: Metadata = { title: "Critérios de avaliação — I.D.I.O.T.A." };
 
 export default async function CriteriosPage() {
   await requireSupervisor();

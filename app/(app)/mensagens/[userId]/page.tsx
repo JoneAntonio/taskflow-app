@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { DmChatSection } from "@/components/chat/dm-chat-section";
 
-export const metadata: Metadata = { title: "Mensagens — JAFLOW" };
+export const metadata: Metadata = { title: "Mensagens — I.D.I.O.T.A." };
 
 export default async function MensagensPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;

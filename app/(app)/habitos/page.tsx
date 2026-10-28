@@ -7,7 +7,7 @@ import { HabitCard } from "@/components/habits/habit-card";
 import { calculateStreak } from "@/services/habits.service";
 import type { Habit, HabitLog } from "@/types/database";
 
-export const metadata: Metadata = { title: "Hábitos — JAFLOW" };
+export const metadata: Metadata = { title: "Hábitos — I.D.I.O.T.A." };
 
 export default async function HabitosPage() {
   const supabase = await createClient();

@@ -80,11 +80,9 @@ export function Sidebar({
     <aside className="nx-glass sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-[var(--color-border)] lg:flex">
       <div className="flex items-center gap-2.5 px-5 pb-5 pt-6">
         <NexusMark className="h-7 w-7" />
-        <div className="leading-none">
-          <span className="font-display text-[15px] font-semibold tracking-tight text-[var(--color-ink)]">JAFLOW</span>
-          <span className="ml-1.5 rounded border border-[var(--color-border)] px-1 py-px font-mono-data text-[9.5px] text-[var(--color-accent)]">
-            nexus
-          </span>
+        <div className="min-w-0 leading-none">
+          <span className="block font-display text-[15px] font-semibold tracking-[0.04em] text-[var(--color-ink)]">I.D.I.O.T.A.</span>
+          <span className="mt-1 block truncate font-mono-data text-[9.5px] text-[var(--color-accent)]">inteligência digital integrada</span>
         </div>
       </div>
 

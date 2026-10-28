@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NotesView } from "@/components/notes/notes-view";
 import type { Notebook, Note } from "@/types/database";
 
-export const metadata: Metadata = { title: "Notas — JAFLOW" };
+export const metadata: Metadata = { title: "Notas — I.D.I.O.T.A." };
 
 export default async function NotasPage() {
   const supabase = await createClient();

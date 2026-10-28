@@ -170,7 +170,7 @@ export const usePomodoroStore = create<PomodoroState>((set, get) => ({
       if (nextIndex >= plan.length) {
         toast.success("Pausa terminada — hora de retomar a atividade! 🔔", { duration: 8000 });
         if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-          new Notification("JAFLOW — Pomodoro", { body: "A pausa terminou. Hora de retomares a atividade." });
+          new Notification("I.D.I.O.T.A. — Pomodoro", { body: "A pausa terminou. Hora de retomares a atividade." });
         }
         const { intervalId } = get();
         if (intervalId) clearInterval(intervalId);

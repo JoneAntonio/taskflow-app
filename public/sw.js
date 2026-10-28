@@ -1,4 +1,4 @@
-// Service worker mínimo do JAFLOW.
+// Service worker mínimo do I.D.I.O.T.A..
 // Por agora só regista a app como "instalável"; cache offline pode ser
 // adicionado depois se for preciso (ex: com a biblioteca Workbox).
 self.addEventListener("install", () => {
@@ -13,7 +13,7 @@ self.addEventListener("fetch", () => {
   // Passa tudo diretamente à rede por agora (sem cache offline ainda).
 });
 
-// Recebe uma notificação push real, enviada pelo servidor do JAFLOW, e
+// Recebe uma notificação push real, enviada pelo servidor do I.D.I.O.T.A., e
 // mostra-a mesmo que este separador esteja fechado.
 self.addEventListener("push", (event) => {
   if (!event.data) return;
@@ -21,11 +21,11 @@ self.addEventListener("push", (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: "JAFLOW", body: event.data.text() };
+    payload = { title: "I.D.I.O.T.A.", body: event.data.text() };
   }
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || "JAFLOW Nexus", {
+    self.registration.showNotification(payload.title || "I.D.I.O.T.A.", {
       body: payload.body || "",
       icon: "/icons/icon-192.png",
       badge: "/icons/badge-96.png",

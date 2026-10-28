@@ -4,7 +4,7 @@ export const emailNotificationsService = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        subject: "Teste de notificação — JAFLOW",
+        subject: "Teste de notificação — I.D.I.O.T.A.",
         message: "Este é um email de teste. Se o recebeste, o envio de emails está a funcionar corretamente.",
       }),
     });

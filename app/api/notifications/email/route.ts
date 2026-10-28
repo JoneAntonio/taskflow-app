@@ -40,10 +40,10 @@ export async function POST(request: Request) {
   try {
     await sendEmail({
       to,
-      subject: body.subject ?? "JAFLOW",
+      subject: body.subject ?? "I.D.I.O.T.A.",
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-          <h2 style="color: #14151b;">JAFLOW</h2>
+          <h2 style="color: #14151b;">I.D.I.O.T.A.</h2>
           <p style="color: #3a3a3a; font-size: 15px; line-height: 1.6;">${escapeHtml(body.message ?? "")}</p>
         </div>
       `,

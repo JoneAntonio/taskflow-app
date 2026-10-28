@@ -1,5 +1,5 @@
 /**
- * Campo orbital do JAFLOW Nexus — o mesmo fundo do ecrã de início de sessão
+ * Campo orbital do I.D.I.O.T.A. — o mesmo fundo do ecrã de início de sessão
  * (núcleo luminoso, órbitas animadas e grelha técnica), partilhado pelo login
  * e por todas as páginas da app.
  */

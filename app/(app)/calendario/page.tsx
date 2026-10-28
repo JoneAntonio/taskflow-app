@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CalendarGrid } from "@/components/calendar/calendar-grid";
 import type { Task } from "@/types/database";
 
-export const metadata: Metadata = { title: "Calendário — JAFLOW" };
+export const metadata: Metadata = { title: "Calendário — I.D.I.O.T.A." };
 
 export default async function CalendarioPage() {
   const supabase = await createClient();

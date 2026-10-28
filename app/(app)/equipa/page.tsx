@@ -10,7 +10,7 @@ import { AIInsightCard } from "@/components/team/ai-insight-card";
 import { getOperationColor } from "@/lib/operation-colors";
 import type { TeamAgent, TeamOperation } from "@/types/team-maturity";
 
-export const metadata: Metadata = { title: "Maturidade da Equipa — JAFLOW" };
+export const metadata: Metadata = { title: "Maturidade da Equipa — I.D.I.O.T.A." };
 
 export default async function EquipaPage() {
   await requireSupervisor();

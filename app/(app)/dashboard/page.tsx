@@ -15,7 +15,7 @@ import { TaskListItem } from "@/components/tasks/task-list-item";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { Project } from "@/types/database";
 
-export const metadata: Metadata = { title: "Dashboard — JAFLOW" };
+export const metadata: Metadata = { title: "Dashboard — I.D.I.O.T.A." };
 
 export default async function DashboardPage() {
   const supabase = await createClient();

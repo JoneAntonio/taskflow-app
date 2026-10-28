@@ -75,7 +75,7 @@ export async function GET(request: Request) {
         try {
           await sendEmail({
             to: admin.profile.email,
-            subject: `JAFLOW — Objetivos SMART da equipa ${team.name} esta semana`,
+            subject: `I.D.I.O.T.A. — Objetivos SMART da equipa ${team.name} esta semana`,
             html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
               <h2 style="color:#14151b;">Objetivos SMART — ${safeTeamName}</h2>
               <p style="color:#3a3a3a;font-size:14px;">Estes são os objetivos que podem precisar de uma atualização de estado esta semana:</p>

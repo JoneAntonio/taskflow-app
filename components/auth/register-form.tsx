@@ -43,7 +43,7 @@ export function RegisterForm() {
       <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-5 text-sm text-[var(--color-ink)]">
         <p className="font-medium">Confirma o teu email</p>
         <p className="mt-1 text-[var(--color-ink-muted)]">
-          Enviámos um link de confirmação. Abre-o para ativares a tua conta JAFLOW.
+          Enviámos um link de confirmação. Abre-o para ativares a tua conta I.D.I.O.T.A..
         </p>
       </div>
     );

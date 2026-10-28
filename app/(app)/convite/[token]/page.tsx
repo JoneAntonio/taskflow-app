@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AcceptLinkInviteButton } from "@/components/teams/accept-link-invite-button";
 import type { TeamInvite } from "@/types/database";
 
-export const metadata: Metadata = { title: "Convite — JAFLOW" };
+export const metadata: Metadata = { title: "Convite — I.D.I.O.T.A." };
 
 function isExpired(expiresAt: string | null, now: Date): boolean {
   if (!expiresAt) return false;

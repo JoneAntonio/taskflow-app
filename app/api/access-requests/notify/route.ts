@@ -45,10 +45,10 @@ export async function POST(request: Request) {
       try {
         await sendEmail({
           to: platformAdmin.email,
-          subject: "JAFLOW — Pedido de acesso de Supervisor",
+          subject: "I.D.I.O.T.A. — Pedido de acesso de Supervisor",
           html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
             <h2 style="color:#14151b;">Pedido de acesso</h2>
-            <p style="color:#3a3a3a;font-size:14px;">${requesterName} pediu para se tornar Supervisor no JAFLOW.</p>
+            <p style="color:#3a3a3a;font-size:14px;">${requesterName} pediu para se tornar Supervisor no I.D.I.O.T.A..</p>
             <a href="${origin}/perfil" style="display:inline-block;margin-top:12px;background:#f2a93b;color:#14151b;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;">Rever pedidos</a>
           </div>`,
         });

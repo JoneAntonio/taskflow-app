@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { RegisterForm } from "@/components/auth/register-form";
 
-export const metadata: Metadata = { title: "Criar conta — JAFLOW" };
+export const metadata: Metadata = { title: "Criar conta — I.D.I.O.T.A." };
 
 export default function RegisterPage() {
   return (

@@ -32,7 +32,7 @@ export function InstallAppPrompt() {
 
   return (
     <div className="fixed bottom-20 left-4 z-30 flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] py-2 pl-4 pr-2 shadow-[var(--shadow-lg)] lg:bottom-4">
-      <span className="text-sm text-[var(--color-ink)]">Instalar o JAFLOW como app?</span>
+      <span className="text-sm text-[var(--color-ink)]">Instalar o I.D.I.O.T.A. como app?</span>
       <button
         onClick={handleInstall}
         className="flex items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-3 py-1.5 text-xs font-semibold text-[var(--color-accent-ink)]"

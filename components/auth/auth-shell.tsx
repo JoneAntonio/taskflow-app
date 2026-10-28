@@ -36,14 +36,16 @@ export function AuthShell({
 
         <div className="relative flex items-center gap-2.5">
           <NexusMark className="h-8 w-8" />
-          <span className="font-display text-lg font-semibold tracking-tight">JAFLOW</span>
-          <span className="rounded border border-[#1b2436] px-1.5 py-px font-mono-data text-[10px] text-[#3dd9ff]">nexus</span>
+          <span className="font-display text-lg font-semibold tracking-[0.04em]">I.D.I.O.T.A.</span>
         </div>
 
         <div className="relative max-w-md">
           <h2 className="font-display text-[44px] font-semibold leading-[1.02] tracking-[-0.04em]">
             O teu centro de comando para trabalho, estudo e vida.
           </h2>
+          <p className="mt-4 font-mono-data text-[12px] leading-relaxed text-[#3dd9ff]">
+            Inteligência Digital Integrada para Organização, Trabalho e Aprendizagem
+          </p>
           <dl className="mt-10 space-y-3">
             {SIGNALS.map((s) => (
               <div key={s.k} className="flex items-baseline gap-4 border-t border-[#1b2436] pt-3">
@@ -55,7 +57,7 @@ export function AuthShell({
         </div>
 
         <p className="relative flex items-center gap-2 font-mono-data text-[11px] text-[#5e6a85]">
-          <span className="nx-live-dot" /> sistema operacional · © {new Date().getFullYear()} JAFLOW
+          <span className="nx-live-dot" /> sistema operacional · © {new Date().getFullYear()} I.D.I.O.T.A.
         </p>
       </div>
 
@@ -64,8 +66,7 @@ export function AuthShell({
         <div className="w-full max-w-sm">
           <div className="mb-10 flex items-center gap-2.5 lg:hidden">
             <NexusMark className="h-8 w-8" />
-            <span className="font-display text-lg font-semibold tracking-tight text-[var(--color-ink)]">JAFLOW</span>
-            <span className="rounded border border-[var(--color-border)] px-1.5 py-px font-mono-data text-[10px] text-[var(--color-accent)]">nexus</span>
+            <span className="font-display text-lg font-semibold tracking-[0.04em] text-[var(--color-ink)]">I.D.I.O.T.A.</span>
           </div>
           <h1 className="font-display text-[28px] font-semibold leading-tight text-[var(--color-ink)]">{title}</h1>
           <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{subtitle}</p>

@@ -1,7 +1,7 @@
 {
-  "name": "JAFLOW Nexus",
-  "short_name": "Nexus",
-  "description": "Centro de comando para tarefas, projetos, hábitos, foco e equipa — com alertas à hora certa.",
+  "name": "I.D.I.O.T.A. — Inteligência Digital Integrada",
+  "short_name": "I.D.I.O.T.A.",
+  "description": "Inteligência Digital Integrada para Organização, Trabalho e Aprendizagem — tarefas, projetos, hábitos, foco e equipa, com alertas à hora certa.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

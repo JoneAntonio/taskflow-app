@@ -7,7 +7,7 @@ import { AutoOpenTaskFromQuery } from "@/components/tasks/auto-open-task-from-qu
 import { HojeView } from "@/components/tasks/hoje-view";
 import type { Task } from "@/types/database";
 
-export const metadata: Metadata = { title: "Hoje — JAFLOW" };
+export const metadata: Metadata = { title: "Hoje — I.D.I.O.T.A." };
 
 export default async function HojePage() {
   const supabase = await createClient();

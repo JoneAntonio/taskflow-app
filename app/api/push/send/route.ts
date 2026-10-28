@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     .eq("user_id", targetUserId);
 
   const payload = JSON.stringify({
-    title: body.title ?? "JAFLOW",
+    title: body.title ?? "I.D.I.O.T.A.",
     body: body.body ?? "",
     url: body.url ?? "/dashboard",
   });
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         action: "relay",
         userId: targetUserId,
-        title: body.title ?? "JAFLOW",
+        title: body.title ?? "I.D.I.O.T.A.",
         body: body.body ?? "",
         url: body.url ?? "/dashboard",
       }),

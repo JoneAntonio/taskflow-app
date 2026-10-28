@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NewTeamButton } from "@/components/teams/new-team-button";
 import type { Team } from "@/types/database";
 
-export const metadata: Metadata = { title: "Equipas — JAFLOW" };
+export const metadata: Metadata = { title: "Equipas — I.D.I.O.T.A." };
 
 export default async function EquipasPage() {
   const supabase = await createClient();
